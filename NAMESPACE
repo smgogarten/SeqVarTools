@@ -1,0 +1,29 @@
+import(methods)
+import(SeqArray)
+import(IRanges)
+import(GenomicRanges)
+importFrom(GWASExactHW, HWExact)
+
+exportMethods(applyMethod,
+              refChar,
+              altChar,
+              nAlleles,
+              isVariant,
+              isSNV,
+              getGenotype,
+              getGenotypeAlleles,
+              refDosage,
+              getVariableLengthData,
+              titv,
+              alleleFrequency,
+              missingGenotypeRate,
+              heterozygosity,
+              homozygosity,
+              pca,
+              hwe,
+              inbreedCoeff,
+              meanBySample,
+              mendelErr,
+              duplicateDiscordance)
+
+export(setVariantID)

@@ -1,0 +1,307 @@
+%\VignetteIndexEntry{Introduction to SeqVarTools}
+%\VignetteDepends{SeqVarTools}
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{Sweave}
+\usepackage{amsmath}  
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage[pdftex,plainpages=false, letterpaper, bookmarks, bookmarksnumbered, colorlinks, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue]{hyperref}
+
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rcode}[1]{{\texttt{#1}}}
+
+\begin{document}
+
+\title{Introduction to SeqVarTools}
+\author{Stephanie M. Gogarten}
+
+\maketitle
+\tableofcontents
+
+\SweaveOpts{keep.source=TRUE, eps=FALSE} 
+
+\section{Introduction}
+
+\Rpackage{SeqArray} provides an alternative to the Variant Call
+Format (VCF) for storage of variants called from sequencing data,
+enabling efficient storage, fast access to subsets of the data, and
+rapid computation.
+
+\Rpackage{SeqVarTools} provides an interface to the \Rpackage{SeqArray} storage
+format with tools for many common tasks in variant analysis.
+
+It is highly recommended to read the vignette in \Rpackage{SeqArray}
+in addition to this document to understand the data structure
+and full array of features.
+  
+
+\section{Converting a Variant Call Format (VCF) file}
+
+To work with \Rpackage{SeqVarTools}, we must first convert a VCF file
+into the \Rpackage{SeqArray} GDS format.  All information in the VCF
+file is preserved in the resulting GDS file.
+<<>>=
+library(SeqVarTools)
+vcffile <- seqExampleFileName("vcf")
+gdsfile <- "tmp.gds"
+seqVCF2GDS(vcffile, gdsfile, verbose=FALSE)
+gds <- seqOpen(gdsfile)
+gds
+@ 
+
+We can look at some basic information in this file, such as the
+reference and alternate alleles.
+<<>>=
+ref(gds)
+head(refChar(gds))
+alt(gds)
+head(altChar(gds))
+@ 
+
+How many alleles are there for each variant?
+<<>>=
+table(nAlleles(gds))
+@
+
+Two variants have 3 alleles (1 REF and 2 ALT).  We can extract the
+second alterate allele for these variants by using the argument
+\Rcode{n=2} to \Rcode{altChar}.
+<<>>=
+multi.allelic <- which(nAlleles(gds) > 2)
+altChar(gds)[multi.allelic]
+altChar(gds, n=1)[multi.allelic]
+altChar(gds, n=2)[multi.allelic]
+@
+
+These two sites have three alleles, two are each single nucleotides and the third is a dinucleotide, representing an indel.
+<<>>=
+table(isSNV(gds))
+isSNV(gds)[multi.allelic]
+@ 
+
+Chromosome and position can be accessed as vectors or as a
+\Rcode{GRanges} object.
+<<>>=
+head(seqGetData(gds, "chromosome"))
+head(seqGetData(gds, "position"))
+granges(gds)
+@ 
+
+We can also find the sample and variant IDs.
+<<>>=
+head(seqGetData(gds, "sample.id"))
+head(seqGetData(gds, "variant.id"))
+@ 
+
+The variant IDs are sequential integers created by \Rcode{seqVCF2GDS}.
+We may wish to rename them to something more useful.  Note the
+``annotation/'' prefix required to retrive the ``id'' variable.  We
+need to confirm that the new IDs are unique (which is not always the
+case for the ``annotation/id'' field).
+<<>>=
+rsID <- seqGetData(gds, "annotation/id")
+head(rsID)
+length(unique(rsID)) == length(rsID)
+@ 
+
+Renaming the variant IDs requires modifying the GDS file, so we have
+to close it first.
+<<>>=
+seqClose(gds)
+setVariantID(gdsfile, rsID)
+gds <- seqOpen(gdsfile)
+head(seqGetData(gds, "variant.id"))
+@ 
+
+Note that using character strings for variant.id instead of integers
+may decrease performance for large datasets.
+
+\Rcode{getGenotype} transforms the genotypes from the internal storage
+format to VCF-like character strings.
+<<>>=
+geno <- getGenotype(gds)
+dim(geno)
+geno[1:10, 1:5]
+@ 
+
+\Rcode{getGenotypeAlleles} returns the nucleotides instead of integers.
+<<>>=
+geno <- getGenotypeAlleles(gds)
+geno[1:10, 1:5]
+@ 
+
+
+\section{Applying methods to subsets of data}
+
+If a dataset is large, we may want to work with subsets of the data at
+one time.
+We can use \Rcode{applyMethod} to select a subset of variants and/or
+samples.  \Rcode{applyMethod} is essentially a wrapper for
+\Rcode{seqSetFilter} that enables us to apply a method or function to
+a data subset in one line.  If it is desired to use the same filter
+multiple times, it may be more efficient to set the filter once
+instead of using \Rcode{applyMethod}.
+<<>>=
+samp.id <- seqGetData(gds, "sample.id")[1:10]
+var.id <- seqGetData(gds, "variant.id")[1:5]
+applyMethod(gds, getGenotype, variant=var.id, sample=samp.id)
+@ 
+
+As an alternative to specifying variant ids, we can use a GRanges
+object to select a range on chromosome 22.  This feature is not available in \Rcode{seqSetFilter}.
+<<>>=
+library(GenomicRanges)
+gr <- GRanges(seqnames="22", IRanges(start=1, end=250000000))
+geno <- applyMethod(gds, getGenotype, variant=gr)
+dim(geno)
+@ 
+
+
+\section{Examples}
+
+\subsection{Transition/transversion ratio}
+
+The transition/transversion ratio (TiTv) is frequently used as a
+quality metric.  We can calculate TiTv over the entire dataset or by sample.
+<<>>=
+titv(gds)
+head(titv(gds, by.sample=TRUE))
+@ 
+
+Alternatively, we can plot TiTv binned by various metrics
+(allele frequency, missing rate, depth) to assess variant quality.
+We need the ids of the variants that fall in each bin.
+<<>>=
+binVar <- function(var, names, breaks) {
+  names(var) <- names
+  var <- sort(var)
+  mids <- breaks[1:length(breaks)-1] + 
+    (breaks[2:length(breaks)] - breaks[1:length(breaks)-1])/2
+  bins <- cut(var, breaks, labels=mids, right=FALSE)
+  split(names(var), bins)
+}
+@ 
+
+<<fig=TRUE>>=
+variant.id <- seqGetData(gds, "variant.id")
+afreq <- alleleFrequency(gds)
+maf <- pmin(afreq, 1-afreq)
+maf.bins <- binVar(maf, variant.id, seq(0,0.5,0.02))
+nbins <- length(maf.bins)
+titv.maf <- rep(NA, nbins)
+for (i in 1:nbins) {
+  capture.output(titv.maf[i] <- applyMethod(gds, titv, variant=maf.bins[[i]]))
+}
+plot(as.numeric(names(maf.bins)), titv.maf, xlab="MAF", ylab="TiTv")
+@ 
+
+<<fig=TRUE>>= 
+miss <- missingGenotypeRate(gds)
+miss.bins <- binVar(miss, variant.id, c(seq(0,0.5,0.05),1))
+nbins <- length(miss.bins)
+titv.miss <- rep(NA, nbins)
+for (i in 1:nbins) {
+  capture.output(titv.miss[i] <- applyMethod(gds, titv, variant=miss.bins[[i]]))
+}
+plot(as.numeric(names(miss.bins)), titv.miss, xlab="missing rate", ylab="TiTv")
+@ 
+
+<<fig=TRUE>>=
+depth <- seqApply(gds, "annotation/format/DP", mean, margin="by.variant", 
+                  as.is="double", na.rm=TRUE)
+depth.bins <- binVar(depth, variant.id, seq(0,200,20))
+nbins <- length(depth.bins)
+titv.depth <- rep(NA, nbins)
+for (i in 1:nbins) {
+  capture.output(titv.depth[i] <- applyMethod(gds, titv, variant=depth.bins[[i]]))
+}
+plot(as.numeric(names(depth.bins)), titv.depth, xlab="mean depth", ylab="TiTv")
+@ 
+
+\subsection{Heterozygosity}
+We will calculate the ratio of heterozygotes to non-reference
+homozygotes by sample.  First, we filter the data to exclude any
+variants with missing rate $<0.1$ or heterozygosity$>0.6$\%.
+<<>>=
+miss.var <- missingGenotypeRate(gds, margin="by.variant")
+het.var <- heterozygosity(gds, margin="by.variant")
+filt <- seqGetData(gds, "variant.id")[miss.var <= 0.1 & het.var <= 0.6]
+@
+
+We calculate the heterozygosity and homozyogity by sample, using only
+the variants selected above.  Since we want to use the same variant
+filter for both methods, we set it once using \Rcode{seqSetFilter} and
+reset at the end.
+<<fig=TRUE>>=
+seqSetFilter(gds, variant.id=filt)
+het <- heterozygosity(gds, margin="by.sample")
+homnr <- homozygosity(gds, margin="by.sample", allele="alt")
+hethom <- het / homnr
+hist(hethom, main="", xlab="Het/Hom Non-Ref")
+seqSetFilter(gds)
+@ 
+
+
+\subsection{Principal Component Analysis}
+We can do Principal Component Analysis (PCA) to separate subjects by
+ancestry.  All the samples in the example file are CEU, so we expect
+to see only one cluster.
+<<fig=TRUE>>=
+pc <- pca(gds)
+names(pc)
+plot(pc$eigenvect[,1], pc$eigenvect[,2])
+@ 
+
+
+\subsection{Hardy-Weinberg Equilibrium}
+We can test for deviations from Hardy-Weinberg Equilibrium (HWE),
+which can reveal variants of low quality.
+<<fig=TRUE>>=
+pval <- hwe(gds)
+pval <- -log10(sort(pval))
+n <- length(pval)
+a <- 1:n
+b <- a/n
+x <- -log10(b)
+plot(x, pval, xlab="-log10(expected P)", ylab="-log10(observed P)")	
+abline(0,1,col="red")
+@ 
+
+The inbreeding coefficient can also be used as a quality metric.  For
+variants, this is 1 - observed heterozygosity / expected heterozygosity.
+<<fig=TRUE>>=
+f <- inbreedCoeff(gds, margin="by.variant")
+hist(f)
+@ 
+
+We can also calculate the inbreeding coefficient by sample.
+<<>>=
+ic <- inbreedCoeff(gds, margin="by.sample")
+range(ic)
+@ 
+
+
+\subsection{Mendelian errors}
+Checking for Mendelian errors is another way to assess
+variant quality.  The example data contains a trio (child, mother, and
+father).
+<<>>=
+data(pedigree)
+pedigree[pedigree$family == 1463,]
+err <- mendelErr(gds, pedigree, verbose=FALSE)
+table(err$by.variant)
+err$by.trio
+@ 
+
+The example data do not have any Mendelian errors.
+
+<<>>=
+seqClose(gds)
+@ 
+
+<<echo=FALSE, results=hide>>=
+unlink(gdsfile)
+@ 
+
+\end{document}
