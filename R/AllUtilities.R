@@ -1,8 +1,8 @@
 
 .applyMethod <- function(gdsobj, FUN, variant.id=NULL, sample.id=NULL, ...) {
-  seqSetFilter(gdsobj, sample.id=sample.id, variant.id=variant.id)
+  seqSetFilter(gdsobj, sample.id=sample.id, variant.id=variant.id, action="push")
   result <- FUN(gdsobj, ...)
-  seqSetFilter(gdsobj, verbose=FALSE)
+  seqSetFilter(gdsobj, action="pop", verbose=FALSE)
   result
 }
 

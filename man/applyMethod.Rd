@@ -31,6 +31,9 @@
   \code{applyMethod} applies a method or function \code{FUN} to the
   subset of variants defined by \code{variant} and samples defined by
   \code{sample} in a GDS object.
+
+  If a filter was previously set with \code{\link{seqSetFilter}}, it
+  will be saved and reset after the call to \code{applyMethod}.
 }
 
 \value{

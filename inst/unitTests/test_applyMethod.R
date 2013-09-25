@@ -49,3 +49,15 @@ test_applyMethod_missing <- function() {
                  applyMethod(gds, seqGetData, var.name="variant.id"))
   seqClose(gds)
 }
+
+test_applyMethod_pushpop <- function() {
+  gds <- seqOpen(seqExampleFileName("gds"))
+  sample.id <- seqGetData(gds, "sample.id")
+  seqSetFilter(gds, sample.id=sample.id[1:5], variant.id=1:10)
+  samp.orig <- seqGetData(gds, "sample.id")
+  var.orig <- seqGetData(gds, "variant.id")
+  applyMethod(gds, print, sample=sample.id[6:10], variant=11:20)
+  checkIdentical(samp.orig, seqGetData(gds, "sample.id"))
+  checkIdentical(var.orig, seqGetData(gds, "variant.id"))
+  seqClose(gds)
+}
