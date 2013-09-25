@@ -39,17 +39,18 @@
     SeqArray:::.altAllele(x)
   } else {
     ## if n>0, return nth ALT allele
-    unlist(lapply(strsplit(x, ",", fixed=TRUE), function(x) x[n+1]))
+    unlist(lapply(strsplit(x, ",", fixed=TRUE), function(x) x[n+1]),
+           use.names=FALSE)
   }
 }
 
 .parseNumAlleles <- function(x) {
-  unlist(lapply(strsplit(x, ",", fixed=TRUE), length))
+  unlist(lapply(strsplit(x, ",", fixed=TRUE), length), use.names=FALSE)
 }
 
 .maxAlleleLength <- function(x) {
   a <- gregexpr("[ACGT]+", x)
-  unlist(lapply(a, function(y) max(attr(y, "match.length"))))
+  unlist(lapply(a, function(y) max(attr(y, "match.length"))), use.names=FALSE)
 }
   
 .isTransition <- function(ref, alt) {
@@ -60,35 +61,4 @@
 .isTransversion <- function(ref, alt) {
   (ref %in% c("C","T") & alt %in% c("A","G")) |
   (ref %in% c("A","G") & alt %in% c("C","T"))
-}
-
-.parseVariableLength <- function(x) {
-  if (all(x$length == 1)) {
-    x$data
-  } else {
-    var <- array(dim=c(max(x$length), nrow(x$data), length(x$length)))
-
-    ## assign each element of length to an index of first array dimension
-    n.ind <- rep(NA, ncol(x$data))
-    j <- 1
-    for (i in 1:length(x$length)) {
-      len <- x$length[i]
-      if (len > 0) {
-        n.ind[j:(j + len - 1)] <- 1:len
-        j <- j + len
-      }
-    }
-
-    ## for each index of first array dimension, get values
-    for (n in 1:dim(var)[1]) {
-      var.ind <- which(x$length >= n)
-      var[n,,var.ind] <- x$data[,n.ind == n]
-    }
-
-    ## if first array dimension is 1, simplify to a matrix
-    if (dim(var)[1] == 1) {
-      var <- var[1,,]
-    }
-    var
-  }
 }
