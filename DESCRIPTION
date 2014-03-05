@@ -1,5 +1,5 @@
 Package: SeqVarTools
-Version: 1.1.1
+Version: 1.1.2
 Type: Package
 Title: Tools for variant data
 Description: An interface to the fast-access storage format for VCF
@@ -13,4 +13,4 @@ Imports: methods, GenomicRanges, IRanges, GWASExactHW
 Suggests: BiocGenerics, RUnit
 License: GPL-3
 LazyData: yes
-biocViews: SNP, GeneticVariability, Sequencing, Sequencing, Genetics
+biocViews: SNP, GeneticVariability, Sequencing, Genetics
