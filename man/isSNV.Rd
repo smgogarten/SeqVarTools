@@ -7,11 +7,11 @@
 \description{Flag single nucleotide variants}
 
 \usage{
-\S4method{isSNV}{SeqVarGDSClass}(gdsobj, biallelic=TRUE)
+\S4method{isSNV}{SeqVarGDSClass}(x, biallelic=TRUE)
 }
 
 \arguments{
-  \item{gdsobj}{A \code{\link{SeqVarGDSClass}} object with VCF data.}
+  \item{x}{A \code{\link{SeqVarGDSClass}} object with VCF data.}
   \item{biallelic}{A logical indicating whether only biallelic SNVs are considered.}
 }
 

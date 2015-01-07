@@ -1,8 +1,12 @@
 import(methods)
+import(gdsfmt)
 import(SeqArray)
+import(S4Vectors)
 import(IRanges)
 import(GenomicRanges)
 importFrom(GWASExactHW, HWExact)
+
+importMethodsFrom(VariantAnnotation, isSNV)
 
 exportMethods(applyMethod,
               refChar,

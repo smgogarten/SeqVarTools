@@ -58,8 +58,8 @@ setMethod("isVariant",
  
 setMethod("isSNV",
           "SeqVarGDSClass",
-          function(gdsobj, biallelic=TRUE) {
-            a <- seqGetData(gdsobj, "allele")
+          function(x, biallelic=TRUE) {
+            a <- seqGetData(x, "allele")
             if (biallelic) {
               nchar(a) == 3
             } else {
