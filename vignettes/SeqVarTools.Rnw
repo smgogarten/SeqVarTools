@@ -1,15 +1,10 @@
 %\VignetteIndexEntry{Introduction to SeqVarTools}
 %\VignetteDepends{SeqVarTools}
 \documentclass[11pt]{article}
-\usepackage{fullpage}
-\usepackage{Sweave}
-\usepackage{amsmath}  
-\usepackage{graphicx}
-\usepackage[utf8]{inputenc}
-\usepackage[pdftex,plainpages=false, letterpaper, bookmarks, bookmarksnumbered, colorlinks, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue]{hyperref}
 
-\newcommand{\Rpackage}[1]{{\textit{#1}}}
-\newcommand{\Rcode}[1]{{\texttt{#1}}}
+<<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
+BiocStyle::latex()
+@
 
 \begin{document}
 
@@ -19,27 +14,25 @@
 \maketitle
 \tableofcontents
 
-\SweaveOpts{keep.source=TRUE, eps=FALSE} 
-
 \section{Introduction}
 
-\Rpackage{SeqArray} provides an alternative to the Variant Call
+\Biocpkg{SeqArray} provides an alternative to the Variant Call
 Format (VCF) for storage of variants called from sequencing data,
 enabling efficient storage, fast access to subsets of the data, and
 rapid computation.
 
-\Rpackage{SeqVarTools} provides an interface to the \Rpackage{SeqArray} storage
+\Biocpkg{SeqVarTools} provides an interface to the \Biocpkg{SeqArray} storage
 format with tools for many common tasks in variant analysis.
 
-It is highly recommended to read the vignette in \Rpackage{SeqArray}
+It is highly recommended to read the vignette in \Biocpkg{SeqArray}
 in addition to this document to understand the data structure
 and full array of features.
   
 
 \section{Converting a Variant Call Format (VCF) file}
 
-To work with \Rpackage{SeqVarTools}, we must first convert a VCF file
-into the \Rpackage{SeqArray} GDS format.  All information in the VCF
+To work with \Biocpkg{SeqVarTools}, we must first convert a VCF file
+into the \Biocpkg{SeqArray} GDS format.  All information in the VCF
 file is preserved in the resulting GDS file.
 <<>>=
 library(SeqVarTools)
@@ -66,7 +59,7 @@ table(nAlleles(gds))
 
 Two variants have 3 alleles (1 REF and 2 ALT).  We can extract the
 second alterate allele for these variants by using the argument
-\Rcode{n=2} to \Rcode{altChar}.
+\Rcode{n=2} to \Rfunction{altChar}.
 <<>>=
 multi.allelic <- which(nAlleles(gds) > 2)
 altChar(gds)[multi.allelic]
@@ -81,7 +74,7 @@ isSNV(gds)[multi.allelic]
 @ 
 
 Chromosome and position can be accessed as vectors or as a
-\Rcode{GRanges} object.
+\Rclass{GRanges} object.
 <<>>=
 head(seqGetData(gds, "chromosome"))
 head(seqGetData(gds, "position"))
@@ -94,7 +87,7 @@ head(seqGetData(gds, "sample.id"))
 head(seqGetData(gds, "variant.id"))
 @ 
 
-The variant IDs are sequential integers created by \Rcode{seqVCF2GDS}.
+The variant IDs are sequential integers created by \Rfunction{seqVCF2GDS}.
 We may wish to rename them to something more useful.  Note the
 ``annotation/'' prefix required to retrive the ``id'' variable.  We
 need to confirm that the new IDs are unique (which is not always the
@@ -117,7 +110,7 @@ head(seqGetData(gds, "variant.id"))
 Note that using character strings for variant.id instead of integers
 may decrease performance for large datasets.
 
-\Rcode{getGenotype} transforms the genotypes from the internal storage
+\Rfunction{getGenotype} transforms the genotypes from the internal storage
 format to VCF-like character strings.
 <<>>=
 geno <- getGenotype(gds)
@@ -125,7 +118,7 @@ dim(geno)
 geno[1:10, 1:5]
 @ 
 
-\Rcode{getGenotypeAlleles} returns the nucleotides instead of integers.
+\Rfunction{getGenotypeAlleles} returns the nucleotides instead of integers.
 <<>>=
 geno <- getGenotypeAlleles(gds)
 geno[1:10, 1:5]
@@ -136,12 +129,12 @@ geno[1:10, 1:5]
 
 If a dataset is large, we may want to work with subsets of the data at
 one time.
-We can use \Rcode{applyMethod} to select a subset of variants and/or
-samples.  \Rcode{applyMethod} is essentially a wrapper for
-\Rcode{seqSetFilter} that enables us to apply a method or function to
+We can use \Rfunction{applyMethod} to select a subset of variants and/or
+samples.  \Rfunction{applyMethod} is essentially a wrapper for
+\Rfunction{seqSetFilter} that enables us to apply a method or function to
 a data subset in one line.  If it is desired to use the same filter
 multiple times, it may be more efficient to set the filter once
-instead of using \Rcode{applyMethod}.
+instead of using \Rfunction{applyMethod}.
 <<>>=
 samp.id <- seqGetData(gds, "sample.id")[1:10]
 var.id <- seqGetData(gds, "variant.id")[1:5]
@@ -149,7 +142,7 @@ applyMethod(gds, getGenotype, variant=var.id, sample=samp.id)
 @ 
 
 As an alternative to specifying variant ids, we can use a GRanges
-object to select a range on chromosome 22.  This feature is not available in \Rcode{seqSetFilter}.
+object to select a range on chromosome 22.  This feature is not available in \Rfunction{seqSetFilter}.
 <<>>=
 library(GenomicRanges)
 gr <- GRanges(seqnames="22", IRanges(start=1, end=250000000))
@@ -231,7 +224,7 @@ filt <- seqGetData(gds, "variant.id")[miss.var <= 0.1 & het.var <= 0.6]
 
 We calculate the heterozygosity and homozyogity by sample, using only
 the variants selected above.  Since we want to use the same variant
-filter for both methods, we set it once using \Rcode{seqSetFilter} and
+filter for both methods, we set it once using \Rfunction{seqSetFilter} and
 reset at the end.
 <<fig=TRUE>>=
 seqSetFilter(gds, variant.id=filt)

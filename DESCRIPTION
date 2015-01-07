@@ -10,7 +10,7 @@ Maintainer: Stephanie M. Gogarten <sdmorris@u.washington.edu>, Xiuwen
         Zheng <zhengx@u.washington.edu>
 Depends: SeqArray (>= 1.1.1)
 Imports: methods, gdsfmt, GenomicRanges, IRanges, S4Vectors, GWASExactHW, VariantAnnotation
-Suggests: BiocGenerics, RUnit
+Suggests: BiocGenerics, BiocStyle, RUnit
 License: GPL-3
 LazyData: yes
 biocViews: SNP, GeneticVariability, Sequencing, Genetics
