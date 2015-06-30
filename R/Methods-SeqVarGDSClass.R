@@ -50,7 +50,8 @@ setMethod("isVariant",
           "SeqVarGDSClass",
           function(gdsobj, use.names=FALSE) {
             var <- seqApply(gdsobj, "genotype",
-                            function(x) {colSums(x, na.rm=TRUE) > 0})
+                            function(x) {colSums(x, na.rm=TRUE) > 0},
+                            margin="by.variant", as.is="list")
             var <- matrix(unlist(var, use.names=FALSE), ncol=length(var),
                           dimnames=list(sample=NULL, variant=NULL))
             if (use.names) .applyNames(gdsobj, var) else var
@@ -74,7 +75,8 @@ setMethod("getGenotype",
           function(gdsobj, use.names=TRUE) {
             gc <- seqApply(gdsobj, c(geno="genotype", phase="phase"),
                            function(x) {sep=ifelse(x$phase, "|", "/")
-                                        paste(x$geno[1,], sep, x$geno[2,], sep="")})
+                                        paste(x$geno[1,], sep, x$geno[2,], sep="")},
+                           margin="by.variant", as.is="list")
             gc <- matrix(unlist(gc, use.names=FALSE), ncol=length(gc),
                          dimnames=list(sample=NULL, variant=NULL))
             gc[gc == "NA/NA"] <- NA
@@ -98,7 +100,7 @@ setMethod("getGenotypeAlleles",
                                sep=ifelse(x$phase, "|", "/")
                                paste(a, sep, b, sep="")
                              }
-                           }, sort=sort)
+                           }, margin="by.variant", as.is="list", sort=sort)
             gc <- matrix(unlist(gc, use.names=FALSE), ncol=length(gc),
                          dimnames=list(sample=NULL, variant=NULL))
             gc[gc == "NA/NA"] <- NA
@@ -110,7 +112,7 @@ setMethod("refDosage",
           function(gdsobj, use.names=TRUE) {
             rd <- seqApply(gdsobj, "genotype",
                            function(x) {colSums(x == 0)},
-                            margin="by.variant")
+                           margin="by.variant", as.is="list")
             rd <- matrix(unlist(rd, use.names=FALSE), ncol=length(rd),
                          dimnames=list(sample=NULL, variant=NULL))
             if (use.names) .applyNames(gdsobj, rd) else rd
@@ -119,10 +121,11 @@ setMethod("refDosage",
 setMethod("getVariableLengthData",
           c("SeqVarGDSClass", "character"),
           function(gdsobj, var.name, use.names=TRUE) {
-            var.list <- seqApply(gdsobj, var.name, function(x) {x})
+            var.list <- seqApply(gdsobj, var.name, function(x) {x},
+                                 margin="by.variant", as.is="list")
+            n <- .nSamp(gdsobj)
             var <- array(unlist(var.list, use.names=FALSE),
-                         dim=c(nrow(var.list[[1]]), ncol(var.list[[1]]),
-                               length(var.list)))
+                         dim=c(n, length(var.list[[1]])/n, length(var.list)))
             var <- aperm(var, c(2,1,3))
             
             ## if first array dimension is 1, simplify to a matrix
