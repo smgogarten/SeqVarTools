@@ -7,7 +7,7 @@ Description: An interface to the fast-access storage format for VCF
         analysis.
 Author: Stephanie M. Gogarten, Xiuwen Zheng
 Maintainer: Stephanie M. Gogarten <sdmorris@u.washington.edu>, Xiuwen
-        Zheng <zhengx@u.washington.edu>
+        Zheng <zhengx@u.washington.edu>, Adrienne Stilp <amstilp@u.washington.edu>
 Depends: SeqArray (>= 1.1.1)
 Imports: methods, gdsfmt, GenomicRanges, IRanges, S4Vectors, GWASExactHW, VariantAnnotation
 Suggests: BiocGenerics, BiocStyle, RUnit
