@@ -86,5 +86,6 @@ setGeneric("mendelErr",
              standardGeneric("mendelErr"))
 
 setGeneric("duplicateDiscordance",
-           function(gdsobj, ...)
+           function(gdsobj, obj2, ...)
              standardGeneric("duplicateDiscordance"))
+

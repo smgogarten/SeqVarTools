@@ -37,8 +37,8 @@
 }
 
 setMethod("duplicateDiscordance",
-          "SeqVarGDSClass",
-          function(gdsobj, samples, check.phase=FALSE, verbose=TRUE) {
+          c("SeqVarGDSClass", "missing"),
+          function(gdsobj, samples=NULL, check.phase=FALSE, verbose=TRUE) {
             ## samples should have columns of sample.id, subject.id
             ## find matching sample pairs for subjects (one sample per subject)
             samp.pairs <- .samplePairs(samples)
@@ -87,4 +87,213 @@ setMethod("duplicateDiscordance",
             seqSetFilter(gdsobj, samp.sel=filt.orig, verbose=FALSE)
 
             list(by.variant=var.df, by.subject=samp.pairs)
+          })
+
+
+
+#####################################################################
+# definition for the signature with two SeqVarGDSClass objects
+#
+#
+
+# returns number of concordant genotypes
+.getNConc <- function(geno1, geno2){
+  sel <- geno1 == geno2
+  sum(sel)
+}
+
+# returns index selecting genotype pairs that involve the alt allele
+.getalt <- function(geno1, geno2){
+  !(geno1 == "ref" & geno2 == "ref")
+}
+
+# returns the number of genotype pairs involving the alt allele
+.getNAlt <- function(geno1, geno2){
+  sum(.getalt(geno1, geno2))
+}
+
+# returns the number of concordant pairs involving the alt allele
+.getNAltConc <- function(geno1, geno2){
+  sel <- .getalt(geno1, geno2) & (geno1 == geno2)
+  sum(sel)
+}
+
+.getNHetAlt <- function(geno1, geno2) {
+  sel <- (geno1 == "alt" & geno2 == "het") |
+    (geno1 == "het" & geno2 == "alt")
+  sum(sel)
+}
+
+.getNHetRef <- function(geno1, geno2) {
+  sel <- (geno1 == "ref" & geno2 == "het") |
+    (geno1 == "het" & geno2 == "ref")
+  sum(sel)
+}
+
+.getNRefAlt <- function(geno1, geno2){
+  sel <- (geno1 == "ref" & geno2 == "alt") | (geno1 == "alt" & geno2 == "ref")
+  sum(sel)
+}
+
+
+.matchVariants <- function(gr1, gr2){
+  
+  required <- c("variant.id", "ref", "alt", "snv")
+  names1 <- names(elementMetadata(gr1))
+  if (length(setdiff(required, names1)) > 0) stop(paste("gr1 must have metadata", paste(required, collapse=", ")))
+  
+  names2 <- names(elementMetadata(gr2))
+  if (length(setdiff(required, names2)) > 0) stop(paste("gr2 must have metadata", paste(required, collapse=", ")))
+  
+  # subset to only biallelic snvs
+  #sel.snv <- gr1$snv & gr2$snv
+  gr1 <- gr1[gr1$snv]
+  gr2 <- gr2[gr2$snv]
+  
+  # find overlaps
+  overlaps <- findOverlaps(gr1, gr2)
+  
+  overlapping.1 <- gr1[queryHits(overlaps)]
+  overlapping.2 <- gr2[subjectHits(overlaps)]
+  
+  # check alleles -- no flipping for now
+  sel.same <- (overlapping.1$ref == overlapping.2$ref) & (overlapping.1$alt == overlapping.2$alt)
+  overlapping <- data.frame(variant.id.1=overlapping.1$variant.id[sel.same],
+                            variant.id.2=overlapping.2$variant.id[sel.same])
+  
+  overlapping
+  
+}
+
+# the main function will only check sample-level at this point
+.matchSamples <- function(samp1, samp2) {
+  
+  if (!("sample.id" %in% names(samp1)) | !("sample.id" %in% names(samp2))) stop("sample data frames must have sample.id")
+  if (!("subjectID" %in% names(samp1)) | !("subjectID" %in% names(samp2))) stop("sample data frames must have subjectID")
+  
+  # match on subjectIDs
+  subjects <- intersect(samp1$subjectID, samp2$subjectID)
+  
+  samp1 <- samp1[samp1$subjectID %in% subjects, ]
+  samp2 <- samp2[samp2$subjectID %in% subjects, ]
+  
+  names(samp1)[names(samp1) == "sample.id"] <- "sample.id.1"
+  names(samp2)[names(samp2) == "sample.id"] <- "sample.id.2"
+  
+  samp <- merge(samp1, samp2)
+  samp
+  
+}
+
+
+.getGRanges <- function(gds){
+  gr <- granges(gds)
+  gr$variant.id <- seqGetData(gds, "variant.id")
+  gr$ref <- refChar(gds)
+  gr$alt <- altChar(gds)
+  gr$snv <- isSNV(gds)
+  
+  gr
+}
+
+
+.getGenotypeClass <- function(x){
+  
+  # map for genotype classes
+  class.map <- c("alt", "het", "ref")
+  
+  # 0 = alt/alt, 1 = het, 2 = ref/ref, so we can just subset class map by the dosage plus 1
+  class.map[x + 1]  
+  
+}
+
+
+# assumes filters are already set, and will reset filters
+setMethod("duplicateDiscordance",
+          c("SeqVarGDSClass", "SeqVarGDSClass"),
+          function(gdsobj, obj2, verbose=TRUE){
+            
+            # save original filters
+            originalVariants1 <- seqGetData(gdsobj, "variant.id")
+            originalSamples1 <- seqGetData(gdsobj, "sample.id")
+            
+            originalVariants2 <- seqGetData(obj2, "variant.id")
+            originalSamples2 <- seqGetData(obj2, "sample.id")
+            
+            
+            # match samples -- no subject matching for now
+            if (verbose) message("matching samples... ", appendLF=FALSE)
+            samp1 <- data.frame(sample.id=seqGetData(gdsobj, "sample.id"), stringsAsFactors=F)
+            samp1$subjectID <- samp1$sample.id
+            
+            samp2 <- data.frame(sample.id=seqGetData(obj2, "sample.id"), stringsAsFactors=F)
+            samp2$subjectID <- samp2$sample.id
+            
+            samples <- .matchSamples(samp1, samp2)
+            if (verbose) message(paste(nrow(samples), "pairs identified!"))
+            
+            # match variants
+            if (verbose) message("matching variants... ", appendLF=FALSE)
+            gr1 <- .getGRanges(gdsobj)
+            gr2 <- .getGRanges(obj2)
+            overlappingVariants <- .matchVariants(gr1, gr2)
+            if (verbose) message(paste(nrow(overlappingVariants), "variant matches identified!"))
+            
+            # set up results data frame -- can just add columns to the samples data frame
+            samples$n.variants <- NA
+            samples$n.concordant <- NA
+            samples$n.alt <- NA
+            samples$n.alt.conc <- NA
+            samples$n.het.ref <- NA
+            samples$n.het.alt <- NA
+            samples$n.ref.alt <- NA
+            
+            # set filters for the variants -- will still need to order them properly
+            seqSetFilter(gdsobj, variant.id=overlappingVariants$variant.id.1, verbose=FALSE)
+            seqSetFilter(obj2, variant.id=overlappingVariants$variant.id.2, verbose=FALSE)
+            
+            for (i in seq_along(samples$subjectID)){
+              
+              if (verbose & (i %% 10) == 0){
+                message(paste("sample pair", i, "out of", nrow(samples)))
+              }
+              
+              # set sample filter for this pair
+              seqSetFilter(gdsobj, sample.id=samples$sample.id.1[i], verbose=FALSE)
+              seqSetFilter(obj2, sample.id=samples$sample.id.2[i], verbose=FALSE)
+              
+              # prepare genotype data frame
+              dos1 <- refDosage(gdsobj)
+              dos2 <- refDosage(obj2)
+              
+              # order genotypes appropriately
+              dos1 <- dos1[, as.character(overlappingVariants$variant.id.1)]
+              dos2 <- dos2[, as.character(overlappingVariants$variant.id.2)]
+              
+              # remove missing genotypes
+              sel <- !is.na(dos1) & !is.na(dos2)
+              dos1 <- dos1[sel]
+              dos2 <- dos2[sel]
+              
+              class1 <- .getGenotypeClass(dos1)
+              class2 <- .getGenotypeClass(dos2)
+              
+              # store information about discordant variants for this pair
+              samples$n.variants[i] <- length(dos1)
+              samples$n.concordant[i] <- .getNConc(class1, class2)
+              samples$n.alt[i] <- .getNAlt(class1, class2)
+              samples$n.alt.conc[i] <- .getNAltConc(class1, class2)
+              samples$n.het.ref[i] <- .getNHetRef(class1, class2)
+              samples$n.het.alt[i] <- .getNHetAlt(class1, class2)
+              samples$n.ref.alt[i] <- .getNRefAlt(class1, class2)
+              
+            }
+            
+            # reset original filters
+            seqSetFilter(gdsobj, sample.id=originalSamples1, variant.id=originalVariants1, verbose=FALSE)
+            seqSetFilter(obj2, sample.id=originalSamples2, variant.id=originalVariants2, verbose=FALSE)
+            
+            # return samples data frame
+            samples
+            
           })
