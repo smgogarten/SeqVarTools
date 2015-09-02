@@ -5,7 +5,7 @@ test_hwe <- function() {
                  names(pv))
   
   mono <- alleleFrequency(gds) %in% c(0,1)
-  checkEquals(mono | !isSNV(gds), is.na(pv), checkNames=FALSE)
+  checkEquals(mono | nAlleles(gds) != 2, is.na(pv), checkNames=FALSE)
   seqClose(gds)
 }
 

@@ -21,7 +21,7 @@
   HWE calculations are performed with the \code{\link{HWExact}}
   function in the \pkg{\link{GWASExactHW}} package.
 
-  P values are set to \code{NA} for all non-single-nucleotide variants
+  P values are set to \code{NA} for all multiallelic
   and monomorphic variants.
 }
 

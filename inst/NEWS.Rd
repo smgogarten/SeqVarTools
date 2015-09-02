@@ -6,3 +6,14 @@
     \item Use BiocStyle for vignette
   }
 }
+\section{Changes in version 1.7.3}{
+  \itemize{
+    \item Add methods for duplicateDiscordance with two datasets
+    \item Add alternateAlleleDetection
+  }
+}
+\section{Changes in version 1.7.4}{
+  \itemize{
+    \item HWE works on biallelic INDELs as well as SNVs
+  }
+}

@@ -5,6 +5,7 @@ import(S4Vectors)
 import(IRanges)
 import(GenomicRanges)
 importFrom(GWASExactHW, HWExact)
+importFrom(stringr, str_count)
 
 importMethodsFrom(VariantAnnotation, isSNV)
 

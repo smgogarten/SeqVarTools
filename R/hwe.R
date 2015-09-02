@@ -15,8 +15,8 @@ setMethod("hwe",
                             margin="by.variant", as.is="integer")
             pv <- HWExact(data.frame(nAA, nAa, naa))
 
-            ## set non-SNVs to NA
-            pv[!isSNV(gdsobj)] <- NA
+            ## set non-biallelic variants to NA
+            pv[nAlleles(gdsobj) != 2] <- NA
 
             ## set pvalue to NA for monomorphic SNPs
             pv[(nAa + naa) == 0 | (nAa + nAA) == 0] <- NA
