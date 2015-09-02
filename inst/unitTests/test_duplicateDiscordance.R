@@ -110,6 +110,13 @@ test_getNRefAlt <- function() {
   checkIdentical(SeqVarTools:::.getNRefAlt(df$geno1, df$geno2), SeqVarTools:::.getNRefAlt(df$geno2, df$geno1))
 }
 
+test_getGentoypeClass <- function() {
+  
+  vals <- c(NA, 0, 1, 2)
+  class <- SeqVarTools:::.getGenotypeClass(vals)
+  checkEquals(class, c("miss", "alt", "het", "ref"))
+
+}
 
 test_matchVariants <- function() {
   
@@ -140,6 +147,9 @@ test_matchVariants <- function() {
   checkEquals(overlaps$variant.id.1, c(3, 3, 5, 7, 8))
   checkEquals(overlaps$variant.id.2, c(1, 2, 5, 6, 7))
   
+  overlapsNoDups <- SeqVarTools:::.matchVariants(gr1, gr2, allowOverlaps=FALSE)
+  checkEquals(overlapsNoDups$variant.id.1, c(3, 5, 7, 8))
+  checkEquals(overlapsNoDups$variant.id.2, c(1, 5, 6, 7))
 }
 
 test_matchSamples <- function() {

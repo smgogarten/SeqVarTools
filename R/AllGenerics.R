@@ -89,3 +89,6 @@ setGeneric("duplicateDiscordance",
            function(gdsobj, obj2, ...)
              standardGeneric("duplicateDiscordance"))
 
+setGeneric("alternateAlleleDetection",
+           function(gdsobj, gdsobj2, ...)
+             standardGeneric("alternateAlleleDetection"))

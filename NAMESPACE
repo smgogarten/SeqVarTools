@@ -28,6 +28,7 @@ exportMethods(applyMethod,
               inbreedCoeff,
               meanBySample,
               mendelErr,
-              duplicateDiscordance)
+              duplicateDiscordance,
+              alternateAlleleDetection)
 
 export(setVariantID)

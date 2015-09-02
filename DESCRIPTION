@@ -1,5 +1,5 @@
 Package: SeqVarTools
-Version: 1.7.2
+Version: 1.7.3
 Type: Package
 Title: Tools for variant data
 Description: An interface to the fast-access storage format for VCF
@@ -14,3 +14,13 @@ Suggests: BiocGenerics, BiocStyle, RUnit
 License: GPL-3
 LazyData: yes
 biocViews: SNP, GeneticVariability, Sequencing, Genetics
+Collate: AllGenerics.R
+  AllUtilities.R
+  Methods-SeqVarGDSClass.R
+  duplicateDiscordance.R
+  hwe.R
+  inbreedCoeff.R
+  mendelErr.R
+  pca.R
+  setVariantID.R
+  alternateAlleleDetection.R

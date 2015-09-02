@@ -136,7 +136,7 @@ setMethod("duplicateDiscordance",
 }
 
 
-.matchVariants <- function(gr1, gr2){
+.matchVariants <- function(gr1, gr2, allowOverlaps=TRUE){
   
   required <- c("variant.id", "ref", "alt", "snv")
   names1 <- names(elementMetadata(gr1))
@@ -153,6 +153,8 @@ setMethod("duplicateDiscordance",
   # find overlaps
   overlaps <- findOverlaps(gr1, gr2)
   
+
+  
   overlapping.1 <- gr1[queryHits(overlaps)]
   overlapping.2 <- gr2[subjectHits(overlaps)]
   
@@ -160,6 +162,11 @@ setMethod("duplicateDiscordance",
   sel.same <- (overlapping.1$ref == overlapping.2$ref) & (overlapping.1$alt == overlapping.2$alt)
   overlapping <- data.frame(variant.id.1=overlapping.1$variant.id[sel.same],
                             variant.id.2=overlapping.2$variant.id[sel.same])
+  
+  if (!allowOverlaps){
+    # choose the first overlapping variant
+    overlapping <- overlapping[!duplicated(overlapping$variant.id.1) & !duplicated(overlapping$variant.id.2), ]
+  }
   
   overlapping
   
@@ -203,7 +210,12 @@ setMethod("duplicateDiscordance",
   class.map <- c("alt", "het", "ref")
   
   # 0 = alt/alt, 1 = het, 2 = ref/ref, so we can just subset class map by the dosage plus 1
-  class.map[x + 1]  
+  tmp <- class.map[x + 1]
+  tmp[is.na(tmp)] <- "miss"
+  
+  if (is.matrix(x)) tmp <- matrix(tmp, nrow=nrow(x))
+  
+  tmp
   
 }
 
