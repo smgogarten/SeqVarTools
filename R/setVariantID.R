@@ -16,8 +16,7 @@ setVariantID <- function(gdsfile, variant.id) {
   ## delete existing node and create a new one,
   ## as data type may be different
   compress <- objdesp.gdsn(node)$compress
-  delete.gdsn(node)
   add.gdsn(gdsobj, "variant.id", variant.id,
-           compress=compress, closezip=TRUE)
+           compress=compress, closezip=TRUE, replace=TRUE)
   closefn.gds(gdsobj)
 }

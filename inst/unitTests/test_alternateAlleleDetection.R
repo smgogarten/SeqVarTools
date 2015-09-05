@@ -69,7 +69,7 @@ test_alternateAlleleDetection <- function() {
   checkEquals(res$n.samples, colSums(!is.na(refdos)), checkNames=FALSE)
   checkEquals(res$true.neg, colSums(refdos, na.rm=T), checkNames=FALSE)
   checkEquals(res$true.pos, colSums(2-refdos, na.rm=T), checkNames=FALSE)
-  closefn.gds(gds2)
+  seqClose(gds2)
   
   # change a sample id
   tmp <- openfn.gds(tmpfile, readonly=FALSE)  
@@ -103,8 +103,8 @@ test_alternateAlleleDetection <- function() {
   checkEquals(res$false.pos, SeqVarTools:::.falsePos(class1, class2) + SeqVarTools:::.falsePos(class2, class1))
   checkEquals(res$false.neg, SeqVarTools:::.falseNeg(class1, class2) + SeqVarTools:::.falseNeg(class2, class1))
 
-  closefn.gds(gds1)
-  closefn.gds(gds2)
+  seqClose(gds1)
+  seqClose(gds2)
   
   unlink(tmpfile)
   

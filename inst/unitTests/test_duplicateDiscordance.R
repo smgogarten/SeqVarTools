@@ -203,7 +203,7 @@ test_duplicateDiscordanceAcrossDatasets <- function() {
   checkEquals(res$n.concordant, res$n.variants)
   checkEquals(res$n.alt, res$n.alt.conc)
 
-  closefn.gds(gds2)
+  seqClose(gds2)
   
   # change a sample id
   tmp <- openfn.gds(tmpfile, readonly=FALSE)  
@@ -248,8 +248,8 @@ test_duplicateDiscordanceAcrossDatasets <- function() {
   
   checkEquals(res$n.alt.conc[1], sum(minor & match))
   
-  closefn.gds(gds1)
-  closefn.gds(gds2)
+  seqClose(gds1)
+  seqClose(gds2)
   
   unlink(tmpfile)
   
