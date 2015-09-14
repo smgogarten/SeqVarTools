@@ -17,3 +17,8 @@
     \item HWE works on biallelic INDELs as well as SNVs
   }
 }
+\section{Changes in version 1.7.5}{
+  \itemize{
+    \item Added SeqVarData class to combine sample annotation with GDS object
+  }
+}

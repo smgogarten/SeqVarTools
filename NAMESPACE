@@ -4,12 +4,16 @@ import(SeqArray)
 import(S4Vectors)
 import(IRanges)
 import(GenomicRanges)
+import(Biobase)
 importFrom(GWASExactHW, HWExact)
 importFrom(stringr, str_count)
 
 importMethodsFrom(VariantAnnotation, isSNV)
 
-exportMethods(applyMethod,
+exportClasses(SeqVarData)
+
+exportMethods(sampleData, "sampleData<-",
+              applyMethod,
               refChar,
               altChar,
               nAlleles,
@@ -32,4 +36,5 @@ exportMethods(applyMethod,
               duplicateDiscordance,
               alternateAlleleDetection)
 
-export(setVariantID)
+export(SeqVarData,
+       setVariantID)
