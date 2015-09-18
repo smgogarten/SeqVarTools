@@ -4,18 +4,8 @@ setMethod("inbreedCoeff",
           function(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE) {           
             margin <- match.arg(margin)
             if (margin == "by.variant") {
-              nhet <- seqApply(gdsobj, "genotype",
-                               function(x) {sum((x[1,] == 0 & x[2,] == 1) |
-                                                (x[1,] == 1 & x[2,] == 0), na.rm=TRUE)},
-                               margin="by.variant", as.is="integer")
-              ntot <- seqApply(gdsobj, "genotype",
-                               function(x) {sum(!is.na(x[1,]))},
-                               margin="by.variant", as.is="integer")
-              afreq <- seqApply(gdsobj, "genotype",
-                                function(x) {mean(x == 0, na.rm=TRUE)},
-                               margin="by.variant", as.is="double")
-              exp.het <- 2*afreq*(1-afreq)*ntot
-              f <- 1 - (nhet/exp.het)
+              counts <- .countGenotypes(gdsobj)
+              f <- .f(counts)
               if (use.names)
                 names(f) <- seqGetData(gdsobj, "variant.id")
               f

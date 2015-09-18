@@ -22,3 +22,8 @@
     \item Added SeqVarData class to combine sample annotation with GDS object
   }
 }
+\section{Changes in version 1.7.6}{
+  \itemize{
+    \item HWE method returns additional columns and allows permutation of genotypes
+  }
+}

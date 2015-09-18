@@ -249,14 +249,13 @@ plot(pc$eigenvect[,1], pc$eigenvect[,2])
 
 \subsection{Hardy-Weinberg Equilibrium}
 We can test for deviations from Hardy-Weinberg Equilibrium (HWE),
-which can reveal variants of low quality.
+which can reveal variants of low quality. A test with permuted
+genotypes gives expected values under the null hypothesis of HWE.
 <<fig=TRUE>>=
-pval <- hwe(gds)
-pval <- -log10(sort(pval))
-n <- length(pval)
-a <- 1:n
-b <- a/n
-x <- -log10(b)
+hw <- hwe(gds)
+pval <- -log10(sort(hw$p))
+hw.perm <- hwe(gds, permute=TRUE)
+x <- -log10(sort(hw.perm$p))
 plot(x, pval, xlab="-log10(expected P)", ylab="-log10(observed P)")	
 abline(0,1,col="red")
 @ 
@@ -264,8 +263,7 @@ abline(0,1,col="red")
 The inbreeding coefficient can also be used as a quality metric.  For
 variants, this is 1 - observed heterozygosity / expected heterozygosity.
 <<fig=TRUE>>=
-f <- inbreedCoeff(gds, margin="by.variant")
-hist(f)
+hist(hw$f)
 @ 
 
 We can also calculate the inbreeding coefficient by sample.

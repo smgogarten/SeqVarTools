@@ -8,25 +8,34 @@
   Single-Nucleotide Variants}
 
 \usage{
-\S4method{hwe}{SeqVarGDSClass}(gdsobj, use.names=FALSE)
+\S4method{hwe}{SeqVarGDSClass}(gdsobj, permute=FALSE)
 }
 
 \arguments{
   \item{gdsobj}{A \code{\link{SeqVarGDSClass}} object with VCF data.}
-  \item{use.names}{A logical indicating whether to assign variant IDs
-    as names of the output vector.}
+  \item{permute}{A logical indicating whether to permute the genotypes to get a set of p-values under the null hypothesis.}
 }
 
 \details{
   HWE calculations are performed with the \code{\link{HWExact}}
   function in the \pkg{\link{GWASExactHW}} package.
 
+  \code{permute=TRUE} will permute the genotypes prior to running the test. This can be useful for obtaining a set of expected values under the null hypothesis to compare to the observed values.
+
   P values are set to \code{NA} for all multiallelic
   and monomorphic variants.
 }
 
 \value{
-  A vector of p values for the exact test.
+  A data.frame with the following columns:
+\item{variant.id}{The unique identifier for the variant}
+\item{nAA}{The number of reference homozygotes}
+\item{nAa}{The number of heterozygotes}
+\item{naa}{The number of alternate homozygotes}
+\item{afreq}{The reference allele frequency}
+\item{p}{p values for the exact test}
+\item{f}{The inbreeding coefficient, 1 - observed
+  heterozygosity / expected heterozygosity}
 }
 
 \author{Stephanie Gogarten}
@@ -41,10 +50,10 @@ gds <- seqOpen(seqExampleFileName("gds"))
 ## autosomal variants only
 auto <- seqGetData(gds, "chromosome") \%in\% 1:22
 var.auto <- seqGetData(gds, "variant.id")[auto]
-pv <- applyMethod(gds, hwe, variant=var.auto)
-head(pv)
-sum(is.na(pv))
-range(pv, na.rm=TRUE)
+hw <- applyMethod(gds, hwe, variant=var.auto)
+head(hw)
+sum(is.na(hw$p))
+range(hw$p, na.rm=TRUE)
 seqClose(gds)
 }
 

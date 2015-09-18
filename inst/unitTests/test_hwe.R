@@ -1,23 +1,42 @@
+
+test_permute <- function() {
+    x <- matrix(c(0,0,1,1,NA,NA), nrow=2)
+    p <- SeqVarTools:::.permuteGenotypes(x)
+    checkEquals(c(0,0,1,1), sort(as.vector(p[,1:2])))
+    checkTrue(all(is.na(p[,3])))
+}
+
+test_count <- function() {
+    gds <- seqOpen(seqExampleFileName("gds"))
+    filt <- nAlleles(gds) == 2
+    seqSetFilter(gds, variant.sel=filt)
+    geno <- getGenotype(gds)
+    counts <- data.frame(nAA=colSums(geno == "0/0", na.rm=TRUE),
+                         nAa=colSums(geno == "0/1" | geno == "1/0", na.rm=TRUE),
+                         naa=colSums(geno == "1/1", na.rm=TRUE),
+                         row.names=1:ncol(geno))
+    checkEquals(counts, SeqVarTools:::.countGenotypes(gds))
+    perm <- SeqVarTools:::.countGenotypes(gds, permute=TRUE)
+    checkEquals(rowSums(counts), rowSums(perm), checkNames=FALSE)
+    checkEquals(2*counts$nAA + counts$nAa, 2*perm$nAA + perm$nAa, checkNames=FALSE)
+    seqClose(gds)
+}
+
 test_hwe <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
-  pv <- hwe(gds, use.names=TRUE)
-  checkIdentical(as.character(seqGetData(gds, "variant.id")),
-                 names(pv))
-  
-  mono <- alleleFrequency(gds) %in% c(0,1)
-  checkEquals(mono | nAlleles(gds) != 2, is.na(pv), checkNames=FALSE)
-  seqClose(gds)
-}
+    gds <- seqOpen(seqExampleFileName("gds"))
+    af <- alleleFrequency(gds)
+    biallelic <- nAlleles(gds) == 2
+    mono <- af %in% c(0,1)
+    hw <- hwe(gds, permute=FALSE)
+    checkEquals(mono | !biallelic, is.na(hw$p), checkNames=FALSE)
+    
+    filt <- biallelic & !mono
+    seqSetFilter(gds, variant.sel=filt)
+    hw <- hwe(gds, permute=FALSE)
+    checkEquals(af[filt], hw$afreq)
+    checkEquals(inbreedCoeff(gds), hw$f)
 
-test_hwe_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
-  var.id <- 101:110
-  samp.id <- seqGetData(gds, "sample.id")[6:10]
-  seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
-  pv <- hwe(gds)
-  seqSetFilter(gds)
-  checkIdentical(pv,
-                 applyMethod(gds, hwe, variant=var.id, sample=samp.id))
-  seqClose(gds)
+    hw <- hwe(gds, permute=TRUE)
+    checkEquals(af[filt], hw$afreq)
+    seqClose(gds)
 }
-
