@@ -75,7 +75,7 @@ setMethod("getGenotype",
           function(gdsobj, use.names=TRUE) {
             gc <- seqApply(gdsobj, c(geno="genotype", phase="phase"),
                            function(x) {sep=ifelse(x$phase, "|", "/")
-                                        paste(x$geno[1,], sep, x$geno[2,], sep="")},
+                                        paste0(x$geno[1,], sep, x$geno[2,])},
                            margin="by.variant", as.is="list")
             gc <- matrix(unlist(gc, use.names=FALSE), ncol=length(gc),
                          dimnames=list(sample=NULL, variant=NULL))
@@ -98,7 +98,7 @@ setMethod("getGenotypeAlleles",
                                paste(pmin(a,b), pmax(a,b), sep="/")
                              } else  {
                                sep=ifelse(x$phase, "|", "/")
-                               paste(a, sep, b, sep="")
+                               paste0(a, sep, b)
                              }
                            }, margin="by.variant", as.is="list", sort=sort)
             gc <- matrix(unlist(gc, use.names=FALSE), ncol=length(gc),

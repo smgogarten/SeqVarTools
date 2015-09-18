@@ -63,3 +63,38 @@
   (ref %in% c("C","T") & alt %in% c("A","G")) |
   (ref %in% c("A","G") & alt %in% c("C","T"))
 }
+
+## number of homozygote reference genotypes
+.nHomRef <- function(x) {
+    sum(x[1,] == 0 & x[2,] == 0, na.rm=TRUE)
+}
+
+## number of heterozyotes with one reference allele
+.nHetRef <- function(x) {
+    sum((x[1,] == 0 & x[2,] != 0) |
+        (x[1,] != 0 & x[2,] == 0), na.rm=TRUE)
+}
+
+## number of genotypes with no reference alleles
+.nHomAlt <- function(x) {
+    sum(x[1,] != 0 & x[2,] != 0, na.rm=TRUE)
+}
+
+.permuteGenotypes <- function(x) {
+    ## get subset of matrix with no missing values
+    ind <- colSums(is.na(x)) == 0
+    nm <- x[,ind,drop=FALSE]
+    ## permute alleles
+    nm <- matrix(sample(nm), nrow=nrow(nm), ncol=ncol(nm))
+    ## replace non-missing genotypes
+    x[,ind] <- nm
+    x
+}
+
+.countGenotypes <- function(gdsobj, permute=FALSE) {
+    n <- seqApply(gdsobj, "genotype", function(x) {
+        if (permute) x <- .permuteGenotypes(x)
+        c(nAA=.nHomRef(x), nAa=.nHetRef(x), naa=.nHomAlt(x))
+    }, margin="by.variant", as.is="list")
+    as.data.frame(do.call(rbind, n))
+}
