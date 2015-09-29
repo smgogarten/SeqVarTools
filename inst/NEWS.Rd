@@ -27,3 +27,8 @@
     \item HWE method returns additional columns and allows permutation of genotypes
   }
 }
+\section{Changes in version 1.7.7}{
+  \itemize{
+    \item added methods to calculate and plot reference allele fraction
+  }
+}

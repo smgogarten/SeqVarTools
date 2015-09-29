@@ -68,6 +68,19 @@ setGeneric("meanBySample",
            function(gdsobj, ...)
              standardGeneric("meanBySample"))
 
+setGeneric("refFrac",
+           function(gdsobj, ...)
+             standardGeneric("refFrac"))
+
+setGeneric("refFracOverHets",
+           function(gdsobj, ...)
+             standardGeneric("refFracOverHets"))
+
+setGeneric("refFracPlot",
+           function(gdsobj, ...)
+             standardGeneric("refFracPlot"))
+
+
 ## other
 setGeneric("pca",
            function(gdsobj, ...)

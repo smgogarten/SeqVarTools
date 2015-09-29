@@ -1,0 +1,7 @@
+variant.id	labelDescription
+sample.id	unique sample identifier
+sex	sex coded as M=male, F=female
+population	HapMap population
+family	family identifier (=sample.id for singletons)
+father	father (NA for singletons)
+mother	mother (NA for singletons)

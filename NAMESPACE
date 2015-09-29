@@ -34,7 +34,10 @@ exportMethods(sampleData, "sampleData<-",
               meanBySample,
               mendelErr,
               duplicateDiscordance,
-              alternateAlleleDetection)
+              alternateAlleleDetection,
+              refFrac,
+              refFracOverHets,
+              refFracPlot)
 
 export(SeqVarData,
        setVariantID)
