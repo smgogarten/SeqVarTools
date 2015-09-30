@@ -16,6 +16,12 @@ test_refFrac <- function() {
     geno <- seqGetData(gds, "genotype")
     het <- geno[1,,] != geno[2,,]
     rf[!het | is.na(het)] <- NA
-    checkEquals(colMeans(rf, na.rm=TRUE), refFracOverHets(gds), checkNanes=FALSE)
+    checkEquals(colMeans(rf, na.rm=TRUE), refFracOverHets(gds), checkNames=FALSE)
+
+    ## compare with allelic balance from VCF
+    ab <- getVariableLengthData(gds, "annotation/format/AB")
+    rf[is.na(ab)] <- NA
+    checkEquals(rf, ab, tolerance=0.01)
+    
     seqClose(gds)
 }

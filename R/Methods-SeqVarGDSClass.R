@@ -123,9 +123,19 @@ setMethod("getVariableLengthData",
           function(gdsobj, var.name, use.names=TRUE) {
             var.list <- seqApply(gdsobj, var.name, function(x) {x},
                                  margin="by.variant", as.is="list")
-            n <- .nSamp(gdsobj)
+            .ncol <- function(x) ifelse(is.null(x), 0, ncol(x))
+            n.alleles <- sapply(var.list, .ncol)
+            nsamp <- .nSamp(gdsobj)
+            if (length(unique(n.alleles)) > 1) {
+                ## fill in missing values
+                maxn <- max(n.alleles)
+                var.list <- lapply(var.list, function(x) {
+                    cbind(x, matrix(NA, nrow=nsamp, ncol=(maxn - .ncol(x))))
+                })
+            }
             var <- array(unlist(var.list, use.names=FALSE),
-                         dim=c(n, length(var.list[[1]])/n, length(var.list)))
+                         dim=c(nrow(var.list[[1]]), ncol(var.list[[1]]),
+                             length(var.list)))
             var <- aperm(var, c(2,1,3))
             
             ## if first array dimension is 1, simplify to a matrix
