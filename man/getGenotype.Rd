@@ -96,6 +96,7 @@ refDosage(gds)
 altDosage(gds)
 alleleDosage(gds, n=0)
 alleleDosage(gds, n=1)
+alleleDosage(gds, n=c(0,1,0,1,0))
 seqClose(gds)
 }
 
