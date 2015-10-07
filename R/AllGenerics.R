@@ -43,7 +43,7 @@ setGeneric("altDosage",
              standardGeneric("altDosage"))
 
 setGeneric("alleleDosage",
-           function(gdsobj, ...)
+           function(gdsobj, n, ...)
              standardGeneric("alleleDosage"))
 
 setGeneric("getVariableLengthData",

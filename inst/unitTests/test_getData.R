@@ -201,6 +201,14 @@ test_alleleDosage <- function() {
       cnt[i,] <- stringr::str_count(geno[i,], as.character(n))
   }
   checkEquals(cnt, alleleDosage(gds, n))
+
+  ## n is a list
+  n <- lapply(nalleles, function(x) sample(0:(x-1), sample(1:x, 1)))
+  for (i in 1:ncol(geno)) {
+      tmp <- lapply(n[[i]], function(x) stringr::str_count(geno[,i], as.character(x)))
+      cnt[,i] <- colSums(do.call(rbind, tmp))
+  }
+  checkEquals(cnt, alleleDosage(gds, n))
   
   ## invalid allele
   checkException(alleleDosage(gds, n=10))

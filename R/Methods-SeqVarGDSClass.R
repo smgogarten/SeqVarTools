@@ -130,13 +130,31 @@ setMethod("altDosage",
           })
 
 setMethod("alleleDosage",
-          "SeqVarGDSClass",
+          c("SeqVarGDSClass", "numeric"),
           function(gdsobj, n=0, use.names=TRUE) {
             if (length(n) == 1) n <- rep(n, .nVar(gdsobj))
             stopifnot(length(n) == .nVar(gdsobj))
             stopifnot(all(n <= nAlleles(gdsobj)))
             d <- seqApply(gdsobj, "genotype",
                           function(index, x) {colSums(x == n[index])},
+                          margin="by.variant", as.is="list",
+                          var.index="relative")
+            d <- matrix(unlist(d, use.names=FALSE), ncol=length(d),
+                         dimnames=list(sample=NULL, variant=NULL))
+            if (use.names) .applyNames(gdsobj, d) else d
+          })
+
+setMethod("alleleDosage",
+          c("SeqVarGDSClass", "list"),
+          function(gdsobj, n, use.names=TRUE) {
+            stopifnot(length(n) == .nVar(gdsobj))
+            d <- seqApply(gdsobj, "genotype",
+                          function(index, x) {
+                              tmp <- matrix(x %in% n[[index]], ncol=ncol(x),
+                                             nrow=nrow(x))
+                              tmp[is.na(x)] <- NA
+                              colSums(tmp)
+                          },
                           margin="by.variant", as.is="list",
                           var.index="relative")
             d <- matrix(unlist(d, use.names=FALSE), ncol=length(d),

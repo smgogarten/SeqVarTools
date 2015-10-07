@@ -8,7 +8,8 @@
 \alias{getGenotypeAlleles,SeqVarGDSClass-method}
 \alias{refDosage,SeqVarGDSClass-method}
 \alias{altDosage,SeqVarGDSClass-method}
-\alias{alleleDosage,SeqVarGDSClass-method}
+\alias{alleleDosage,SeqVarGDSClass,numeric-method}
+\alias{alleleDosage,SeqVarGDSClass,list-method}
 
 \title{Get genotype data}
 
@@ -22,7 +23,8 @@
 \S4method{getGenotypeAlleles}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sort=FALSE)
 \S4method{refDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
 \S4method{altDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
-\S4method{alleleDosage}{SeqVarGDSClass}(gdsobj, n=0, use.names=TRUE)
+\S4method{alleleDosage}{SeqVarGDSClass,numeric}(gdsobj, n=0, use.names=TRUE)
+\S4method{alleleDosage}{SeqVarGDSClass,list}(gdsobj, n, use.names=TRUE)
 }
 
 \arguments{
@@ -31,9 +33,9 @@
     variant IDs as dimnames of the resulting matrix.}
   \item{sort}{Logical for whether to sort alleles lexographically ("G/T"
     instead of "T/G").}
-  \item{n}{An integer or integer vector indicating which allele to return dosage
-  of.  \code{n=0} is the reference allele, \code{n=1} is the first
-  alternate allele, and so on. \code{n} may have length 1 to return the dosage of the same allele for all variants, or length=number of variants in the current filter to count a different allele for each variant.}
+  \item{n}{An integer, vector, or list indicating which allele(s) to return dosage
+  for.  \code{n=0} is the reference allele, \code{n=1} is the first
+  alternate allele, and so on.}
 }
 
 \details{
@@ -47,6 +49,8 @@
   Missing genotypes are coded as \code{NA}.
   
   Only diploid genotypes (the first two alleles at a given site) are returned.
+
+  If the argument \code{n} to\code{alleleDosage} is a single integer, the same allele is counted for all variants. If \code{n} is a vector with length=number of variants in the current filter, a different allele is counted for each variant. If \code{n} is a list, more than one allele can be counted for each variant. For example, if \code{n[[1]]=c(1,3)}, genotypes "0/1" and "0/3" will each have a dosage of 1 and genotype "1/3" will have a dosage of 2.
 }
 
 \value{
@@ -70,8 +74,8 @@
   for one alternate allele, and 0 for no alternate allele (homozygous reference).
 
   \code{alleleDosage} returns an integer matrix with the dosage of the
-  specified allele only: 2 for two copies of the allele ("0/0" if \code{n=0}, "1/1" if \code{n=1}, etc.), 1
-  for one copy of the specified allele, and 0 for no copies of the allele.
+  specified allele(s) only: 2 for two copies of the allele ("0/0" if \code{n=0}, "1/1" if \code{n=1}, etc.), 1
+  for one copy of the specified allele(s), and 0 for no copies of the allele(s).
 }
 
 \author{Stephanie Gogarten}
@@ -97,6 +101,7 @@ altDosage(gds)
 alleleDosage(gds, n=0)
 alleleDosage(gds, n=1)
 alleleDosage(gds, n=c(0,1,0,1,0))
+alleleDosage(gds, n=list(0,c(0,1),0,c(0,1),1))
 seqClose(gds)
 }
 
