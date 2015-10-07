@@ -32,3 +32,8 @@
     \item added methods to calculate and plot reference allele fraction
   }
 }
+\section{Changes in version 1.7.9}{
+  \itemize{
+    \item added more options to return dosage of different alleles
+  }
+}

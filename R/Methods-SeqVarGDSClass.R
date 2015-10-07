@@ -118,6 +118,32 @@ setMethod("refDosage",
             if (use.names) .applyNames(gdsobj, rd) else rd
           })
 
+setMethod("altDosage",
+          "SeqVarGDSClass",
+          function(gdsobj, use.names=TRUE) {
+            d <- seqApply(gdsobj, "genotype",
+                           function(x) {colSums(x != 0)},
+                           margin="by.variant", as.is="list")
+            d <- matrix(unlist(d, use.names=FALSE), ncol=length(d),
+                         dimnames=list(sample=NULL, variant=NULL))
+            if (use.names) .applyNames(gdsobj, d) else d
+          })
+
+setMethod("alleleDosage",
+          "SeqVarGDSClass",
+          function(gdsobj, n=0, use.names=TRUE) {
+            if (length(n) == 1) n <- rep(n, .nVar(gdsobj))
+            stopifnot(length(n) == .nVar(gdsobj))
+            stopifnot(all(n <= nAlleles(gdsobj)))
+            d <- seqApply(gdsobj, "genotype",
+                          function(index, x) {colSums(x == n[index])},
+                          margin="by.variant", as.is="list",
+                          var.index="relative")
+            d <- matrix(unlist(d, use.names=FALSE), ncol=length(d),
+                         dimnames=list(sample=NULL, variant=NULL))
+            if (use.names) .applyNames(gdsobj, d) else d
+          })
+
 setMethod("getVariableLengthData",
           c("SeqVarGDSClass", "character"),
           function(gdsobj, var.name, use.names=TRUE) {

@@ -38,6 +38,14 @@ setGeneric("refDosage",
            function(gdsobj, ...)
              standardGeneric("refDosage"))
 
+setGeneric("altDosage",
+           function(gdsobj, ...)
+             standardGeneric("altDosage"))
+
+setGeneric("alleleDosage",
+           function(gdsobj, ...)
+             standardGeneric("alleleDosage"))
+
 setGeneric("getVariableLengthData",
            function(gdsobj, var.name, ...)
              standardGeneric("getVariableLengthData"))

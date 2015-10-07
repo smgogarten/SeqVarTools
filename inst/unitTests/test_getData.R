@@ -163,3 +163,48 @@ test_refDosage_apply <- function() {
                  applyMethod(gds, refDosage, variant=var.id, sample=samp.id))
   seqClose(gds)
 }
+
+test_altDosage <- function() {
+  gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
+  gds <- seqOpen(gdsfile)
+  geno <- getGenotype(gds)
+  d <- altDosage(gds)
+  hasref <- geno %in% paste0("0/", 0:(max(nAlleles(gds))-1))
+  hasref[is.na(geno)] <- NA
+  hasalt <- !(geno %in% "0/0")
+  hasalt[is.na(geno)] <- NA
+  checkEquals(!hasref, as.vector(d == 2))
+  checkEquals(hasalt & hasref, as.vector(d == 1))
+  checkEquals(geno == "0/0", d == 0)
+  checkIdentical(is.na(geno), is.na(d))
+  checkIdentical(refDosage(gds), 2-d)
+  seqClose(gds)
+}
+
+test_alleleDosage <- function() {
+  gds <- seqOpen(seqExampleFileName("gds"))
+  checkIdentical(refDosage(gds), alleleDosage(gds, n=0))
+  checkIdentical(altDosage(gds), alleleDosage(gds, n=1))
+  seqClose(gds)
+  
+  gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
+  gds <- seqOpen(gdsfile)
+  checkIdentical(refDosage(gds), alleleDosage(gds, n=0))
+  checkIdentical(altDosage(gds), 2-alleleDosage(gds, n=0))
+
+  ## different alleles for each variant
+  nalleles <- nAlleles(gds)
+  n <- sapply(nalleles, function(x) sample(0:(x-1), 1))
+  geno <- getGenotype(gds)
+  cnt <- matrix(nrow=nrow(geno), ncol=ncol(geno), dimnames=dimnames(geno))
+  for (i in 1:nrow(geno)) {
+      cnt[i,] <- stringr::str_count(geno[i,], as.character(n))
+  }
+  checkEquals(cnt, alleleDosage(gds, n))
+  
+  ## invalid allele
+  checkException(alleleDosage(gds, n=10))
+  checkException(alleleDosage(gds, n=c(1,0)))
+  
+  seqClose(gds)
+}
