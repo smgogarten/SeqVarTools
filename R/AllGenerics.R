@@ -121,3 +121,7 @@ setGeneric("sampleData",
 setGeneric("sampleData<-",
            function(x, value)
              standardGeneric("sampleData<-"))
+
+setGeneric("regression",
+           function(gdsobj, ...)
+             standardGeneric("regression"))

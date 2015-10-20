@@ -39,7 +39,8 @@ exportMethods(sampleData, "sampleData<-",
               alternateAlleleDetection,
               refFrac,
               refFracOverHets,
-              refFracPlot)
+              refFracPlot,
+              regression)
 
 export(SeqVarData,
        setVariantID)

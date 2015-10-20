@@ -1,5 +1,5 @@
 Package: SeqVarTools
-Version: 1.9.0
+Version: 1.9.1
 Type: Package
 Title: Tools for variant data
 Description: An interface to the fast-access storage format for VCF
@@ -28,3 +28,4 @@ Collate:
   setVariantID.R
   alternateAlleleDetection.R
   refFrac.R
+  regression.R
