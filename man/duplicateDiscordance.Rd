@@ -9,7 +9,7 @@
 
 \usage{
 \S4method{duplicateDiscordance}{SeqVarGDSClass,missing}(gdsobj, samples=NULL, check.phase=FALSE, verbose=TRUE)
-\S4method{duplicateDiscordance}{SeqVarGDSClass,SeqVarGDSClass}(gdsobj, obj2, verbose=TRUE)
+\S4method{duplicateDiscordance}{SeqVarGDSClass,SeqVarGDSClass}(gdsobj, obj2, by.variant=FALSE, verbose=TRUE)
 }
 
 \arguments{
@@ -20,6 +20,7 @@
     "subject.id" should match for duplicate samples.}
   \item{check.phase}{A logical indicating whether phase should be
   considered when calculating discordance.}
+  \item{by.variant}{Calculate discordance by variant, otherwise by sample}
   \item{verbose}{A logical indicating whether to print progress messages.}
 }
 
@@ -33,7 +34,7 @@
   
   For calls that invovle two gds files,
   duplicate discordance is calculated by matching sample pairs (not subjects).
-  Samples are matched using must have the same sample.id in each gds object, so the samples must have the same identifier in both gds files.
+  Samples are matched only if they have the same sample.id in each gds object, so the samples must have the same identifier in both gds files.
   In the future, support will be added for matching on a subjectID instead of on sample IDs.
   Variants are matched using position and alleles.
   Only biallelic SNVs are considered.
@@ -55,11 +56,11 @@
   (as given in \code{samples}).}
   
   For calls invovling two gds files,
-  A data frame with the following columns:
-\item{subjectID}{currently, this is the sample ID}
-\item{sample.id.1}{sample id in the first gds file}
-\item{sample.id.2}{sample id in the second gds file}
-\item{n.variants}{the number of non-missing variants that were compared}
+  A data frame with the following columns, depending on whether \code{by.variant=TRUE} or \code{FALSE}:
+\item{subjectID}{currently, this is the sample ID (\code{by.variant=FALSE} only)}
+\item{sample.id.1/variant.id.1}{sample id or variant id in the first gds file}
+\item{sample.id.2/variant.id.1}{sample id or variant id in the second gds file}
+\item{n.variants/n.samples}{the number of non-missing variants or samples that were compared}
 \item{n.concordant}{the number of concordant variants}
 \item{n.alt}{the number of variants involving the alternate allele in either sample}
 \item{n.alt.conc}{the number of concordant variants invovling the alternate allele in either sample}

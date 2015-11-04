@@ -97,42 +97,38 @@ setMethod("duplicateDiscordance",
 #
 
 # returns number of concordant genotypes
-.getNConc <- function(geno1, geno2){
-  sel <- geno1 == geno2
-  sum(sel)
+.getMatchesConc <- function(geno1, geno2){
+  sel <- (geno1 == geno2) & (geno1 != "miss")
+  sel
 }
 
 # returns index selecting genotype pairs that involve the alt allele
-.getalt <- function(geno1, geno2){
-  !(geno1 == "ref" & geno2 == "ref")
+.getAlt <- function(geno1, geno2){
+  (geno1 == "het" | geno1 == "alt" | geno2 == "het" | geno2 == "alt") & (geno1 != "miss") & (geno2 != "miss")
 }
 
-# returns the number of genotype pairs involving the alt allele
-.getNAlt <- function(geno1, geno2){
-  sum(.getalt(geno1, geno2))
-}
 
 # returns the number of concordant pairs involving the alt allele
-.getNAltConc <- function(geno1, geno2){
-  sel <- .getalt(geno1, geno2) & (geno1 == geno2)
-  sum(sel)
+.getMatchesAltConc <- function(geno1, geno2){
+  sel <- .getAlt(geno1, geno2) & (geno1 == geno2) & (geno1 != "miss")
+  sel
 }
 
-.getNHetAlt <- function(geno1, geno2) {
+.getMatchesHetAlt <- function(geno1, geno2) {
   sel <- (geno1 == "alt" & geno2 == "het") |
     (geno1 == "het" & geno2 == "alt")
-  sum(sel)
+  sel
 }
 
-.getNHetRef <- function(geno1, geno2) {
+.getMatchesHetRef <- function(geno1, geno2) {
   sel <- (geno1 == "ref" & geno2 == "het") |
     (geno1 == "het" & geno2 == "ref")
-  sum(sel)
+  sel
 }
 
-.getNRefAlt <- function(geno1, geno2){
+.getMatchesRefAlt <- function(geno1, geno2){
   sel <- (geno1 == "ref" & geno2 == "alt") | (geno1 == "alt" & geno2 == "ref")
-  sum(sel)
+  sel
 }
 
 
@@ -223,7 +219,7 @@ setMethod("duplicateDiscordance",
 # assumes filters are already set, and will reset filters
 setMethod("duplicateDiscordance",
           c("SeqVarGDSClass", "SeqVarGDSClass"),
-          function(gdsobj, obj2, verbose=TRUE){
+          function(gdsobj, obj2, by.variant=FALSE, verbose=TRUE){
             
             # save original filters
             originalVariants1 <- seqGetData(gdsobj, "variant.id")
@@ -252,13 +248,23 @@ setMethod("duplicateDiscordance",
             if (verbose) message(paste(nrow(overlappingVariants), "variant matches identified!"))
             
             # set up results data frame -- can just add columns to the samples data frame
-            samples$n.variants <- NA
-            samples$n.concordant <- NA
-            samples$n.alt <- NA
-            samples$n.alt.conc <- NA
-            samples$n.het.ref <- NA
-            samples$n.het.alt <- NA
-            samples$n.ref.alt <- NA
+            if (!by.variant){
+              samples$n.variants <- NA
+              samples$n.concordant <- NA
+              samples$n.alt <- NA
+              samples$n.alt.conc <- NA
+              samples$n.het.ref <- NA
+              samples$n.het.alt <- NA
+              samples$n.ref.alt <- NA
+            } else {
+              overlappingVariants$n.samples <- 0
+              overlappingVariants$n.concordant <- 0
+              overlappingVariants$n.alt <- 0
+              overlappingVariants$n.alt.conc <- 0
+              overlappingVariants$n.het.ref <- 0
+              overlappingVariants$n.het.alt <- 0
+              overlappingVariants$n.ref.alt <- 0
+            }
             
             # set filters for the variants -- will still need to order them properly
             seqSetFilter(gdsobj, variant.id=overlappingVariants$variant.id.1, verbose=FALSE)
@@ -284,20 +290,30 @@ setMethod("duplicateDiscordance",
               
               # remove missing genotypes
               sel <- !is.na(dos1) & !is.na(dos2)
-              dos1 <- dos1[sel]
-              dos2 <- dos2[sel]
+              #dos1 <- dos1[sel]
+              #dos2 <- dos2[sel]
               
               class1 <- .getGenotypeClass(dos1)
               class2 <- .getGenotypeClass(dos2)
               
-              # store information about discordant variants for this pair
-              samples$n.variants[i] <- length(dos1)
-              samples$n.concordant[i] <- .getNConc(class1, class2)
-              samples$n.alt[i] <- .getNAlt(class1, class2)
-              samples$n.alt.conc[i] <- .getNAltConc(class1, class2)
-              samples$n.het.ref[i] <- .getNHetRef(class1, class2)
-              samples$n.het.alt[i] <- .getNHetAlt(class1, class2)
-              samples$n.ref.alt[i] <- .getNRefAlt(class1, class2)
+              if (!by.variant){
+                # store information about discordant variants for this pair
+                samples$n.variants[i] <- sum(sel)
+                samples$n.concordant[i] <- sum(.getMatchesConc(class1, class2)[sel])
+                samples$n.alt[i] <- sum(.getAlt(class1, class2)[sel])
+                samples$n.alt.conc[i] <- sum(.getMatchesAltConc(class1, class2)[sel])
+                samples$n.het.ref[i] <- sum(.getMatchesHetRef(class1, class2)[sel])
+                samples$n.het.alt[i] <- sum(.getMatchesHetAlt(class1, class2)[sel])
+                samples$n.ref.alt[i] <- sum(.getMatchesRefAlt(class1, class2)[sel])
+              } else {
+                overlappingVariants$n.samples <- overlappingVariants$n.samples + sel
+                overlappingVariants$n.concordant <- overlappingVariants$n.concordant + .getMatchesConc(class1, class2)
+                overlappingVariants$n.alt <- overlappingVariants$n.alt + .getAlt(class1, class2)
+                overlappingVariants$n.alt.conc <- overlappingVariants$n.alt.conc + .getMatchesAltConc(class1, class2)
+                overlappingVariants$n.het.ref <- overlappingVariants$n.het.ref + .getMatchesHetRef(class1, class2)
+                overlappingVariants$n.het.alt <- overlappingVariants$n.het.alt + .getMatchesHetAlt(class1, class2)
+                overlappingVariants$n.ref.alt <- overlappingVariants$n.ref.alt + .getMatchesRefAlt(class1, class2)
+              }
               
             }
             
@@ -305,7 +321,11 @@ setMethod("duplicateDiscordance",
             seqSetFilter(gdsobj, sample.id=originalSamples1, variant.id=originalVariants1, verbose=FALSE)
             seqSetFilter(obj2, sample.id=originalSamples2, variant.id=originalVariants2, verbose=FALSE)
             
-            # return samples data frame
-            samples
+            # return results data frame
+            if (by.variant){
+              return(overlappingVariants)
+            } else {
+              return(samples)
+            }
             
           })
