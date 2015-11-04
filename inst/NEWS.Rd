@@ -37,3 +37,8 @@
     \item added more options to return dosage of different alleles
   }
 }
+\section{Changes in version 1.9.2}{
+  \itemize{
+    \item added by.variant option to duplicateDiscordance for two gds files
+  }
+}
