@@ -97,8 +97,9 @@ setMethod("refFracPlot",
 
             ## title with variant.id, chr:position, SNV status
             title <- .varTitle(gdsobj)
-            
-            for (i in 1:length(variant.id)) {            
+
+            ## plot in same order as variant.id
+            for (i in match(variant.id, seqGetData(gdsobj, "variant.id"))) {            
               ## median fraction for hets
               pcol <- .colMap(geno[,i])
               refhet <- pcol == "green"

@@ -32,7 +32,7 @@
   If \code{check.phase=TRUE}, variants with mismatched phase are
   considered discordant.  If \code{check.phase=FALSE}, phase is ignored.
   
-  For calls that invovle two gds files,
+  For calls that involve two gds files,
   duplicate discordance is calculated by matching sample pairs (not subjects).
   Samples are matched only if they have the same sample.id in each gds object, so the samples must have the same identifier in both gds files.
   In the future, support will be added for matching on a subjectID instead of on sample IDs.
@@ -55,7 +55,7 @@
   discordance rate (num.discord / num.var).  Row.names are subject.id
   (as given in \code{samples}).}
   
-  For calls invovling two gds files,
+  For calls involving two gds files,
   A data frame with the following columns, depending on whether \code{by.variant=TRUE} or \code{FALSE}:
 \item{subjectID}{currently, this is the sample ID (\code{by.variant=FALSE} only)}
 \item{sample.id.1/variant.id.1}{sample id or variant id in the first gds file}
