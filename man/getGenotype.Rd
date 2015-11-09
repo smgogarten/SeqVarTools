@@ -73,9 +73,11 @@
   alternate allele: 2 for two alternate alleles ("1/1", "1/2", etc.), 1
   for one alternate allele, and 0 for no alternate allele (homozygous reference).
 
-  \code{alleleDosage} returns an integer matrix with the dosage of the
-  specified allele(s) only: 2 for two copies of the allele ("0/0" if \code{n=0}, "1/1" if \code{n=1}, etc.), 1
-  for one copy of the specified allele(s), and 0 for no copies of the allele(s).
+  \code{alleleDosage} with an integer argument returns an integer matrix with the dosage of the
+  specified allele only: 2 for two copies of the allele ("0/0" if \code{n=0}, "1/1" if \code{n=1}, etc.), 1
+  for one copy of the specified allele, and 0 for no copies of the allele.
+
+  \code{alleleDosage} with a list argument returns a list of allele x sample matrices with the dosage of each specified allele for each variant.
 }
 
 \author{Stephanie Gogarten}

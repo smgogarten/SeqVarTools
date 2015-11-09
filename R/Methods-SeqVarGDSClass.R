@@ -144,22 +144,39 @@ setMethod("alleleDosage",
             if (use.names) .applyNames(gdsobj, d) else d
           })
 
+## setMethod("alleleDosage",
+##           c("SeqVarGDSClass", "list"),
+##           function(gdsobj, n, use.names=TRUE) {
+##             stopifnot(length(n) == .nVar(gdsobj))
+##             d <- seqApply(gdsobj, "genotype",
+##                           function(index, x) {
+##                               tmp <- matrix(x %in% n[[index]], ncol=ncol(x),
+##                                              nrow=nrow(x))
+##                               tmp[is.na(x)] <- NA
+##                               colSums(tmp)
+##                           },
+##                           margin="by.variant", as.is="list",
+##                           var.index="relative")
+##             d <- matrix(unlist(d, use.names=FALSE), ncol=length(d),
+##                          dimnames=list(sample=NULL, variant=NULL))
+##             if (use.names) .applyNames(gdsobj, d) else d
+##           })
+
 setMethod("alleleDosage",
           c("SeqVarGDSClass", "list"),
           function(gdsobj, n, use.names=TRUE) {
             stopifnot(length(n) == .nVar(gdsobj))
+            samp.names <- if (use.names) seqGetData(gdsobj, "sample.id") else NULL
             d <- seqApply(gdsobj, "genotype",
                           function(index, x) {
-                              tmp <- matrix(x %in% n[[index]], ncol=ncol(x),
-                                             nrow=nrow(x))
-                              tmp[is.na(x)] <- NA
-                              colSums(tmp)
+                              tmp <- lapply(n[[index]], function(allele) colSums(x == allele))
+                              matrix(unlist(tmp, use.names=FALSE), nrow=length(tmp), byrow=TRUE,
+                                     dimnames=list(allele=n[[index]], sample=samp.names))
                           },
                           margin="by.variant", as.is="list",
                           var.index="relative")
-            d <- matrix(unlist(d, use.names=FALSE), ncol=length(d),
-                         dimnames=list(sample=NULL, variant=NULL))
-            if (use.names) .applyNames(gdsobj, d) else d
+            if (use.names) names(d) <- seqGetData(gdsobj, "variant.id")
+            d
           })
 
 setMethod("getVariableLengthData",

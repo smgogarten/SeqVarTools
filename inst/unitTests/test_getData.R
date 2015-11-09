@@ -181,6 +181,23 @@ test_altDosage <- function() {
   seqClose(gds)
 }
 
+## former alleleDosage method for list, summing over all requested alleles
+.alleleDosageSum <- function(gdsobj, n, use.names=TRUE) {
+    stopifnot(length(n) == SeqVarTools:::.nVar(gdsobj))
+    d <- seqApply(gdsobj, "genotype",
+                  function(index, x) {
+                      tmp <- matrix(x %in% n[[index]], ncol=ncol(x),
+                                    nrow=nrow(x))
+                      tmp[is.na(x)] <- NA
+                      colSums(tmp)
+                  },
+                  margin="by.variant", as.is="list",
+                  var.index="relative")
+    d <- matrix(unlist(d, use.names=FALSE), ncol=length(d),
+                dimnames=list(sample=NULL, variant=NULL))
+    if (use.names) SeqVarTools:::.applyNames(gdsobj, d) else d
+}
+
 test_alleleDosage <- function() {
   gds <- seqOpen(seqExampleFileName("gds"))
   checkIdentical(refDosage(gds), alleleDosage(gds, n=0))
@@ -204,11 +221,19 @@ test_alleleDosage <- function() {
 
   ## n is a list
   n <- lapply(nalleles, function(x) sample(0:(x-1), sample(1:x, 1)))
+  cnt <- list()
   for (i in 1:ncol(geno)) {
-      tmp <- lapply(n[[i]], function(x) stringr::str_count(geno[,i], as.character(x)))
-      cnt[,i] <- colSums(do.call(rbind, tmp))
+  ##     tmp <- lapply(n[[i]], function(x) stringr::str_count(geno[,i], as.character(x)))
+  ##     cnt[,i] <- colSums(do.call(rbind, tmp))
+      cnt[[i]] <- do.call(rbind, lapply(n[[i]], function(x) stringr::str_count(geno[,i], as.character(x))))
+      dimnames(cnt[[i]]) <- list(allele=n[[i]], sample=rownames(geno))
   }
-  checkEquals(cnt, alleleDosage(gds, n))
+  ad <- alleleDosage(gds, n)
+  checkEquals(cnt, ad, checkNames=FALSE)
+
+  adsum <- t(do.call(rbind, lapply(ad, function(x) colSums(x))))
+  names(dimnames(adsum)) <- c("sample", "variant")
+  checkEquals(.alleleDosageSum(gds, n), adsum)
   
   ## invalid allele
   checkException(alleleDosage(gds, n=10))

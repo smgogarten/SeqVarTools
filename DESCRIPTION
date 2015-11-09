@@ -1,5 +1,5 @@
 Package: SeqVarTools
-Version: 1.9.3
+Version: 1.9.4
 Type: Package
 Title: Tools for variant data
 Description: An interface to the fast-access storage format for VCF
