@@ -67,7 +67,7 @@ setMethod("refFracOverHets",
   paste0("Variant ", var.id, ", chr", loc, ", ",
         ifelse(snv, "SNV", "INDEL"), ", ",
         "nAlt=", nalleles-1, "\n",
-         paste(rev(paste(names(counts), counts, sep="=")), collapse=", "))
+         apply(counts, 1, function(x) paste(rev(paste(names(counts), x, sep="=")), collapse=", ")))
 }
 
 
