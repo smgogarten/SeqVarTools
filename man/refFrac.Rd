@@ -15,7 +15,7 @@
 \usage{
 \S4method{refFrac}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
 \S4method{refFracOverHets}{SeqVarGDSClass}(gdsobj, FUN=mean, use.names=TRUE)
-\S4method{refFracPlot}{SeqVarGDSClass}(gdsobj, variant.id, ...)
+\S4method{refFracPlot}{SeqVarGDSClass}(gdsobj, variant.id, highlight=NULL, ...)
 }
 
 \arguments{
@@ -24,6 +24,7 @@
   \item{use.names}{A logical indicating whether to assign variant or
     samples IDs as names of the output vector.}
   \item{variant.id}{A vector of variant.ids to plot.}
+  \item{highlight}{A list of sample.ids to highlight with sequential integers on each plot}
   \item{...}{Additional arguments passed to \code{\link{plot}}.}
 }
 
@@ -64,7 +65,9 @@ gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools
 gds <- seqOpen(gdsfile)
 RF <- refFrac(gds)
 dim(RF)
-refFracPlot(gds, variant.id=5)
+samples <- seqGetData(gds, "sample.id")
+refFracPlot(gds, variant.id=5:6, 
+            highlight=list(samples[2:3], samples[4:5]))
 seqClose(gds)
 }
 

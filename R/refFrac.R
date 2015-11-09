@@ -73,7 +73,7 @@ setMethod("refFracOverHets",
 
 setMethod("refFracPlot",
           "SeqVarGDSClass",
-          function(gdsobj, variant.id, ...) {
+          function(gdsobj, variant.id, highlight=NULL,...) {
             filt.orig <- seqGetFilter(gdsobj)$variant.sel
             seqSetFilter(gdsobj, variant.id=variant.id, verbose=FALSE)
 
@@ -94,6 +94,8 @@ setMethod("refFracPlot",
 
             ## color-code by genotype call
             geno <- getGenotype(gdsobj)
+            dimnames(ref.frac) <- dimnames(geno)
+            dimnames(tot.reads) <- dimnames(geno)
 
             ## title with variant.id, chr:position, SNV status
             title <- .varTitle(gdsobj)
@@ -123,6 +125,12 @@ setMethod("refFracPlot",
                    main=title[i], xlim=c(0,1), ...)
               abline(v=0.5)
               abline(v=med.frac, col="green")
+              
+              ## highlight samples?
+              if (!is.null(highlight)) {
+                  text(ref.frac[highlight[[i]],i], tot.reads[highlight[[i]],i],
+                       col="black")
+              }
             }
             
             seqSetFilter(gdsobj, variant.sel=filt.orig, verbose=FALSE)
