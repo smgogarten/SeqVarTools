@@ -170,8 +170,8 @@ setMethod("alleleDosage",
             d <- seqApply(gdsobj, "genotype",
                           function(index, x) {
                               tmp <- lapply(n[[index]], function(allele) colSums(x == allele))
-                              matrix(unlist(tmp, use.names=FALSE), nrow=length(tmp), byrow=TRUE,
-                                     dimnames=list(allele=n[[index]], sample=samp.names))
+                              matrix(unlist(tmp, use.names=FALSE), ncol=length(tmp),
+                                     dimnames=list(sample=samp.names, allele=n[[index]]))
                           },
                           margin="by.variant", as.is="list",
                           var.index="relative")

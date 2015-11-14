@@ -225,13 +225,13 @@ test_alleleDosage <- function() {
   for (i in 1:ncol(geno)) {
   ##     tmp <- lapply(n[[i]], function(x) stringr::str_count(geno[,i], as.character(x)))
   ##     cnt[,i] <- colSums(do.call(rbind, tmp))
-      cnt[[i]] <- do.call(rbind, lapply(n[[i]], function(x) stringr::str_count(geno[,i], as.character(x))))
-      dimnames(cnt[[i]]) <- list(allele=n[[i]], sample=rownames(geno))
+      cnt[[i]] <- do.call(cbind, lapply(n[[i]], function(x) stringr::str_count(geno[,i], as.character(x))))
+      dimnames(cnt[[i]]) <- list(sample=rownames(geno), allele=n[[i]])
   }
   ad <- alleleDosage(gds, n)
   checkEquals(cnt, ad, checkNames=FALSE)
 
-  adsum <- t(do.call(rbind, lapply(ad, function(x) colSums(x))))
+  adsum <- do.call(cbind, lapply(ad, function(x) rowSums(x)))
   names(dimnames(adsum)) <- c("sample", "variant")
   checkEquals(.alleleDosageSum(gds, n), adsum)
   
