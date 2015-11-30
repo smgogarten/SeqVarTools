@@ -17,9 +17,9 @@ setMethod("hwe",
               f <- .f(counts)
 
               ## set non-biallelic or monomorphic variants to NA
-              sel <- nAlleles(gdsobj) != 2 |
-                  counts$nAa + counts$naa == 0 |
-                      counts$nAa + counts$nAA == 0
+              sel <- nAlleles(gdsobj) != 2L |
+                  counts$nAa + counts$naa == 0L |
+                      counts$nAa + counts$nAA == 0L
               p[sel] <- NA
               f[sel] <- NA
 

@@ -18,8 +18,8 @@ setMethod("inbreedCoeff",
 
               ## apply the function variant by variant
               seqApply(gdsobj, "genotype", function(x) {
-                p <- mean(x==0, na.rm=TRUE)      # allele frequency
-                g <- colSums(x==0)               # genotypes: # of reference allele
+                p <- mean(x==0L, na.rm=TRUE)     # allele frequency
+                g <- colSums(x==0L)              # genotypes: # of reference allele
                 d <- (g*g - g*(1 + 2*p) + 2*p*p) / (2*p*(1-p))
                 n <<- n + is.finite(d)           # output to the global variable "n"
                 d[!is.finite(d)] <- 0

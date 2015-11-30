@@ -2,7 +2,7 @@
 setMethod("refFrac",
           "SeqVarGDSClass",
           function(gdsobj, use.names=TRUE) {
-            vars <- seqSummary(gdsobj, check="none", verbose=FALSE)$format$var.name
+            vars <- seqSummary(gdsobj, "annotation/format", check="none", verbose=FALSE)$ID
             if (!("AD" %in% vars)) {
               stop("annotation/format/AD must be present to compute allelic balance")
             }
@@ -19,7 +19,7 @@ setMethod("refFrac",
 setMethod("refFracOverHets",
           "SeqVarGDSClass",
           function(gdsobj, FUN=mean, use.names=TRUE) {
-            vars <- seqSummary(gdsobj, check="none", verbose=FALSE)$format$var.name
+            vars <- seqSummary(gdsobj, "annotation/format", check="none", verbose=FALSE)$ID
             if (!("AD" %in% vars)) {
               stop("annotation/format/AD must be present to compute allelic balance")
             }
