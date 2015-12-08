@@ -137,7 +137,9 @@ setMethod("duplicateDiscordance",
 }
 
 
-.matchVariants <- function(gr1, gr2, allowOverlaps=TRUE){
+.matchVariants <- function(gr1, gr2, match.on=c("alleles", "position"), allowOverlaps=TRUE){
+  
+  match.on = match.arg(match.on)
   
   required <- c("variant.id", "ref", "alt", "snv")
   names1 <- names(elementMetadata(gr1))
@@ -159,14 +161,23 @@ setMethod("duplicateDiscordance",
   overlapping.1 <- gr1[queryHits(overlaps)]
   overlapping.2 <- gr2[subjectHits(overlaps)]
   
-  # check alleles -- no flipping for now
+  # data frame to track overlaps
+  overlapping <- data.frame(variant.id.1=overlapping.1$variant.id,
+                            variant.id.2=overlapping.2$variant.id,
+                            stringsAsFactors=F)
+
+  # check alleles if requested
   sel.same <- (overlapping.1$ref == overlapping.2$ref) & (overlapping.1$alt == overlapping.2$alt)
-  overlapping <- data.frame(variant.id.1=overlapping.1$variant.id[sel.same],
-                            variant.id.2=overlapping.2$variant.id[sel.same])
+  sel.flip <- (overlapping.1$ref == overlapping.2$alt) & (overlapping.1$alt == overlapping.2$ref)
+  overlapping$recode <- sel.flip
+  if (match.on == "alleles"){
+    overlapping <- overlapping[sel.same | sel.flip, ]
+  } 
   
   if (!allowOverlaps){
     # choose the first overlapping variant
-    overlapping <- overlapping[!duplicated(overlapping$variant.id.1) & !duplicated(overlapping$variant.id.2), ]
+    overlapping <- overlapping[!duplicated(overlapping$variant.id.1), ]
+    overlapping <- overlapping[!duplicated(overlapping$variant.id.2), ]
   }
   
   overlapping
@@ -223,7 +234,9 @@ setMethod("duplicateDiscordance",
 # assumes filters are already set, and will reset filters
 setMethod("duplicateDiscordance",
           c("SeqVarData", "SeqVarData"),
-          function(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), by.variant=FALSE, verbose=TRUE){
+          function(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), match.variants.on=c("alleles", "position"), by.variant=FALSE, verbose=TRUE){
+            
+            match.variants.on = match.arg(match.variants.on)
             
             # save original filters
             originalVariants1 <- seqGetData(gdsobj, "variant.id")
@@ -249,7 +262,7 @@ setMethod("duplicateDiscordance",
             if (verbose) message("matching variants... ", appendLF=FALSE)
             gr1 <- .getGRanges(gdsobj)
             gr2 <- .getGRanges(obj2)
-            overlappingVariants <- .matchVariants(gr1, gr2)
+            overlappingVariants <- .matchVariants(gr1, gr2, match.on=match.variants.on)
             if (verbose) message(paste(nrow(overlappingVariants), "variant matches identified!"))
             
             # set up results data frame -- can just add columns to the samples data frame
@@ -292,6 +305,9 @@ setMethod("duplicateDiscordance",
               # order genotypes appropriately
               dos1 <- dos1[, as.character(overlappingVariants$variant.id.1)]
               dos2 <- dos2[, as.character(overlappingVariants$variant.id.2)]
+              
+              # recode if the alt/ref alleles are switched
+              dos2[overlappingVariants$recode] <- 2 - dos2[overlappingVariants$recode]
               
               # remove missing genotypes
               sel <- !is.na(dos1) & !is.na(dos2)

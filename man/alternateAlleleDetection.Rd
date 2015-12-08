@@ -22,7 +22,7 @@
   Calculates the accuracy of detecting alternate alleles in one dataset (\code{gdsobj}) given a ``gold standard'' dataset (\code{gdsobj2}).
   Samples are matched using the \code{match.samples.on} argument. The first element of \code{match.samples.on} indicates the column to be used as the subject identifier for the first dataset, and the second element is the column to be used for the second dataset.
   Variants are matched on position and alleles using bi-allelic SNVs only.
-  No genotype recoding is done; the variant must have the same reference and alternate alleles to be considered a match.
+  Genotype dosages are recoded to count the same allele if the reference allele in one dataset is the alternate allele in the other dataset.
   If a variant in one dataset matches to multiple variants in the second dataset, then only the first match will be used.
   If a variant is missing in either dataset for a given sample pair, that sample pair is ignored for that variant.
   To exclude certain variants or samples from the calculate, use \code{\link{seqSetFilter}} to set appropriate filters on each gds object.

@@ -93,6 +93,9 @@ setMethod("alternateAlleleDetection",
               dos1 <- dos1[, as.character(overlappingVariants$variant.id.1)]
               dos2 <- dos2[, as.character(overlappingVariants$variant.id.2)]
               
+              # recoded variants where ref in one = alt in other
+              dos2[overlappingVariants$recode] <- 2 - dos2[overlappingVariants$recode]
+              
               ## remove missing genotypes
               #sel <- !is.na(dos1) & !is.na(dos2)
               #dos1 <- dos1[sel]

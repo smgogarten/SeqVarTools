@@ -9,13 +9,14 @@
 
 \usage{
 \S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", check.phase=FALSE, verbose=TRUE)
-\S4method{duplicateDiscordance}{SeqVarData,SeqVarData}(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), by.variant=FALSE, verbose=TRUE)
+\S4method{duplicateDiscordance}{SeqVarData,SeqVarData}(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), match.variants.on=c("alleles", "position"), by.variant=FALSE, verbose=TRUE)
 }
 
 \arguments{
   \item{gdsobj}{A \code{\link{SeqVarData}} object with VCF data.}
   \item{obj2}{A \code{\link{SeqVarData}} object with VCF data.}
   \item{match.samples.on}{Character string or vector of strings indicating which column should be used for matching samples. See details.}
+  \item{match.variants.on}{Character string of length one indicating how to match variants. See details.}
   \item{check.phase}{A logical indicating whether phase should be
   considered when calculating discordance.}
   \item{by.variant}{Calculate discordance by variant, otherwise by sample}
@@ -31,10 +32,12 @@
   considered discordant.  If \code{check.phase=FALSE}, phase is ignored.
   
   For calls that involve two gds files, 
-  duplicate discordance is calculated by matching sample pairs between the two data sets. 
-  Variants are matched using position and alleles.
-  Only biallelic SNVs are considered.
-  No recoding is done; the same allele must be the reference in both gds files.
+  duplicate discordance is calculated by matching sample pairs and variants between the two data sets. 
+  Only biallelic SNVs are considered in the comparison.
+  Variants can be matched using chromosome and position only (\code{match.variants.on="position"}) or by using chromosome, position, and alleles (\code{match.variants.on="alleles"}).
+  If matching on alleles and the reference allele in the first dataset is the alternate allele in the second dataset, the genotype dosage will be recoded so the same allele is counted before making the comparison.
+  If a variant in one dataset maps to multiple variants in the other dataset, only the first pair is considered for the comparison.
+
 
   The argument \code{match.samples.on} can be used to select which column in the \code{\link{sampleData}} of the input \code{\link{SeqVarData}} object should be used for matching samples.
   For one gds file, \code{match.samples.on} should be a single string.

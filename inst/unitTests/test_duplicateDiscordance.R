@@ -119,9 +119,9 @@ test_getGentoypeClass <- function() {
 
 test_matchVariants <- function() {
   
-  gr1 <- GRanges(seqnames=c("1", "1", "1", "1", "2", "2"),
-                 ranges=IRanges(start=c(1, 1, 2, 3, 1, 3),
-                                end  =c(1, 2, 2, 3, 1, 3))
+  gr1 <- GRanges(seqnames=c("1", "1", "1", "1", "2", "2", "4"),
+                 ranges=IRanges(start=c(1, 1, 2, 3, 1, 3, 1),
+                                end  =c(1, 2, 2, 3, 1, 3, 1))
   )
   gr1$ref <- rep("A", length(gr1))
   gr1$alt <- rep("B", length(gr1))
@@ -130,25 +130,39 @@ test_matchVariants <- function() {
   gr1$snv[2] <- FALSE
   gr1$variant.id <- 1:length(gr1) + 2
   
-  gr2 <- GRanges(seqnames=c("1", "1", "1", "1", "1", "2", "2", "3"),
-                 ranges=IRanges(start=c(1, 1, 1, 2, 2, 1, 3, 1),
-                                end = c(1, 1, 2, 2, 2, 1, 3, 1)))
+  gr2 <- GRanges(seqnames=c("1", "1", "1", "1", "1", "2", "2", "3", "4"),
+                 ranges=IRanges(start=c(1, 1, 1, 2, 2, 1, 3, 1, 1),
+                                end = c(1, 1, 2, 2, 2, 1, 3, 1, 1)))
   gr2$ref <- rep("A", length(gr2))
   gr2$alt <- rep("B", length(gr2))
   gr2$alt[3] <- "BC"
   gr2$alt[4] <- "C"
+  gr2$ref[9] <- "B"
+  gr2$alt[9] <- "A"
   gr2$snv <- rep(TRUE, length(gr2))
   gr2$snv[3] <- FALSE
   gr2$variant.id <- 1:length(gr2)
   
-  overlaps <- SeqVarTools:::.matchVariants(gr1, gr2)  
+  # match on position only, duplicates alowed
+  overlaps <- SeqVarTools:::.matchVariants(gr1, gr2, match.on="position")  
+  checkEquals(overlaps$variant.id.1, c(3, 3, 5, 5, 7, 8, 9))
+  checkEquals(overlaps$variant.id.2, c(1, 2, 4, 5, 6, 7, 9))
+  checkEquals(overlaps$recode, c(rep(FALSE, 6), TRUE))
+
+  # match on position, no duplicates
+  overlapsNoDups <- SeqVarTools:::.matchVariants(gr1, gr2, match.on="position", allowOverlaps=FALSE)
+  checkEquals(overlapsNoDups$variant.id.1, c(3, 5, 7, 8, 9))
+  checkEquals(overlapsNoDups$variant.id.2, c(1, 4, 6, 7, 9))
   
-  checkEquals(overlaps$variant.id.1, c(3, 3, 5, 7, 8))
-  checkEquals(overlaps$variant.id.2, c(1, 2, 5, 6, 7))
+  # match on position and alleles  
+  overlaps <- SeqVarTools:::.matchVariants(gr1, gr2, match.on="alleles")
+  checkEquals(overlaps$variant.id.1, c(3, 3, 5, 7, 8, 9))
+  checkEquals(overlaps$variant.id.2, c(1, 2, 5, 6, 7, 9))
+  checkEquals(overlaps$recode, c(rep(FALSE, 5), TRUE))
   
-  overlapsNoDups <- SeqVarTools:::.matchVariants(gr1, gr2, allowOverlaps=FALSE)
-  checkEquals(overlapsNoDups$variant.id.1, c(3, 5, 7, 8))
-  checkEquals(overlapsNoDups$variant.id.2, c(1, 5, 6, 7))
+  overlapsNoDups <- SeqVarTools:::.matchVariants(gr1, gr2, match.on="alleles", allowOverlaps=FALSE)
+  checkEquals(overlapsNoDups$variant.id.1, c(3, 5, 7, 8, 9))
+  checkEquals(overlapsNoDups$variant.id.2, c(1, 5, 6, 7, 9))
 }
 
 test_matchSamples <- function() {
@@ -198,8 +212,8 @@ test_duplicateDiscordanceAcrossDatasets <- function() {
   filt.2 <- seqGetFilter(seqData2)
   
   # makes sure it runs
-  res <- duplicateDiscordance(seqData1, seqData2)
-  res.var <- duplicateDiscordance(seqData1, seqData2, by.variant=TRUE)
+  res <- duplicateDiscordance(seqData1, seqData2, match.variants.on="alleles")
+  res.var <- duplicateDiscordance(seqData1, seqData2, match.variants.on="alleles", by.variant=TRUE)
   
   # check filters
   checkEquals(seqGetFilter(seqData1), filt.1)
@@ -230,8 +244,8 @@ test_duplicateDiscordanceAcrossDatasets <- function() {
   seqSetFilter(seqData1, sample.id=samples1$sample.id[1:2], variant.id=seqGetData(seqData1, "variant.id")[1:50])
   seqSetFilter(seqData2, sample.id=samples2$sample.id[1:2], variant.id=seqGetData(seqData2, "variant.id")[25:75])
   
-  res <- duplicateDiscordance(seqData1, seqData2) 
-  res.var <- duplicateDiscordance(seqData1, seqData2, by.variant=TRUE) 
+  res <- duplicateDiscordance(seqData1, seqData2, match.variants.on="alleles") 
+  res.var <- duplicateDiscordance(seqData1, seqData2, by.variant=TRUE, match.variants.on="alleles") 
   
   # set filter to only read overlaps
   seqSetFilter(seqData1, variant.id=intersect(seqGetData(seqData1, "variant.id"), seqGetData(gds2, "variant.id")))
