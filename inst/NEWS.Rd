@@ -47,3 +47,8 @@
     \item alleleDosage returns list with dosage of each allele separately
   }
 }
+\section{Changes in version 1.9.8}{
+  \itemize{
+    \item duplicateDiscordance and alternateAlleleDetection require SeqVarData objects; both can match on a subject.id instead of sample.id
+  }
+}

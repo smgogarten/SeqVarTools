@@ -34,8 +34,8 @@
 
 # assumes filters are already set, and will reset filters
 setMethod("alternateAlleleDetection",
-          c("SeqVarGDSClass", "SeqVarGDSClass"),
-          function(gdsobj, gdsobj2, verbose=TRUE){
+          c("SeqVarData", "SeqVarData"),
+          function(gdsobj, gdsobj2, match.samples.on=c("subject.id", "subject.id"), verbose=TRUE){
             
             # save original filters
             originalVariants1 <- seqGetData(gdsobj, "variant.id")
@@ -47,11 +47,11 @@ setMethod("alternateAlleleDetection",
             
             # match samples -- no subject matching for now
             if (verbose) message("matching samples... ", appendLF=FALSE)
-            samp1 <- data.frame(sample.id=seqGetData(gdsobj, "sample.id"), stringsAsFactors=F)
-            samp1$subjectID <- samp1$sample.id
+            samp1 <- pData(sampleData(gdsobj))[, c("sample.id", match.samples.on[1])]
+            names(samp1)[2] <- "subject.id"
             
-            samp2 <- data.frame(sample.id=seqGetData(gdsobj2, "sample.id"), stringsAsFactors=F)
-            samp2$subjectID <- samp2$sample.id
+            samp2 <- pData(sampleData(gdsobj2))[, c("sample.id", match.samples.on[2])]
+            names(samp2)[2] <- "subject.id"
             
             samples <- .matchSamples(samp1, samp2)
             if (verbose) message(paste(nrow(samples), "pairs identified!"))
@@ -75,7 +75,7 @@ setMethod("alternateAlleleDetection",
             overlappingVariants$false.pos <- 0
             overlappingVariants$false.neg <- 0
             
-            for (i in seq_along(samples$subjectID)){
+            for (i in seq_along(samples$subject.id)){
               
               if (verbose & (i %% 10) == 0){
                 message(paste("sample pair", i, "out of", nrow(samples)))

@@ -1,3 +1,4 @@
+library(Biobase)
 library(GenomicRanges)
 
 test_samplePairs <- function() {
@@ -26,22 +27,26 @@ test_genoMatch <- function() {
 test_duplicateDiscordance_apply <- function() {
   gds <- seqOpen(seqExampleFileName("gds"))
   sample.id <- seqGetData(gds, "sample.id")
-  samples <- data.frame(subject.id=rep(c("subj1", "subj2"), each=2),
-                        sample.id=sample.id[1:4],
+  samples <- data.frame(subject.id=c(rep(c("subj1", "subj2"), each=2), sample.id[5:length(sample.id)]),
+                        sample.id=sample.id,
                         stringsAsFactors=FALSE)
   var.id <- 101:110
-  seqSetFilter(gds, variant.id=var.id)
-  disc <- duplicateDiscordance(gds, samples=samples)
+  
+  seqData <- SeqVarData(gds, sampleData=AnnotatedDataFrame(samples))
+  
+  seqSetFilter(gds, variant.id=var.id, sample.id=sample.id[1:4])
+  
+  disc <- duplicateDiscordance(seqData)
   seqSetFilter(gds)
   checkIdentical(disc,
-                 applyMethod(gds, duplicateDiscordance,
-                             variant=var.id, samples=samples))
+                 applyMethod(seqData, duplicateDiscordance,
+                             variant=var.id))
   seqClose(gds)
 }
 
 
 
-## tests for duplicae discordance on two gds files
+## tests for duplicate discordance on two gds files
 
 .getTestGeno <- function() {
   vals <- c("ref", "het", "alt", "miss")
@@ -149,16 +154,16 @@ test_matchVariants <- function() {
 test_matchSamples <- function() {
   
   # no duplicates at this point
-  samp1 <- data.frame(subjectID=c("A", "A", "B", "C", "D"), stringsAsFactors=F)
+  samp1 <- data.frame(subject.id=c("A", "A", "B", "C", "D"), stringsAsFactors=F)
   samp1$sample.id <- letters[1:nrow(samp1)]                    
   
-  samp2 <- data.frame(subjectID=c("A", "B", "D", "D", "E"), stringsAsFactors=F)
+  samp2 <- data.frame(subject.id=c("A", "B", "D", "D", "E"), stringsAsFactors=F)
   samp2$sample.id <- letters[1:nrow(samp2)]
   
   chk <- SeqVarTools:::.matchSamples(samp1, samp2)
-  chk$chk <- paste(chk$subjectID, chk$sample.id.1, chk$sample.id.2)
+  chk$chk <- paste(chk$subject.id, chk$sample.id.1, chk$sample.id.2)
   checkTrue(setequal(chk$chk, c("A a a", "A b a", "B c b", "D e c", "D e d")))
-  checkTrue(setequal(chk$subjectID, intersect(samp1$subjectID, samp2$subjectID)))
+  checkTrue(setequal(chk$subject.id, intersect(samp1$subject.id, samp2$subject.id)))
   checkEquals(nrow(chk), 5)
   
 }
@@ -173,30 +178,39 @@ test_duplicateDiscordanceAcrossDatasets <- function() {
   gds1 <- seqOpen(filename)
   gds2 <- seqOpen(tmpfile)
   
-  seqSetFilter(gds1)
-  seqSetFilter(gds2)
+  # add sample data
+  samples1 <- data.frame(sample.id=seqGetData(gds1, "sample.id"), stringsAsFactors=F)
+  samples1$subject.id <- samples1$sample.id
+  seqData1 <- SeqVarData(gds1, sampleData=AnnotatedDataFrame(samples1))
   
-  seqSetFilter(gds1, sample.id=seqGetData(gds1, "sample.id")[1:3])
-  seqSetFilter(gds2, sample.id=seqGetData(gds2, "sample.id")[2:4])
+  samples2 <- data.frame(sample.id=seqGetData(gds2, "sample.id"), stringsAsFactors=F)
+  samples2$subject.id <- samples2$sample.id
+  seqData2 <- SeqVarData(gds2, sampleData=AnnotatedDataFrame(samples2))
+
+  seqSetFilter(seqData1)
+  seqSetFilter(seqData2)
+  
+  seqSetFilter(seqData1, sample.id=seqGetData(seqData1, "sample.id")[1:3])
+  seqSetFilter(seqData2, sample.id=seqGetData(seqData2, "sample.id")[2:4])
   
   # check filters
-  filt.1 <- seqGetFilter(gds1)
-  filt.2 <- seqGetFilter(gds2)
+  filt.1 <- seqGetFilter(seqData1)
+  filt.2 <- seqGetFilter(seqData2)
   
   # makes sure it runs
-  res <- duplicateDiscordance(gds1, gds2)
-  res.var <- duplicateDiscordance(gds1, gds2, by.variant=TRUE)
+  res <- duplicateDiscordance(seqData1, seqData2)
+  res.var <- duplicateDiscordance(seqData1, seqData2, by.variant=TRUE)
   
   # check filters
-  checkEquals(seqGetFilter(gds1), filt.1)
-  checkEquals(seqGetFilter(gds2), filt.2)
+  checkEquals(seqGetFilter(seqData1), filt.1)
+  checkEquals(seqGetFilter(seqData2), filt.2)
   
   # check data for samples
-  checkEquals(seqGetData(gds1, "sample.id")[2:3], res$sample.id.1)
-  checkEquals(seqGetData(gds2, "sample.id")[1:2], res$sample.id.2)
+  checkEquals(seqGetData(seqData1, "sample.id")[2:3], res$sample.id.1)
+  checkEquals(seqGetData(seqData2, "sample.id")[1:2], res$sample.id.2)
   # and for variants
-  checkEquals(seqGetData(gds1, "variant.id")[isSNV(gds1)], res.var$variant.id.1)
-  checkEquals(seqGetData(gds2, "variant.id")[isSNV(gds2)], res.var$variant.id.2)
+  checkEquals(seqGetData(seqData1, "variant.id")[isSNV(seqData1)], res.var$variant.id.1)
+  checkEquals(seqGetData(seqData2, "variant.id")[isSNV(seqData2)], res.var$variant.id.2)
   
   checkEquals(res$n.concordant, res$n.variants)
   checkEquals(res$n.alt, res$n.alt.conc)
@@ -204,35 +218,29 @@ test_duplicateDiscordanceAcrossDatasets <- function() {
   checkEquals(res.var$n.concordant, res.var$n.samples)
   checkEquals(res.var$n.alt, res.var$n.alt.conc)
   
-  seqClose(gds2)
+  seqSetFilter(seqData1)
+  seqSetFilter(seqData2)
+
+    # change subjectID for seqData2
+  #samples2 <- sampleData(seqData2)
+  samples2$subject.id[2:1] <- samples2$subject.id[1:2]
+  seqData2 <- SeqVarData(gds2, sampleData=AnnotatedDataFrame(samples2))
   
-  # change a sample id
-  tmp <- openfn.gds(tmpfile, readonly=FALSE)  
-  samps <- read.gdsn(index.gdsn(tmp, "sample.id"))
-  samps[1:2] <- samps[2:1]
-  delete.gdsn(index.gdsn(tmp, "sample.id"))
-  add.gdsn(tmp, "sample.id", val=samps, compress="ZIP")
-  closefn.gds(tmp)
   
-  gds2 <- seqOpen(tmpfile)  
+  seqSetFilter(seqData1, sample.id=samples1$sample.id[1:2], variant.id=seqGetData(seqData1, "variant.id")[1:50])
+  seqSetFilter(seqData2, sample.id=samples2$sample.id[1:2], variant.id=seqGetData(seqData2, "variant.id")[25:75])
   
-  seqSetFilter(gds1)
-  seqSetFilter(gds2)
-  
-  seqSetFilter(gds1, sample.id=samps[1:2], variant.id=seqGetData(gds1, "variant.id")[1:50])
-  seqSetFilter(gds2, sample.id=samps[1:2], variant.id=seqGetData(gds2, "variant.id")[25:75])
-  
-  res <- duplicateDiscordance(gds1, gds2) 
-  res.var <- duplicateDiscordance(gds1, gds2, by.variant=TRUE) 
+  res <- duplicateDiscordance(seqData1, seqData2) 
+  res.var <- duplicateDiscordance(seqData1, seqData2, by.variant=TRUE) 
   
   # set filter to only read overlaps
-  seqSetFilter(gds1, variant.id=intersect(seqGetData(gds1, "variant.id"), seqGetData(gds2, "variant.id")))
+  seqSetFilter(seqData1, variant.id=intersect(seqGetData(seqData1, "variant.id"), seqGetData(gds2, "variant.id")))
   
   # read dosages
-  dos <- refDosage(gds1)
+  dos <- refDosage(seqData1)
   
   # get the granges object
-  gr <- SeqVarTools:::.getGRanges(gds1)
+  gr <- SeqVarTools:::.getGRanges(seqData1)
   
   # snvs only
   dos <- dos[, gr$snv]
@@ -250,8 +258,8 @@ test_duplicateDiscordanceAcrossDatasets <- function() {
   
   checkEquals(res$n.alt.conc[1], sum(minor & match))
   
-  seqClose(gds1)
-  seqClose(gds2)
+  seqClose(seqData1)
+  seqClose(seqData2)
   
   unlink(tmpfile)
   

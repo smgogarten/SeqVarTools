@@ -1,3 +1,4 @@
+library(Biobase)
 
 test_posNeg <- function() {
   TP <- matrix(c(2,1,0,0,
@@ -40,60 +41,63 @@ test_alternateAlleleDetection <- function() {
   gds1 <- seqOpen(filename)
   gds2 <- seqOpen(tmpfile)
   
-  seqSetFilter(gds1)
-  seqSetFilter(gds2)
+  # add sample data
+  samples1 <- data.frame(sample.id=seqGetData(gds1, "sample.id"), stringsAsFactors=F)
+  samples1$subject.id <- samples1$sample.id
+  seqData1 <- SeqVarData(gds1, sampleData=AnnotatedDataFrame(samples1))
   
-  seqSetFilter(gds1, sample.id=seqGetData(gds1, "sample.id")[1:3])
-  seqSetFilter(gds2, sample.id=seqGetData(gds2, "sample.id")[2:4])
+  samples2 <- data.frame(sample.id=seqGetData(gds2, "sample.id"), stringsAsFactors=F)
+  samples2$subject.id <- samples2$sample.id
+  seqData2 <- SeqVarData(gds2, sampleData=AnnotatedDataFrame(samples2))
+  
+  seqSetFilter(seqData1)
+  seqSetFilter(seqData2)
+  
+  seqSetFilter(seqData1, sample.id=seqGetData(seqData1, "sample.id")[1:3])
+  seqSetFilter(seqData2, sample.id=seqGetData(seqData2, "sample.id")[2:4])
   
   # check filters
-  filt.1 <- seqGetFilter(gds1)
-  filt.2 <- seqGetFilter(gds2)
+  filt.1 <- seqGetFilter(seqData1)
+  filt.2 <- seqGetFilter(seqData2)
   
   # makes sure it runs
-  res <- alternateAlleleDetection(gds1, gds2) 
+  res <- alternateAlleleDetection(seqData1, seqData2) 
   
   # check filters
-  checkEquals(seqGetFilter(gds1), filt.1)
-  checkEquals(seqGetFilter(gds2), filt.2)
+  checkEquals(seqGetFilter(seqData1), filt.1)
+  checkEquals(seqGetFilter(seqData2), filt.2)
   
   # check data
   checkTrue(all(res$false.pos == 0))
   checkTrue(all(res$false.neg == 0))
   
-  samps <- intersect(seqGetData(gds1, "sample.id"), seqGetData(gds2, "sample.id"))
+  samps <- intersect(seqGetData(seqData1, "sample.id"), seqGetData(seqData2, "sample.id"))
   
-  seqSetFilter(gds1, sample.id=samps, variant.id=res$variant.id.1)
-  refdos <- refDosage(gds1)
+  seqSetFilter(seqData1, sample.id=samps, variant.id=res$variant.id.1)
+  refdos <- refDosage(seqData1)
   # number of samples with nonmissing data
   checkEquals(res$n.samples, colSums(!is.na(refdos)), checkNames=FALSE)
   checkEquals(res$true.neg, colSums(refdos, na.rm=T), checkNames=FALSE)
   checkEquals(res$true.pos, colSums(2-refdos, na.rm=T), checkNames=FALSE)
-  seqClose(gds2)
+
+  # change the mapping
+  samples2$subject.id[2:1] <- samples2$subject.id[1:2]
+  seqData2 <- SeqVarData(gds2, sampleData=AnnotatedDataFrame(samples2))
   
-  # change a sample id
-  tmp <- openfn.gds(tmpfile, readonly=FALSE)  
-  samps <- read.gdsn(index.gdsn(tmp, "sample.id"))
-  samps[1:2] <- samps[2:1]
-  delete.gdsn(index.gdsn(tmp, "sample.id"))
-  add.gdsn(tmp, "sample.id", val=samps, compress="ZIP")
-  closefn.gds(tmp)
   
-  gds2 <- seqOpen(tmpfile)  
+  seqSetFilter(seqData1)
+  seqSetFilter(seqData2)
   
-  seqSetFilter(gds1)
-  seqSetFilter(gds2)
+  seqSetFilter(seqData1, sample.id=samples1$sample.id[1:2], variant.id=seqGetData(seqData1, "variant.id")[1:50])
+  seqSetFilter(seqData2, sample.id=samples2$sample.id[1:2], variant.id=seqGetData(seqData2, "variant.id")[25:75])
   
-  seqSetFilter(gds1, sample.id=samps[1:2], variant.id=seqGetData(gds1, "variant.id")[1:50])
-  seqSetFilter(gds2, sample.id=samps[1:2], variant.id=seqGetData(gds2, "variant.id")[25:75])
+  res <- alternateAlleleDetection(seqData1, seqData2) 
   
-  res <- alternateAlleleDetection(gds1, gds2) 
-  
-  checkEquals(res$variant.id.1, intersect(seqGetData(gds1, "variant.id"), seqGetData(gds2, "variant.id")))
+  checkEquals(res$variant.id.1, intersect(seqGetData(seqData1, "variant.id"), seqGetData(seqData2, "variant.id")))
   
   # set filter to only read overlaps
-  seqSetFilter(gds1, variant.id=res$variant.id.1)
-  dos <- refDosage(gds1)
+  seqSetFilter(seqData1, variant.id=res$variant.id.1)
+  dos <- refDosage(seqData1)
   
   class1 <- SeqVarTools:::.getGenotypeClass(dos[1, ])
   class2 <- SeqVarTools:::.getGenotypeClass(dos[2, ])
@@ -103,8 +107,8 @@ test_alternateAlleleDetection <- function() {
   checkEquals(res$false.pos, SeqVarTools:::.falsePos(class1, class2) + SeqVarTools:::.falsePos(class2, class1))
   checkEquals(res$false.neg, SeqVarTools:::.falseNeg(class1, class2) + SeqVarTools:::.falseNeg(class2, class1))
 
-  seqClose(gds1)
-  seqClose(gds2)
+  seqClose(seqData1)
+  seqClose(seqData2)
   
   unlink(tmpfile)
   

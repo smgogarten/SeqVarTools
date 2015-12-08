@@ -37,10 +37,15 @@
 }
 
 setMethod("duplicateDiscordance",
-          c("SeqVarGDSClass", "missing"),
-          function(gdsobj, samples=NULL, check.phase=FALSE, verbose=TRUE) {
+          c("SeqVarData", "missing"),
+        function(gdsobj, match.samples.on="subject.id", check.phase=FALSE, verbose=TRUE) {
             ## samples should have columns of sample.id, subject.id
             ## find matching sample pairs for subjects (one sample per subject)
+            samples <- pData(sampleData(gdsobj))
+            if (!(match.samples.on %in% names(samples))) stop(sprintf("%s is not a column in sampleData", match.samples.on))
+            samples <- samples[, c("sample.id", match.samples.on)]
+            names(samples)[2] <- "subject.id"
+            
             samp.pairs <- .samplePairs(samples)
 
             ## get original sample filter
@@ -168,17 +173,16 @@ setMethod("duplicateDiscordance",
   
 }
 
-# the main function will only check sample-level at this point
 .matchSamples <- function(samp1, samp2) {
   
   if (!("sample.id" %in% names(samp1)) | !("sample.id" %in% names(samp2))) stop("sample data frames must have sample.id")
-  if (!("subjectID" %in% names(samp1)) | !("subjectID" %in% names(samp2))) stop("sample data frames must have subjectID")
+  if (!("subject.id" %in% names(samp1)) | !("subject.id" %in% names(samp2))) stop("sample data frames must have subject.id")
   
-  # match on subjectIDs
-  subjects <- intersect(samp1$subjectID, samp2$subjectID)
+  # match on subject.ids
+  subjects <- intersect(samp1$subject.id, samp2$subject.id)
   
-  samp1 <- samp1[samp1$subjectID %in% subjects, ]
-  samp2 <- samp2[samp2$subjectID %in% subjects, ]
+  samp1 <- samp1[samp1$subject.id %in% subjects, ]
+  samp2 <- samp2[samp2$subject.id %in% subjects, ]
   
   names(samp1)[names(samp1) == "sample.id"] <- "sample.id.1"
   names(samp2)[names(samp2) == "sample.id"] <- "sample.id.2"
@@ -218,8 +222,8 @@ setMethod("duplicateDiscordance",
 
 # assumes filters are already set, and will reset filters
 setMethod("duplicateDiscordance",
-          c("SeqVarGDSClass", "SeqVarGDSClass"),
-          function(gdsobj, obj2, by.variant=FALSE, verbose=TRUE){
+          c("SeqVarData", "SeqVarData"),
+          function(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), by.variant=FALSE, verbose=TRUE){
             
             # save original filters
             originalVariants1 <- seqGetData(gdsobj, "variant.id")
@@ -229,14 +233,15 @@ setMethod("duplicateDiscordance",
             originalSamples2 <- seqGetData(obj2, "sample.id")
             
             
-            # match samples -- no subject matching for now
+            # match samples
+            # construct sample data frames for matching
             if (verbose) message("matching samples... ", appendLF=FALSE)
-            samp1 <- data.frame(sample.id=seqGetData(gdsobj, "sample.id"), stringsAsFactors=F)
-            samp1$subjectID <- samp1$sample.id
-            
-            samp2 <- data.frame(sample.id=seqGetData(obj2, "sample.id"), stringsAsFactors=F)
-            samp2$subjectID <- samp2$sample.id
-            
+            samp1 <- pData(sampleData(gdsobj))[, c("sample.id", match.samples.on[1])]
+            names(samp1)[2] <- "subject.id"
+
+            samp2 <- pData(sampleData(obj2))[, c("sample.id", match.samples.on[2])]
+            names(samp2)[2] <- "subject.id"
+
             samples <- .matchSamples(samp1, samp2)
             if (verbose) message(paste(nrow(samples), "pairs identified!"))
             
@@ -270,7 +275,7 @@ setMethod("duplicateDiscordance",
             seqSetFilter(gdsobj, variant.id=overlappingVariants$variant.id.1, verbose=FALSE)
             seqSetFilter(obj2, variant.id=overlappingVariants$variant.id.2, verbose=FALSE)
             
-            for (i in seq_along(samples$subjectID)){
+            for (i in seq_along(samples$subject.id)){
               
               if (verbose & (i %% 10) == 0){
                 message(paste("sample pair", i, "out of", nrow(samples)))

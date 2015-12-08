@@ -1,23 +1,21 @@
 \name{duplicateDiscordance}
 \alias{duplicateDiscordance}
-\alias{duplicateDiscordance,SeqVarGDSClass,missing-method}
-\alias{duplicateDiscordance,SeqVarGDSClass,SeqVarGDSClass-method}
+\alias{duplicateDiscordance,SeqVarData,missing-method}
+\alias{duplicateDiscordance,SeqVarData,SeqVarData-method}
 
 \title{Duplicate discordance}
 
 \description{Find discordance rate for duplicate sample pairs}
 
 \usage{
-\S4method{duplicateDiscordance}{SeqVarGDSClass,missing}(gdsobj, samples=NULL, check.phase=FALSE, verbose=TRUE)
-\S4method{duplicateDiscordance}{SeqVarGDSClass,SeqVarGDSClass}(gdsobj, obj2, by.variant=FALSE, verbose=TRUE)
+\S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", check.phase=FALSE, verbose=TRUE)
+\S4method{duplicateDiscordance}{SeqVarData,SeqVarData}(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), by.variant=FALSE, verbose=TRUE)
 }
 
 \arguments{
-  \item{gdsobj}{A \code{\link{SeqVarGDSClass}} object with VCF data.}
-  \item{obj2}{A \code{\link{SeqVarGDSClass}} object with VCF data.}
-  \item{samples}{A data.frame with columns (sample.id, subject.id).
-    "sample.id" values should correspond to "sample.id" in \code{gdsobj}.
-    "subject.id" should match for duplicate samples.}
+  \item{gdsobj}{A \code{\link{SeqVarData}} object with VCF data.}
+  \item{obj2}{A \code{\link{SeqVarData}} object with VCF data.}
+  \item{match.samples.on}{Character string or vector of strings indicating which column should be used for matching samples. See details.}
   \item{check.phase}{A logical indicating whether phase should be
   considered when calculating discordance.}
   \item{by.variant}{Calculate discordance by variant, otherwise by sample}
@@ -32,14 +30,16 @@
   If \code{check.phase=TRUE}, variants with mismatched phase are
   considered discordant.  If \code{check.phase=FALSE}, phase is ignored.
   
-  For calls that involve two gds files,
-  duplicate discordance is calculated by matching sample pairs (not subjects).
-  Samples are matched only if they have the same sample.id in each gds object, so the samples must have the same identifier in both gds files.
-  In the future, support will be added for matching on a subjectID instead of on sample IDs.
+  For calls that involve two gds files, 
+  duplicate discordance is calculated by matching sample pairs between the two data sets. 
   Variants are matched using position and alleles.
   Only biallelic SNVs are considered.
-  No flipping is done; the same allele must be the reference in both gds files.
-  
+  No recoding is done; the same allele must be the reference in both gds files.
+
+  The argument \code{match.samples.on} can be used to select which column in the \code{\link{sampleData}} of the input \code{\link{SeqVarData}} object should be used for matching samples.
+  For one gds file, \code{match.samples.on} should be a single string.
+  For two gds files, \code{match.samples.on} should be a length-2 vector of character strings, where the first element is the column to use for the first gds object and the second element is the column to use for the second gds file.
+
   To exclude certain variants or samples from the calculate, use \code{\link{seqSetFilter}} to set appropriate filters on each gds object.
 
 }
@@ -73,19 +73,27 @@
 \author{Stephanie Gogarten, Adrienne Stilp}
 
 \seealso{
-  \code{\link{SeqVarGDSClass}},
+  \code{\link{SeqVarData}},
   \code{\link{applyMethod}}
 }
 
 \examples{
+require(Biobase)
+
 gds <- seqOpen(seqExampleFileName("gds"))
+
 ## the example file has one sample per subject, but we
 ## will match the first four samples into pairs as an example
 sample.id <- seqGetData(gds, "sample.id")
-samples <- data.frame(subject.id=rep(c("subj1", "subj2"), each=2),
-                      sample.id=sample.id[1:4],
-                      stringsAsFactors=FALSE)
-disc <- duplicateDiscordance(gds, samples=samples)
+samples <- AnnotatedDataFrame(data.frame(data.frame(subject.id=rep(c("subj1", "subj2"), times=45),
+                      sample.id=sample.id,
+                      stringsAsFactors=FALSE)))
+seqData <- SeqVarData(gds, sampleData=samples)
+
+# set a filter on the first four samples
+seqSetFilter(seqData, sample.id=sample.id[1:4])
+
+disc <- duplicateDiscordance(seqData)
 head(disc$by.variant)
 disc$by.subject
 seqClose(gds)
