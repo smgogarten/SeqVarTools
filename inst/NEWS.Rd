@@ -52,3 +52,13 @@
     \item duplicateDiscordance and alternateAlleleDetection require SeqVarData objects; both can match on a subject.id instead of sample.id
   }
 }
+\section{Changes in version 1.9.9}{
+  \itemize{
+    \item duplicateDiscordance across two GDS files can match on either position or position and alleles, with the ability to recode genotypes if th reference allele in one dataset is the alternate allele in the other dataset
+  }
+}
+\section{Changes in version 1.9.10}{
+  \itemize{
+    \item duplicateDiscordance across two GDS files can calculate discordance based on heterozygote/homozygote status instead of genotype
+  }
+}

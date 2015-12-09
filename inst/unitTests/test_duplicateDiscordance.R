@@ -109,6 +109,14 @@ test_getMatchesRefAlt <- function() {
   checkIdentical(SeqVarTools:::.getMatchesRefAlt(df$geno1, df$geno2), SeqVarTools:::.getMatchesRefAlt(df$geno2, df$geno1))
 }
 
+test_getMatchesHetHom <- function (){
+  
+  df <- .getTestGeno()
+  truth <- c(T, F, T, F, F, T, F, F, T, F, T, F, F, F, F, F)
+  checkEquals(SeqVarTools:::.getMatchesHetHom(df$geno1, df$geno2), truth)
+  checkIdentical(SeqVarTools:::.getMatchesHetHom(df$geno1, df$geno2), SeqVarTools:::.getMatchesHetHom(df$geno2, df$geno1))
+}
+
 test_getGentoypeClass <- function() {
   
   vals <- c(NA, 0, 1, 2)
@@ -147,7 +155,6 @@ test_matchVariants <- function() {
   overlaps <- SeqVarTools:::.matchVariants(gr1, gr2, match.on="position")  
   checkEquals(overlaps$variant.id.1, c(3, 3, 5, 5, 7, 8, 9))
   checkEquals(overlaps$variant.id.2, c(1, 2, 4, 5, 6, 7, 9))
-  checkEquals(overlaps$recode, c(rep(FALSE, 6), TRUE))
 
   # match on position, no duplicates
   overlapsNoDups <- SeqVarTools:::.matchVariants(gr1, gr2, match.on="position", allowOverlaps=FALSE)
@@ -159,7 +166,7 @@ test_matchVariants <- function() {
   checkEquals(overlaps$variant.id.1, c(3, 3, 5, 7, 8, 9))
   checkEquals(overlaps$variant.id.2, c(1, 2, 5, 6, 7, 9))
   checkEquals(overlaps$recode, c(rep(FALSE, 5), TRUE))
-  
+
   overlapsNoDups <- SeqVarTools:::.matchVariants(gr1, gr2, match.on="alleles", allowOverlaps=FALSE)
   checkEquals(overlapsNoDups$variant.id.1, c(3, 5, 7, 8, 9))
   checkEquals(overlapsNoDups$variant.id.2, c(1, 5, 6, 7, 9))
@@ -271,6 +278,106 @@ test_duplicateDiscordanceAcrossDatasets <- function() {
   minor <- dos[1, ] < 2 | dos[2, ] < 2
   
   checkEquals(res$n.alt.conc[1], sum(minor & match))
+  
+  seqClose(seqData1)
+  seqClose(seqData2)
+  
+  unlink(tmpfile)
+  
+}
+
+
+
+test_duplicateDiscordanceAcrossDatasets_hethom <- function() {
+  
+  filename <- seqExampleFileName("gds")
+  tmpfile <- tempfile()
+  file.copy(filename, tmpfile)
+  
+  gds1 <- seqOpen(filename)
+  gds2 <- seqOpen(tmpfile)
+  
+  # add sample data
+  samples1 <- data.frame(sample.id=seqGetData(gds1, "sample.id"), stringsAsFactors=F)
+  samples1$subject.id <- samples1$sample.id
+  seqData1 <- SeqVarData(gds1, sampleData=AnnotatedDataFrame(samples1))
+  
+  samples2 <- data.frame(sample.id=seqGetData(gds2, "sample.id"), stringsAsFactors=F)
+  samples2$subject.id <- samples2$sample.id
+  seqData2 <- SeqVarData(gds2, sampleData=AnnotatedDataFrame(samples2))
+  
+  seqSetFilter(seqData1)
+  seqSetFilter(seqData2)
+  
+  seqSetFilter(seqData1, sample.id=seqGetData(seqData1, "sample.id")[1:3])
+  seqSetFilter(seqData2, sample.id=seqGetData(seqData2, "sample.id")[2:4])
+  
+  # check filters
+  filt.1 <- seqGetFilter(seqData1)
+  filt.2 <- seqGetFilter(seqData2)
+  
+  # makes sure it runs
+  res <- duplicateDiscordance(seqData1, seqData2, match.variants.on="alleles", discordance.type = "hethom")
+  tmp <- duplicateDiscordance(seqData1, seqData2, match.variants.on="alleles", discordance.type = "genotype")
+  checkEquals(res$n.variants, tmp$n.variants)
+  checkEquals(res$n.concordant, tmp$n.concordant)
+  
+  res.var <- duplicateDiscordance(seqData1, seqData2, match.variants.on="alleles", by.variant=TRUE, discordance.type="hethom")
+  tmp <- duplicateDiscordance(seqData1, seqData2, match.variants.on="alleles", by.variant=TRUE)
+  checkEquals(res.var$n.samples, tmp$n.samples)
+  checkEquals(res.var$n.concordant, tmp$n.concordant)
+  
+  # check filters
+  checkEquals(seqGetFilter(seqData1), filt.1)
+  checkEquals(seqGetFilter(seqData2), filt.2)
+  
+  # check data for samples
+  checkEquals(seqGetData(seqData1, "sample.id")[2:3], res$sample.id.1)
+  checkEquals(seqGetData(seqData2, "sample.id")[1:2], res$sample.id.2)
+  # and for variants
+  checkEquals(seqGetData(seqData1, "variant.id")[isSNV(seqData1)], res.var$variant.id.1)
+  checkEquals(seqGetData(seqData2, "variant.id")[isSNV(seqData2)], res.var$variant.id.2)
+  
+  checkEquals(res$n.concordant, res$n.variants)
+  checkEquals(res$n.alt, res$n.alt.conc)
+  
+  checkEquals(res.var$n.concordant, res.var$n.samples)
+  
+  seqSetFilter(seqData1)
+  seqSetFilter(seqData2)
+  
+  # change subjectID for seqData2
+  #samples2 <- sampleData(seqData2)
+  samples2$subject.id[2:1] <- samples2$subject.id[1:2]
+  seqData2 <- SeqVarData(gds2, sampleData=AnnotatedDataFrame(samples2))
+  
+  
+  seqSetFilter(seqData1, sample.id=samples1$sample.id[1:2], variant.id=seqGetData(seqData1, "variant.id")[1:50])
+  seqSetFilter(seqData2, sample.id=samples2$sample.id[1:2], variant.id=seqGetData(seqData2, "variant.id")[25:75])
+  
+  res <- duplicateDiscordance(seqData1, seqData2, match.variants.on="alleles", discordance.type="hethom") 
+  res.var <- duplicateDiscordance(seqData1, seqData2, by.variant=TRUE, match.variants.on="alleles", discordance.type="hethom") 
+  
+  # set filter to only read overlaps
+  seqSetFilter(seqData1, variant.id=intersect(seqGetData(seqData1, "variant.id"), seqGetData(gds2, "variant.id")))
+  
+  # read dosages
+  dos <- refDosage(seqData1)
+  
+  # get the granges object
+  gr <- SeqVarTools:::.getGRanges(seqData1)
+  
+  # snvs only
+  dos <- dos[, gr$snv]
+  
+  # non missing
+  nonmiss <- !is.na(colSums(dos))
+  checkEquals(res$n.variants[1], sum(nonmiss))
+  
+  dos <- dos[, nonmiss]
+  dos <- abs(dos - 1)
+  match <- dos[1 ,] == dos[2, ]
+  checkEquals(res$n.concordant[1], sum(match))
   
   seqClose(seqData1)
   seqClose(seqData2)

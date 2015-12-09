@@ -9,7 +9,7 @@
 
 \usage{
 \S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", check.phase=FALSE, verbose=TRUE)
-\S4method{duplicateDiscordance}{SeqVarData,SeqVarData}(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), match.variants.on=c("alleles", "position"), by.variant=FALSE, verbose=TRUE)
+\S4method{duplicateDiscordance}{SeqVarData,SeqVarData}(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), match.variants.on=c("alleles", "position"), discordance.type=c("genotype", "hethom"), by.variant=FALSE, verbose=TRUE)
 }
 
 \arguments{
@@ -17,6 +17,7 @@
   \item{obj2}{A \code{\link{SeqVarData}} object with VCF data.}
   \item{match.samples.on}{Character string or vector of strings indicating which column should be used for matching samples. See details.}
   \item{match.variants.on}{Character string of length one indicating how to match variants. See details.}
+  \item{discordance.type}{Character string describing how discordances should be calculated. See details.}
   \item{check.phase}{A logical indicating whether phase should be
   considered when calculating discordance.}
   \item{by.variant}{Calculate discordance by variant, otherwise by sample}
@@ -37,7 +38,8 @@
   Variants can be matched using chromosome and position only (\code{match.variants.on="position"}) or by using chromosome, position, and alleles (\code{match.variants.on="alleles"}).
   If matching on alleles and the reference allele in the first dataset is the alternate allele in the second dataset, the genotype dosage will be recoded so the same allele is counted before making the comparison.
   If a variant in one dataset maps to multiple variants in the other dataset, only the first pair is considered for the comparison.
-
+  Discordances can be calculated using either genotypes (\code{discordance.type = "genotype"}) or heterozygote/homozygote status (\code{discordance.type = "hethom"}).
+  The latter is a method to calculate discordance that does not require alleles to be measured on the same strand in both datasets, so it is probably best to also set \code{match.variants.on = "position"} if using the \code{"hethom"} option.
 
   The argument \code{match.samples.on} can be used to select which column in the \code{\link{sampleData}} of the input \code{\link{SeqVarData}} object should be used for matching samples.
   For one gds file, \code{match.samples.on} should be a single string.

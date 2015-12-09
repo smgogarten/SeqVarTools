@@ -137,6 +137,13 @@ setMethod("duplicateDiscordance",
 }
 
 
+.getMatchesHetHom <- function(geno1, geno2){
+  sel <- (geno1 %in% c("ref", "alt") & geno2 %in% c("ref", "alt")) |
+    (geno1 == "het" & geno2 == "het")
+  sel
+}
+
+
 .matchVariants <- function(gr1, gr2, match.on=c("alleles", "position"), allowOverlaps=TRUE){
   
   match.on = match.arg(match.on)
@@ -169,10 +176,12 @@ setMethod("duplicateDiscordance",
   # check alleles if requested
   sel.same <- (overlapping.1$ref == overlapping.2$ref) & (overlapping.1$alt == overlapping.2$alt)
   sel.flip <- (overlapping.1$ref == overlapping.2$alt) & (overlapping.1$alt == overlapping.2$ref)
-  overlapping$recode <- sel.flip
   if (match.on == "alleles"){
+    overlapping$recode <- sel.flip
     overlapping <- overlapping[sel.same | sel.flip, ]
-  } 
+  } else {
+    overlapping$recode <- FALSE
+  }
   
   if (!allowOverlaps){
     # choose the first overlapping variant
@@ -234,9 +243,11 @@ setMethod("duplicateDiscordance",
 # assumes filters are already set, and will reset filters
 setMethod("duplicateDiscordance",
           c("SeqVarData", "SeqVarData"),
-          function(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), match.variants.on=c("alleles", "position"), by.variant=FALSE, verbose=TRUE){
+          function(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), match.variants.on=c("alleles", "position"), discordance.type=c("genotype", "hethom"), by.variant=FALSE, verbose=TRUE){
             
+            # deal with arguments
             match.variants.on = match.arg(match.variants.on)
+            discordance.type = match.arg(discordance.type)
             
             # save original filters
             originalVariants1 <- seqGetData(gdsobj, "variant.id")
@@ -267,21 +278,29 @@ setMethod("duplicateDiscordance",
             
             # set up results data frame -- can just add columns to the samples data frame
             if (!by.variant){
+
               samples$n.variants <- NA
               samples$n.concordant <- NA
-              samples$n.alt <- NA
-              samples$n.alt.conc <- NA
-              samples$n.het.ref <- NA
-              samples$n.het.alt <- NA
-              samples$n.ref.alt <- NA
+              
+              if (discordance.type == "genotype") {
+                samples$n.alt <- NA
+                samples$n.alt.conc <- NA
+                samples$n.het.ref <- NA
+                samples$n.het.alt <- NA
+                samples$n.ref.alt <- NA
+              }
             } else {
+              
               overlappingVariants$n.samples <- 0
               overlappingVariants$n.concordant <- 0
-              overlappingVariants$n.alt <- 0
-              overlappingVariants$n.alt.conc <- 0
-              overlappingVariants$n.het.ref <- 0
-              overlappingVariants$n.het.alt <- 0
-              overlappingVariants$n.ref.alt <- 0
+              
+              if (discordance.type == "genotype"){
+                overlappingVariants$n.alt <- 0
+                overlappingVariants$n.alt.conc <- 0
+                overlappingVariants$n.het.ref <- 0
+                overlappingVariants$n.het.alt <- 0
+                overlappingVariants$n.ref.alt <- 0
+              }
             }
             
             # set filters for the variants -- will still need to order them properly
@@ -318,22 +337,34 @@ setMethod("duplicateDiscordance",
               class2 <- .getGenotypeClass(dos2)
               
               if (!by.variant){
+                
                 # store information about discordant variants for this pair
                 samples$n.variants[i] <- sum(sel)
-                samples$n.concordant[i] <- sum(.getMatchesConc(class1, class2)[sel])
-                samples$n.alt[i] <- sum(.getAlt(class1, class2)[sel])
-                samples$n.alt.conc[i] <- sum(.getMatchesAltConc(class1, class2)[sel])
-                samples$n.het.ref[i] <- sum(.getMatchesHetRef(class1, class2)[sel])
-                samples$n.het.alt[i] <- sum(.getMatchesHetAlt(class1, class2)[sel])
-                samples$n.ref.alt[i] <- sum(.getMatchesRefAlt(class1, class2)[sel])
+                
+                if (discordance.type == "hethom"){
+                  samples$n.concordant[i] <- sum(.getMatchesHetHom(class1, class2)[sel])
+                } else {
+                  samples$n.concordant[i] <- sum(.getMatchesConc(class1, class2)[sel])
+                  samples$n.alt[i] <- sum(.getAlt(class1, class2)[sel])
+                  samples$n.alt.conc[i] <- sum(.getMatchesAltConc(class1, class2)[sel])
+                  samples$n.het.ref[i] <- sum(.getMatchesHetRef(class1, class2)[sel])
+                  samples$n.het.alt[i] <- sum(.getMatchesHetAlt(class1, class2)[sel])
+                  samples$n.ref.alt[i] <- sum(.getMatchesRefAlt(class1, class2)[sel])
+                }
               } else {
+                
                 overlappingVariants$n.samples <- overlappingVariants$n.samples + sel
-                overlappingVariants$n.concordant <- overlappingVariants$n.concordant + .getMatchesConc(class1, class2)
-                overlappingVariants$n.alt <- overlappingVariants$n.alt + .getAlt(class1, class2)
-                overlappingVariants$n.alt.conc <- overlappingVariants$n.alt.conc + .getMatchesAltConc(class1, class2)
-                overlappingVariants$n.het.ref <- overlappingVariants$n.het.ref + .getMatchesHetRef(class1, class2)
-                overlappingVariants$n.het.alt <- overlappingVariants$n.het.alt + .getMatchesHetAlt(class1, class2)
-                overlappingVariants$n.ref.alt <- overlappingVariants$n.ref.alt + .getMatchesRefAlt(class1, class2)
+                
+                if (discordance.type == "hethom"){
+                  overlappingVariants$n.concordant <- overlappingVariants$n.concordant + .getMatchesHetHom(class1, class2)  
+                } else if (discordance.type == "genotype") {
+                  overlappingVariants$n.concordant <- overlappingVariants$n.concordant + .getMatchesConc(class1, class2)
+                  overlappingVariants$n.alt <- overlappingVariants$n.alt + .getAlt(class1, class2)
+                  overlappingVariants$n.alt.conc <- overlappingVariants$n.alt.conc + .getMatchesAltConc(class1, class2)
+                  overlappingVariants$n.het.ref <- overlappingVariants$n.het.ref + .getMatchesHetRef(class1, class2)
+                  overlappingVariants$n.het.alt <- overlappingVariants$n.het.alt + .getMatchesHetAlt(class1, class2)
+                  overlappingVariants$n.ref.alt <- overlappingVariants$n.ref.alt + .getMatchesRefAlt(class1, class2)
+                }
               }
               
             }
