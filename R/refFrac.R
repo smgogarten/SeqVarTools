@@ -38,20 +38,16 @@ setMethod("refFracOverHets",
           })
 
 
-## color-code by genotype
-.colMap <- function(x) {
-##   ## x == refDosage
-##   cols <- c("2"="red", "1"="green", "0"="blue") 
-##   pcol <- cols[as.character(x)]
-  ## x == getGenotype
+## code by genotype
+.callType <- function(x) {
   pcol <- character(length(x))
   a <- substr(x, 1, 1)
   b <- substr(x, 3, 3)
-  pcol[a == "0" | b == "0"] <- "#d95f02"
-  pcol[a == "0" & b == "0"] <- "#1b9e77"
-  pcol[a != "0" & b != "0" & a == b] <- "#7570b3"
-  pcol[a != "0" & b != "0" & a != b] <- "#e7298a"
-  pcol[is.na(x)] <- "black"
+  pcol[a == "0" | b == "0"] <- "refhet"
+  pcol[a == "0" & b == "0"] <- "refhom"
+  pcol[a != "0" & b != "0" & a == b] <- "althom"
+  pcol[a != "0" & b != "0" & a != b] <- "althet"
+  pcol[is.na(x)] <- "na"
   pcol
 }
 
@@ -103,8 +99,8 @@ setMethod("refFracPlot",
             ## plot in same order as variant.id
             for (i in match(variant.id, seqGetData(gdsobj, "variant.id"))) {            
               ## median fraction for hets
-              pcol <- .colMap(geno[,i])
-              refhet <- pcol == "green"
+              calls <- .callType(geno[,i])
+              refhet <- calls == "refhet"
               med.frac <- median(ref.frac[refhet, i], na.rm=TRUE)
               ## hets significantly different from 0.5
               pch <- rep(16, length(refhet))
@@ -117,14 +113,21 @@ setMethod("refFracPlot",
                 }
               }
               ## missing genotype
-              pch[pcol == "black"] <- 4
+              pch[calls == "na"] <- 4
+
+              colmap <- c("refhom"="#1b9e77",
+                          "refhet"="#d95f02",
+                          "althom"="#7570b3",
+                          "althet"="#e7298a",
+                          "na"="black")
               
-              plot(ref.frac[,i], tot.reads[,i], col=adjustcolor(pcol, alpha.f=0.5), pch=pch,
+              plot(ref.frac[,i], tot.reads[,i],
+                   col=adjustcolor(colmap[calls], alpha.f=0.5), pch=pch,
                    xlab="Fraction of reference allele reads",
                    ylab="Total reads (unfiltered)",
                    main=title[i], xlim=c(0,1), ...)
               abline(v=0.5)
-              abline(v=med.frac, col="green")
+              abline(v=med.frac, col=colmap["refhet"])
               
               ## highlight samples?
               if (!is.null(highlight)) {

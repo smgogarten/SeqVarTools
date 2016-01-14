@@ -39,7 +39,7 @@
   alternate alleles, purple = alternate homozygote, black = missing. 
   Darker colors indicate a higher density of points.
   Vertical black line
-  is at 0.5, vertical teal line is the median reference allele fraction
+  is at 0.5, vertical orange line is the median reference allele fraction
   for ref/alt heterozygotes.  Values significantly different from 0.5
   (after applying a Bonferroni correction) are plotted with triangles.
 }

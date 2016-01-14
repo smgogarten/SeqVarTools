@@ -8,26 +8,34 @@
 
 \usage{
 \S4method{regression}{SeqVarData}(gdsobj, outcome, covar=NULL,
-                                  model.type=c("linear", "logistic"))
+                                  model.type=c("linear", "logistic", "firth"))
 }
 
 \arguments{
   \item{gdsobj}{A \code{\link{SeqVarData}} object}
   \item{outcome}{A character string with the name of the column in \code{sampleData(gdsobj)} containing the outcome variable}
   \item{covar}{A character vector with the name of the column(s) in \code{sampleData(gdsobj)} containing the covariates}
-  \item{model.type}{the type of model to be run.  "linear" uses \code{\link{lm}}, and "logistic" uses \code{\link{glm}} with \code{family=binomial()}}
+  \item{model.type}{the type of model to be run.  "linear" uses \code{\link{lm}}, "logistic" uses \code{\link{glm}} with \code{family=binomial()}, and "firth" uses \code{\link{logistf}}.}
 }
 
 %\details{
 %}
 
 \value{
-a data.frame with the following columns:
+a data.frame with the following columns (if applicable):
   \item{variant.id}{variant identifier}
+  \item{n}{number of samples with non-missing data}
+  \item{n0}{number of controls (outcome=0) with non-missing data}
+  \item{n1}{number of cases (outcome=1) with non-missing data}
+  \item{freq}{reference allele frequency}
+  \item{freq0}{reference allele frequency in controls}
+  \item{freq1}{reference allele frequency in cases}
   \item{Est}{beta estimate for genotype}
   \item{SE}{standard error of beta estimate for the genotype}
   \item{Wald.Stat}{chi-squared test statistic for association}
   \item{Wald.pval}{p-value for association}
+  \item{PPL.Stat}{firth only: profile penalized likelihood test statistic for association}
+  \item{PPL.pval}{firth only: p-value for association}
 }
 
 \author{Stephanie Gogarten}
@@ -36,7 +44,8 @@ a data.frame with the following columns:
   \code{\link{SeqVarData}},
   \code{\link{seqSetFilter}},
   \code{\link{lm}},
-  \code{\link{glm}}	
+  \code{\link{glm}},
+  \code{\link{logistf}}	
 }
 
 \examples{

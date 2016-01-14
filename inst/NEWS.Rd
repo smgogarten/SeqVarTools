@@ -62,3 +62,9 @@
     \item duplicateDiscordance across two GDS files can calculate discordance based on heterozygote/homozygote status instead of genotype
   }
 }
+\section{Changes in version 1.9.11}{
+  \itemize{
+    \item Add Firth test option to regression
+    \item Bug fix for refFracPlot: hets significantly different from 0.5 plotted as triangles, median line shown
+  }
+}

@@ -5,6 +5,7 @@ import(S4Vectors)
 import(IRanges)
 import(GenomicRanges)
 import(Biobase)
+import(logistf)
 importFrom(GWASExactHW, HWExact)
 importFrom(stringr, str_count)
 
