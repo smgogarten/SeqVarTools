@@ -85,6 +85,7 @@ setMethod("regression",
               res <- seqApply(gdsobj, "genotype", function(x) {
                   ## assume we want effect of reference allele
                   model.data <- cbind(dat, genotype=colSums(x == 0))
+                  model.data <- droplevels(model.data[complete.cases(model.data),])
                   
                   ## don't bother with monomorphic variants
                   freq <- .freqByOutcome(model.data, model.type, outcome)

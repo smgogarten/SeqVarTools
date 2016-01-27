@@ -62,9 +62,9 @@ test_regression <- function() {
 
     dat <- cbind(pData(sampleData(gds)), genotype=refDosage(gds)[,1])
     exp <- lm("outcome ~ covarA + covarB + genotype", dat)
+    seqClose(gds)
     checkEquals(summary(exp)$coef["genotype",1], res[1,"Est"], check.names=FALSE)
     checkEquals(summary(exp)$coef["genotype",2], res[1,"SE"], check.names=FALSE)
-    seqClose(gds)
 }
 
 test_regression_firth <- function() {
@@ -73,9 +73,9 @@ test_regression_firth <- function() {
                       model.type="firth")
 
     dat <- cbind(pData(sampleData(gds)), genotype=refDosage(gds)[,1])
+    seqClose(gds)
     exp <- logistf(as.formula("outcome ~ covarA + covarB + genotype"), dat)
     checkEquals(coef(exp)["genotype"], res[1,"Est"], check.names=FALSE)
-    seqClose(gds)
 }
 
 test_freq <- function() {
