@@ -28,10 +28,19 @@
 .runFirth <- function(model.string, model.data, geno.index=NULL) {
     model.formula <- as.formula(model.string)
     tryCatch({
-        mod <- logistf(model.formula, data=model.data, 
-                       plconf=geno.index, dataout=FALSE)
+        mod <- tryCatch({
+            logistf(model.formula, data=model.data, plconf=geno.index, dataout=FALSE)
+        }, error=function(e) {
+            ## test will fail if geno.index is too large
+            geno.index <- which(colnames(model.matrix(model.formula, model.data)) == "genotype")
+            logistf(model.formula, data=model.data, plconf=geno.index, dataout=FALSE)
+        })
+        ## test will be wrong if geno.index is too small
         ind <- which(mod$terms == "genotype")
-        stopifnot(ind == geno.index)
+        if (ind != geno.index) {
+            mod <- logistf(model.formula, data=model.data, plconf=ind, dataout=FALSE)
+        }
+    
         Est <- unname(coef(mod)[ind])
         cov <- vcov(mod)[ind,ind]
         pval <- unname(mod$prob[ind])
@@ -62,6 +71,12 @@
     }
 }
 
+.freqFromBinary <- function(freq) {
+    freq[is.na(freq)] <- 0
+    unname((freq["n0"]*freq["freq0"] + freq["n1"]*freq["freq1"]) /
+           (freq["n0"] + freq["n1"]))
+}
+
 setMethod("regression",
           "SeqVarData",
           function(gdsobj, outcome, covar=NULL,
@@ -83,13 +98,16 @@ setMethod("regression",
 
               ## apply function over variants
               res <- seqApply(gdsobj, "genotype", function(x) {
+              #res <- seqApply(gdsobj, c(geno="genotype", id="variant.id"), function(x) {
+                  #print(x$id)
                   ## assume we want effect of reference allele
                   model.data <- cbind(dat, genotype=colSums(x == 0))
                   model.data <- droplevels(model.data[complete.cases(model.data),])
                   
                   ## don't bother with monomorphic variants
                   freq <- .freqByOutcome(model.data, model.type, outcome)
-                  if (any(freq[c("freq", "freq0", "freq1")] %in% c(0,1))) {
+                  freq.all <- if (model.type == "linear") freq["freq"] else .freqFromBinary(freq)
+                  if (freq.all %in% c(0,1)) {
                       reg <- rep(NA, 4)
                   } else {
                       if (model.type %in% c("linear", "logistic")) {
