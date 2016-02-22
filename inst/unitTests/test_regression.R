@@ -164,7 +164,7 @@ test_firth_badindex <- function() {
 
 test_droplevels <- function() {
     gds <- .testData(binary=TRUE)
-    seqSetFilter(gds, samp.sel=sampleData(gds)$covarB != "c")
+    seqSetFilter(gds, sample.sel=sampleData(gds)$covarB != "c")
     res <- regression(gds, outcome="outcome", covar=c("covarA", "covarB"),
                       model.type="firth")
 

@@ -173,7 +173,7 @@ setMethod("mendelErr",
             }
               
             ## reset original sample filter
-            seqSetFilter(gdsobj, samp.sel=filt.orig, verbose=FALSE)
+            seqSetFilter(gdsobj, sample.sel=filt.orig, verbose=FALSE)
 
             if (use.names)
               names(var.err) <- seqGetData(gdsobj, "variant.id")

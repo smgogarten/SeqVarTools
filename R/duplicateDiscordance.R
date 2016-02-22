@@ -89,7 +89,7 @@ setMethod("duplicateDiscordance",
             samp.pairs$discord.rate <- subj.discord/subj.nvar
             
             ## reset original sample filter
-            seqSetFilter(gdsobj, samp.sel=filt.orig, verbose=FALSE)
+            seqSetFilter(gdsobj, sample.sel=filt.orig, verbose=FALSE)
 
             list(by.variant=var.df, by.subject=samp.pairs)
           })
