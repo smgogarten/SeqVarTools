@@ -13,12 +13,12 @@
 
 .nSamp <- function(gdsobj) {
   #sum(seqGetFilter(gdsobj)$sample.sel)
-  seqSummary(gdsobj, "genotype", check="none", verbose=FALSE)$seldim[1]
+  seqSummary(gdsobj, "genotype", check="none", verbose=FALSE)$seldim[2L]
 }
 
 .nVar <- function(gdsobj) {
   #sum(seqGetFilter(gdsobj)$variant.sel)
-  seqSummary(gdsobj, "genotype", check="none", verbose=FALSE)$seldim[2]
+  seqSummary(gdsobj, "genotype", check="none", verbose=FALSE)$seldim[3L]
 }
 
 .applyNames <- function(gdsobj, var) {

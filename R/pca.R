@@ -13,7 +13,7 @@ setMethod("pca",
 
               ## apply the function variant by variant
               seqApply(gdsobj, "genotype", function(x) {
-                g <- (x==0)                   # indicator of reference allele
+                g <- (x==0L)                  # indicator of reference allele
                 p <- mean(g, na.rm=TRUE)      # allele frequency
                 g2 <- colSums(g) - 2*p        # genotypes adjusted by allele frequency
                 m <- (g2 %o% g2) / (p*(1-p))  # genetic correlation matrix
