@@ -246,6 +246,9 @@ names(pc)
 plot(pc$eigenvect[,1], pc$eigenvect[,2])
 @ 
 
+See also the packages \Biocpkg{SNPRelate} and \Biocpkg{GENESIS} for
+determining relatedness and population structure.
+
 
 \subsection{Hardy-Weinberg Equilibrium}
 We can test for deviations from Hardy-Weinberg Equilibrium (HWE),
@@ -287,6 +290,55 @@ err$by.trio
 
 The example data do not have any Mendelian errors.
 
+
+\subsection{Association tests}
+
+We can run single-variant association tests for continuous or binary
+traits. We use a \Rclass{SeqVarData} object to combine the genotypes
+with sample annotation. We use the pedigree data from the previous
+section and add simulated phenotypes.
+<<fig=TRUE>>=
+library(Biobase)
+sample.id <- seqGetData(gds, "sample.id")
+pedigree <- pedigree[match(sample.id, pedigree$sample.id),]
+n <- length(sample.id)
+pedigree$phenotype <- rnorm(n, mean=10)
+pedigree$case.status <- rbinom(n, 1, 0.3)
+sample.data <- AnnotatedDataFrame(pedigree)
+
+seqData <- SeqVarData(gds, sample.data)
+
+## continuous phenotype
+assoc <- regression(seqData, outcome="phenotype", covar="sex",
+                    model.type="linear")
+head(assoc)
+pval <- -log10(sort(assoc$Wald.Pval))
+n <- length(pval)
+x <- -log10((1:n)/n)
+plot(x, pval, xlab="-log10(expected P)", ylab="-log10(observed P)")
+abline(0, 1, col = "red")
+@
+
+For binary phenotypes, there are two options, "logistic" and
+"firth". 
+"logistic" uses \Rfunction{glm} and performs a Wald test.
+"firth" uses \Rfunction{logistf}.
+We recommend using the Firth test for rare variants 
+\cite{wang2014}
+
+<<fig=TRUE>>=
+assoc <- regression(seqData, outcome="case.status", covar="sex",
+                    model.type="firth")
+head(assoc)
+pval <- -log10(sort(assoc$PPL.Pval))
+n <- length(pval)
+x <- -log10((1:n)/n)
+plot(x, pval, xlab="-log10(expected P)", ylab="-log10(observed P)")
+abline(0, 1, col = "red")
+@ 
+
+For aggregate tests, see the package \Biocpkg{GENESIS}.
+
 <<>>=
 seqClose(gds)
 @ 
@@ -294,5 +346,7 @@ seqClose(gds)
 <<echo=FALSE, results=hide>>=
 unlink(gdsfile)
 @ 
+
+\bibliography{SeqVarTools}
 
 \end{document}
