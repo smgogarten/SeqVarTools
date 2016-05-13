@@ -21,6 +21,14 @@
   seqSummary(gdsobj, "genotype", check="none", verbose=FALSE)$seldim[3L]
 }
 
+.nSampUnfiltered <- function(gdsobj) {
+  seqSummary(gdsobj, "sample.id", check="none", verbose=FALSE)
+}
+
+.nVarUnfiltered <- function(gdsobj) {
+  seqSummary(gdsobj, "variant.id", check="none", verbose=FALSE)
+}
+
 .applyNames <- function(gdsobj, var) {
   if ("sample" %in% names(dimnames(var)))
     dimnames(var)$sample <- seqGetData(gdsobj, "sample.id")

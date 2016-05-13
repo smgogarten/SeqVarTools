@@ -114,6 +114,12 @@ setGeneric("alternateAlleleDetection",
            function(gdsobj, gdsobj2, ...)
              standardGeneric("alternateAlleleDetection"))
 
+setGeneric("regression",
+           function(gdsobj, ...)
+             standardGeneric("regression"))
+
+
+## SeqVarData
 setGeneric("sampleData",
            function(x)
              standardGeneric("sampleData"))
@@ -122,6 +128,10 @@ setGeneric("sampleData<-",
            function(x, value)
              standardGeneric("sampleData<-"))
 
-setGeneric("regression",
-           function(gdsobj, ...)
-             standardGeneric("regression"))
+setGeneric("variantData",
+           function(x)
+             standardGeneric("variantData"))
+
+setGeneric("variantData<-",
+           function(x, value)
+             standardGeneric("variantData<-"))

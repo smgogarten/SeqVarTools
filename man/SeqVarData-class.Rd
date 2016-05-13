@@ -7,25 +7,33 @@
 \alias{sampleData,SeqVarData-method}
 \alias{sampleData<-}
 \alias{sampleData<-,SeqVarData,AnnotatedDataFrame-method}
+\alias{variantData}
+\alias{variantData,SeqVarData-method}
+\alias{variantData<-}
+\alias{variantData<-,SeqVarData,AnnotatedDataFrame-method}
+\alias{granges}
+\alias{granges,SeqVarData-method}
 
 \title{SeqVarData}
 
 \description{
-	Extends \code{\link{SeqVarGDSClass}} to include annotation for the samples.
+	Extends \code{\link{SeqVarGDSClass}} to include annotation for samples and variants.
 }
 
 \details{
-	A \code{SeqVarData} object adds an \code{\link{AnnotatedDataFrame}} to a \code{\link{SeqVarGDSClass}} object.
+	A \code{SeqVarData} object adds an \code{\link{AnnotatedDataFrame}} for both samples and variants to a \code{\link{SeqVarGDSClass}} object.
 }
 
 \section{Constructor}{
   \describe{
     \item{}{
-      \code{SeqVarData(gds, sampleData)}: Returns a \code{SeqVarData} object.
+      \code{SeqVarData(gds, sampleData, variantData)}: Returns a \code{SeqVarData} object.
 
       \code{gds} can be either the filename of a sequencing GDS file or an existing \code{\link{SeqVarGDSClass}} object.
 
-      \code{sampleData} must be an \code{\link{AnnotatedDataFrame}} with a column \code{sample.id} matching \code{sample.id} in the GDS file.
+      \code{sampleData} must be an \code{\link{AnnotatedDataFrame}} with a column \code{sample.id} matching \code{sample.id} in the GDS file. If this argument is missing, a data frame with only sample.id will be created.
+
+      \code{variantData} must be an \code{\link{AnnotatedDataFrame}} with a column \code{variant.id} matching \code{variant.id} in the GDS file. If this argument is missing, a data frame with only variant.id will be created.
     }
   }
 }
@@ -36,7 +44,15 @@
 		\item{}{
 			\code{sampleData(x)}, \code{sampleData(x)<- value}:
 				Get or set the \code{\link{AnnotatedDataFrame}} with sample data. If a sample filter has been applied with \code{\link{seqSetFilter}}, only selected samples will be returned. \code{value} must include all samples.
-		}
+		}	
+		\item{}{
+			\code{variantData(x)}, \code{variantData(x)<- value}:
+				Get or set the \code{\link{AnnotatedDataFrame}} with variant data. If a variant filter has been applied with \code{\link{seqSetFilter}}, only selected variants will be returned. \code{value} must include all variants.
+		}	
+		\item{}{
+			\code{granges(x)}:
+				Return a \code{\link{GRanges}} object with the columns of \code{variantData} as metadata columns.
+		}	
 	}
 
 	See \code{\link{SeqVarGDSClass}} for additional methods.

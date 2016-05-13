@@ -14,6 +14,8 @@ importMethodsFrom(VariantAnnotation, isSNV)
 exportClasses(SeqVarData)
 
 exportMethods(sampleData, "sampleData<-",
+              variantData, "variantData<-",
+              granges,
               applyMethod,
               refChar,
               altChar,

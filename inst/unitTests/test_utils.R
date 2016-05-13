@@ -4,8 +4,8 @@ test_nSamp <- function() {
   checkEquals(n, SeqVarTools:::.nSamp(gds))
 
   n <- 10
-  seqSetFilter(gds, sample.id=seqGetData(gds, "sample.id")[1:n])
-  checkEquals(10, SeqVarTools:::.nSamp(gds))
+  seqSetFilter(gds, sample.sel=1:n)
+  checkEquals(n, SeqVarTools:::.nSamp(gds))
   seqClose(gds)
 }
 
@@ -15,7 +15,23 @@ test_nVar <- function() {
   checkEquals(n, SeqVarTools:::.nVar(gds))
 
   n <- 10
-  seqSetFilter(gds, variant.id=1:n)
-  checkEquals(10, SeqVarTools:::.nVar(gds))
+  seqSetFilter(gds, variant.sel=1:n)
+  checkEquals(n, SeqVarTools:::.nVar(gds))
+  seqClose(gds)
+}
+
+test_nSampUnfiltered <- function() {
+  gds <- seqOpen(seqExampleFileName("gds"))
+  n <- SeqVarTools:::.nSamp(gds)
+  seqSetFilter(gds, sample.sel=1:10)
+  checkEquals(n, SeqVarTools:::.nSampUnfiltered(gds))
+  seqClose(gds)
+}
+
+test_nVarUnfiltered <- function() {
+  gds <- seqOpen(seqExampleFileName("gds"))
+  n <- SeqVarTools:::.nVar(gds)
+  seqSetFilter(gds, sample.sel=1:10)
+  checkEquals(n, SeqVarTools:::.nVarUnfiltered(gds))
   seqClose(gds)
 }
