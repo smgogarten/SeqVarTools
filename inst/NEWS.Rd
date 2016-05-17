@@ -68,3 +68,8 @@
     \item Bug fix for refFracPlot: hets significantly different from 0.5 plotted as triangles, median line shown
   }
 }
+\section{Changes in version 1.11.1}{
+  \itemize{
+    \item Add variantData slot to SeqVarData class
+  }
+}
