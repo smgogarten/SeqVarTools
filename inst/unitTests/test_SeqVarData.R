@@ -33,11 +33,13 @@ test_SeqVarData <- function() {
 
     ## test errors
     checkException(SeqVarData("abc"))
+    gds <- seqOpen(gds.fn)
     checkException(SeqVarData(gds, pData(adf)))
     adf$sample.id <- paste0("a", adf$sample.id)
     checkException(SeqVarData(gds, adf))
     adf$sample.id <- NULL
     checkException(SeqVarData(gds, adf))
+    seqClose(gds)
 }
 
 test_variantData <- function() {
