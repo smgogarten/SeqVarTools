@@ -361,6 +361,25 @@ setMethod("homozygosity",
           })
 
 
+setMethod("hethom",
+          "SeqVarGDSClass",
+          function(gdsobj, use.names=FALSE) {
+            hom.func <- function(a,b) {a == b & a > 0}
+            het <- integer(.nSamp(gdsobj))
+            hom <- integer(.nSamp(gdsobj))
+            seqApply(gdsobj, "genotype",
+                     function(x) {
+                       nm <- !is.na(x[1,]) & !is.na(x[2,])
+                       het <<- het + (x[1,] != x[2,] & nm)
+                       hom <<- hom + (hom.func(x[1,], x[2,]) & nm)
+                     },
+                     margin="by.variant", as.is="none")
+             if (use.names)
+               names(het) <- seqGetData(gdsobj, "sample.id")
+             het / hom
+           })
+            
+
 setMethod("meanBySample",
           "SeqVarGDSClass",
           function(gdsobj, var.name, use.names=FALSE) {
@@ -377,3 +396,22 @@ setMethod("meanBySample",
               names(tot) <- seqGetData(gdsobj, "sample.id")
             tot / nm
           })
+
+
+setMethod("countSingletons",
+          "SeqVarGDSClass",
+          function(gdsobj, use.names=FALSE) {
+            st <- integer(.nSamp(gdsobj))
+            seqApply(gdsobj, "genotype",
+                     function(x) {
+                       nonref <- which(colSums(x, na.rm=TRUE) > 0)
+                       if (length(nonref) == 1) {
+                           st[nonref] <<- st[nonref] + 1
+                       }
+                     },
+                     margin="by.variant", as.is="none")
+             if (use.names)
+               names(st) <- seqGetData(gdsobj, "sample.id")
+             st
+           })
+      

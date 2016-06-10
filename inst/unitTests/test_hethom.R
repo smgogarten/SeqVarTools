@@ -80,6 +80,20 @@ test_homozygosity_alt <- function() {
   seqClose(gds)
 }
 
+test_hethom <- function() {
+  gds <- seqOpen(seqExampleFileName("gds"))
+  hh <- hethom(gds)
+  geno <- seqGetData(gds, "genotype")
+  hom <- geno[1,,] == geno[2,,] & geno[1,,] > 0
+  checkIdentical(rowSums(geno[1,,] != geno[2,,], na.rm=TRUE) /
+                 rowSums(hom, na.rm=TRUE),
+                 hh)
+  checkEquals(heterozygosity(gds, margin="by.sample") /
+              homozygosity(gds, allele="alt", margin="by.sample"),
+              hh)
+  seqClose(gds)
+}
+
 test_heterozygosity_apply <- function() {
   gds <- seqOpen(seqExampleFileName("gds"))
   var.id <- 101:110

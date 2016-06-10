@@ -223,14 +223,10 @@ filt <- seqGetData(gds, "variant.id")[miss.var <= 0.1 & het.var <= 0.6]
 @
 
 We calculate the heterozygosity and homozyogity by sample, using only
-the variants selected above.  Since we want to use the same variant
-filter for both methods, we set it once using \Rfunction{seqSetFilter} and
-reset at the end.
+the variants selected above.
 <<fig=TRUE>>=
 seqSetFilter(gds, variant.id=filt)
-het <- heterozygosity(gds, margin="by.sample")
-homnr <- homozygosity(gds, margin="by.sample", allele="alt")
-hethom <- het / homnr
+hethom <- hethom(gds)
 hist(hethom, main="", xlab="Het/Hom Non-Ref")
 seqSetFilter(gds)
 @ 

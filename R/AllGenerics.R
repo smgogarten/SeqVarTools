@@ -72,9 +72,17 @@ setGeneric("homozygosity",
            function(gdsobj, ...)
              standardGeneric("homozygosity"))
 
+setGeneric("hethom",
+           function(gdsobj, ...)
+             standardGeneric("hethom"))
+
 setGeneric("meanBySample",
            function(gdsobj, ...)
              standardGeneric("meanBySample"))
+
+setGeneric("countSingletons",
+           function(gdsobj, ...)
+             standardGeneric("countSingletons"))
 
 setGeneric("refFrac",
            function(gdsobj, ...)

@@ -73,3 +73,9 @@
     \item Add variantData slot to SeqVarData class
   }
 }
+\section{Changes in version 1.11.3}{
+  \itemize{
+    \item Add hethom method to calculate heterozygosity / non-reference homozygosity in one step
+    \item Add countSingletons method
+  }
+}

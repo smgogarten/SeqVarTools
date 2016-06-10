@@ -3,6 +3,8 @@
 \alias{heterozygosity,SeqVarGDSClass-method}
 \alias{homozygosity}
 \alias{homozygosity,SeqVarGDSClass-method}
+\alias{hethom}
+\alias{hethom,SeqVarGDSClass-method}
 
 \title{Heterozygosity and Homozygosity}
 
@@ -13,6 +15,7 @@
 \usage{
 \S4method{heterozygosity}{SeqVarGDSClass}(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE)
 \S4method{homozygosity}{SeqVarGDSClass}(gdsobj, allele=c("any", "ref", "alt"), margin=c("by.variant", "by.sample"), use.names=FALSE)
+\S4method{hethom}{SeqVarGDSClass}(gdsobj, use.names=FALSE)
 }
 
 \arguments{
@@ -38,6 +41,8 @@
   is considered.  For example, "ref" will count "0/0" genotypes only,
   "alt" will count "1/1", "2/2", etc. (but not "0/0"), and "any" will
   count all of the above.
+
+  \code{hethom} calculates the ratio of heterozygous genotypes to alternate homozygous genotypes by sample.
 }
 
 \value{
@@ -63,9 +68,7 @@ head(homozygosity(gds, allele="ref", margin="by.variant"))
 head(homozygosity(gds, allele="alt", margin="by.variant"))
 
 ## Het/Hom Non-Ref by sample
-hhnr <- heterozygosity(gds, margin="by.sample") /
-        homozygosity(gds, allele="alt", margin="by.sample")
-head(hhnr)
+head(hethom(gds))
 
 seqClose(gds)
 }
