@@ -84,7 +84,7 @@ setMethod("regression",
               model.type <- match.arg(model.type)
               
               ## get covariates
-              dat <- pData(sampleData(gdsobj))[,c(outcome, covar)]
+              dat <- pData(sampleData(gdsobj))[,c(outcome, covar),drop=FALSE]
               
               ## create model formula
               model.string <- paste(outcome, "~", paste(c(covar, "genotype"), collapse=" + "))

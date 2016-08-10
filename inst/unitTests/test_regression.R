@@ -173,3 +173,14 @@ test_droplevels <- function() {
     exp <- logistf(as.formula("outcome ~ covarA + covarB + genotype"), dat)
     checkEquals(coef(exp)["genotype"], res[1,"Est"], check.names=FALSE)
 }
+
+test_nocovar <- function() {
+    gds <- .testData(binary=FALSE)
+    res <- regression(gds, outcome="outcome", covar=NULL, model.type="linear")
+    
+    dat <- cbind(pData(sampleData(gds)), genotype=refDosage(gds)[,1])
+    exp <- lm("outcome ~ genotype", dat)
+    seqClose(gds)
+    checkEquals(summary(exp)$coef["genotype",1], res[1,"Est"], check.names=FALSE)
+    checkEquals(summary(exp)$coef["genotype",2], res[1,"SE"], check.names=FALSE)
+}
