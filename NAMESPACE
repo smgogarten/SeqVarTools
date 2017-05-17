@@ -15,8 +15,6 @@ import(logistf)
 importFrom(GWASExactHW, HWExact)
 importFrom(stringr, str_count)
 
-importMethodsFrom(VariantAnnotation, isSNV)
-
 exportClasses(SeqVarData)
 
 exportMethods(sampleData, "sampleData<-",

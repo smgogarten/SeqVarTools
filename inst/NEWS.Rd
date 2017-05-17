@@ -79,3 +79,9 @@
     \item Add countSingletons method
   }
 }
+\section{Changes in version 1.15.1}{
+  \itemize{
+    \item Following SeqArray, remove dependency on VariantAnnotation
+    \item Add generic isSNV (replacing previous import of this generic from VariantAnnotation)
+  }
+}

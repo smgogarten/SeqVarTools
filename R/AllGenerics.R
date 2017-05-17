@@ -24,6 +24,10 @@ setGeneric("isVariant",
            function(gdsobj, ...)
              standardGeneric("isVariant"))
 
+setGeneric("isSNV",
+           function(gdsobj, ...)
+             standardGeneric("isSNV"))
+
 
 ## data retrieval and formatting
 setGeneric("getGenotype",
