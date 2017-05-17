@@ -38,13 +38,21 @@
 }
 
 .parseRefAllele <- function(x) {
-  SeqArray:::.refAllele(x)
+  endRef <- regexpr(",", x, fixed=TRUE) - 1L
+  noAlt <- endRef < 0L
+  if (any(noAlt))
+      endRef[noAlt] <- nchar(x[noAlt])
+  substr(x, 1L, endRef)
 }
 
 .parseAltAllele <- function(x, n=0) {
   if (n == 0) {
     ## if n=0, return string with all ALT alleles
-    SeqArray:::.altAllele(x)
+    begAlt <- regexpr(",", x, fixed=TRUE) + 1L
+    noAlt <- begAlt == 0L
+    if (any(noAlt))
+        begAlt[noAlt] <- nchar(x[noAlt]) + 1L
+    substr(x, begAlt, nchar(x))
   } else {
     ## if n>0, return nth ALT allele
     unlist(lapply(strsplit(x, ",", fixed=TRUE), function(x) x[n+1]),

@@ -46,9 +46,7 @@ gds
 We can look at some basic information in this file, such as the
 reference and alternate alleles.
 <<>>=
-ref(gds)
 head(refChar(gds))
-alt(gds)
 head(altChar(gds))
 @ 
 
