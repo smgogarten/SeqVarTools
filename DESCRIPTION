@@ -1,13 +1,12 @@
 Package: SeqVarTools
-Version: 1.15.1
+Version: 1.15.2
 Type: Package
 Title: Tools for variant data
 Description: An interface to the fast-access storage format for VCF
         data provided in SeqArray, with tools for common operations and
         analysis.
 Author: Stephanie M. Gogarten, Xiuwen Zheng, Adrienne Stilp
-Maintainer: Stephanie M. Gogarten <sdmorris@u.washington.edu>, Xiuwen
-        Zheng <zhengx@u.washington.edu>, Adrienne Stilp <amstilp@u.washington.edu>
+Maintainer: Stephanie M. Gogarten <sdmorris@uw.edu>, Xiuwen Zheng <zhengx@uw.edu>, Adrienne Stilp <amstilp@uw.edu>
 Depends: SeqArray (>= 1.11.17)
 Imports: grDevices, graphics, stats, methods, stringr, gdsfmt, GenomicRanges, IRanges, S4Vectors, GWASExactHW, Biobase, logistf
 Suggests: BiocGenerics, BiocStyle, RUnit

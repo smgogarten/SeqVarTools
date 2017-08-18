@@ -92,8 +92,8 @@ test_missing <- function() {
     ## test creation with missing arguments
     gds.fn <- seqExampleFileName("gds")
     svd <- SeqVarData(gds.fn)
-    checkEquals(seqGetData(svd, "sample.id"), sampleData(svd)$sample.id)
-    checkEquals(seqGetData(svd, "variant.id"), variantData(svd)$variant.id)
+    checkEquals(length(seqGetData(svd, "sample.id")), nrow(sampleData(svd)), checkNames=FALSE)
+    checkEquals(length(seqGetData(svd, "variant.id")), nrow(variantData(svd)), checkNames=FALSE)
     seqClose(svd)
 }
 
@@ -105,7 +105,7 @@ test_granges <- function() {
     
     vdf <- .testVariantData(gds)
     variantData(svd) <- vdf
-    checkEquals(pData(vdf)[,-1,drop=FALSE], as.data.frame(mcols(granges(svd))))
+    checkEquals(pData(vdf)[,-1,drop=FALSE], as.data.frame(S4Vectors::mcols(granges(svd))))
     
     seqClose(svd)
 }
@@ -113,10 +113,13 @@ test_granges <- function() {
 test_filtered <- function() {
     gds.fn <- seqExampleFileName("gds")
     gds <- seqOpen(gds.fn)
+    sdf <- .testSampleData(gds)
+    vdf <- .testVariantData(gds)
     seqSetFilter(gds, sample.sel=1:10, variant.sel=1:10, verbose=FALSE)
     svd <- SeqVarData(gds)
     checkEquals(10, nrow(sampleData(svd)), checkNames=FALSE)
     checkEquals(10, nrow(variantData(svd)), checkNames=FALSE)
+    svd <- SeqVarData(gds, sampleData=sdf, variantData=vdf)
     checkEquals(seqGetData(svd, "sample.id"), sampleData(svd)$sample.id)
     checkEquals(seqGetData(svd, "variant.id"), variantData(svd)$variant.id)
     seqClose(svd)

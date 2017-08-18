@@ -31,9 +31,9 @@
 
       \code{gds} can be either the filename of a sequencing GDS file or an existing \code{\link{SeqVarGDSClass}} object.
 
-      \code{sampleData} must be an \code{\link{AnnotatedDataFrame}} with a column \code{sample.id} matching \code{sample.id} in the GDS file. If this argument is missing, a data frame with only sample.id will be created.
+      \code{sampleData} must be an \code{\link{AnnotatedDataFrame}} with a column \code{sample.id} matching \code{sample.id} in the GDS file. If this argument is missing, a data frame with 0 columns will be created.
 
-      \code{variantData} must be an \code{\link{AnnotatedDataFrame}} with a column \code{variant.id} matching \code{variant.id} in the GDS file. If this argument is missing, a data frame with only variant.id will be created.
+      \code{variantData} must be an \code{\link{AnnotatedDataFrame}} with a column \code{variant.id} matching \code{variant.id} in the GDS file. If this argument is missing, a data frame with 0 columns will be created.
     }
   }
 }

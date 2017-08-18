@@ -85,3 +85,8 @@
     \item Add generic isSNV (replacing previous import of this generic from VariantAnnotation)
   }
 }
+\section{Changes in version 1.15.2}{
+  \itemize{
+    \item Creating a SeqVarData object with missing sample or variant annotation will store 0-column data frames in sampleData or variantData, instead of duplicating sample.id and variant.id.
+  }
+}
