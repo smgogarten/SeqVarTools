@@ -50,6 +50,24 @@ SeqVarWindowIterator <- function(seqData, windowSize=10000, windowShift=5000, ve
 }
 
 
+SeqVarListIterator <- function(seqData, variantRanges, verbose=TRUE) {
+    class(seqData) <- "SeqVarListIterator"
+    seqData@variantRanges <- variantRanges
+
+    ## store original filter
+    seqSetFilter(seqData, action="push", verbose=verbose)
+    
+    ## set filter to first range
+    seqSetFilter(seqData, variantRanges[1], intersect=TRUE, verbose=verbose)
+
+    ## pass-by-reference slot for lastRange
+    seqData@lastRange <- new.env()
+    lastRange(seqData) <- 1
+
+    seqData
+}
+
+
 setMethod("restoreFilter",
           "SeqVarGDSClass",
           function(x, verbose=TRUE) {
@@ -126,6 +144,45 @@ setMethod("iterateFilter",
                   i <- lastRange(x) + 1
                   seqSetFilter(x, action="push", verbose=verbose)
                   seqSetFilter(x, variantRanges(x)[i], intersect=TRUE, verbose=verbose)
+                  lastRange(x) <- i
+                  return(TRUE)
+              } else {
+                  .emptyVarFilter(x, verbose=verbose)
+                  return(FALSE)
+              }
+          })
+
+
+setMethod("variantRanges",
+          "SeqVarListIterator",
+          function(x) {
+              x@variantRanges
+          })
+
+setMethod("lastRange",
+          "SeqVarListIterator",
+          function(x) {
+              x@lastRange$i
+          })
+
+setReplaceMethod("lastRange",
+                 c("SeqVarListIterator", "numeric"),
+                 function(x, value) {
+                     x@lastRange$i <- as.integer(value)
+                     x
+                 })
+
+setMethod("iterateFilter",
+          "SeqVarListIterator",
+          function(x, verbose=TRUE) {
+              ## restore original filter
+              restoreFilter(x, verbose=verbose)
+
+              ## set filter for next range list
+              if (lastRange(x) < length(variantRanges(x))) {
+                  i <- lastRange(x) + 1
+                  seqSetFilter(x, action="push", verbose=verbose)
+                  seqSetFilter(x, variantRanges(x)[[i]], intersect=TRUE, verbose=verbose)
                   lastRange(x) <- i
                   return(TRUE)
               } else {

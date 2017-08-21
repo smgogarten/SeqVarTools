@@ -87,7 +87,7 @@
 }
 \section{Changes in version 1.15.2}{
   \itemize{
-    \item Added iterator classes: SeqVarBlockIterator, SeqVarRangeIterator, SeqVarWindowIterator.
+    \item Added iterator classes: SeqVarBlockIterator, SeqVarRangeIterator, SeqVarWindowIterator, SeqVarListIterator.
     \item Creating a SeqVarData object with missing sample or variant annotation will store 0-column data frames in sampleData or variantData, instead of duplicating sample.id and variant.id.
   }
 }

@@ -13,3 +13,7 @@ setClass("SeqVarRangeIterator", contains="SeqVarData",
 setClass("SeqVarWindowIterator", contains="SeqVarRangeIterator",
          slots=c(windowSize="integer", # base pairs
                  windowShift="integer"))
+
+setClass("SeqVarListIterator", contains="SeqVarData",
+         slots=c(variantRanges="GRangesList",
+                 lastRange="environment"))

@@ -120,3 +120,17 @@ test_iterator_window <- function() {
     checkEquals(sort(unique(unlist(var))), seqGetData(it, "variant.id"))
     seqClose(it)
 }
+
+test_iterator_list <- function() {
+    gds <- .testData()
+    gr <- GRangesList(
+        GRanges(seqnames=rep(1,2), ranges=IRanges(start=c(1e6, 3e6), width=1e6)),
+        GRanges(seqnames=rep(1,2), ranges=IRanges(start=c(3e6, 34e6), width=1e6)))
+    it <- SeqVarListIterator(gds, variantRanges=gr, verbose=FALSE)
+    checkEquals(1:7, seqGetData(it, "variant.id"))
+    checkTrue(iterateFilter(it, verbose=FALSE))
+    checkEquals(4:11, seqGetData(it, "variant.id"))
+    checkTrue(!iterateFilter(it, verbose=FALSE))
+    checkEquals(integer(), seqGetData(it, "variant.id"))
+    seqClose(it)
+}

@@ -18,7 +18,8 @@ importFrom(stringr, str_count)
 exportClasses(SeqVarData,
               SeqVarBlockIterator,
               SeqVarRangeIterator,
-              SeqVarWindowIterator)
+              SeqVarWindowIterator,
+              SeqVarListIterator)
 
 exportMethods(sampleData, "sampleData<-",
               variantData, "variantData<-",
@@ -64,4 +65,5 @@ export(SeqVarData,
        SeqVarBlockIterator,
        SeqVarRangeIterator,
        SeqVarWindowIterator,
+       SeqVarListIterator,
        setVariantID)
