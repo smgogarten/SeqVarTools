@@ -180,6 +180,26 @@ setMethod("alleleDosage",
             d
           })
 
+setMethod("expandedAltDosage",
+          "SeqVarGDSClass",
+          function(gdsobj, use.names=TRUE) {
+            samp.names <- if (use.names) seqGetData(gdsobj, "sample.id") else NULL
+            variant.id <- if (use.names) seqGetData(gdsobj, "variant.id") else NULL
+            n <- nAlleles(gdsobj) - 1
+            d <- seqApply(gdsobj, "genotype",
+                          function(index, x) {
+                              tmp <- lapply(1:n[index], function(allele) colSums(x == allele))
+                              var.names <- rep(variant.id[index], n[index])
+                              matrix(unlist(tmp, use.names=FALSE), ncol=length(tmp),
+                                     dimnames=list(sample=samp.names, variant=var.names))
+                          },
+                          margin="by.variant", as.is="list",
+                          var.index="relative")
+            d <- do.call(cbind, d)
+            if (use.names) names(dimnames(d)) <- c("sample", "variant")
+            d
+          })
+
 setMethod("getVariableLengthData",
           c("SeqVarGDSClass", "character"),
           function(gdsobj, var.name, use.names=TRUE) {

@@ -204,6 +204,7 @@ test_alleleDosage <- function() {
   checkEquals(altDosage(gds), alleleDosage(gds, n=1))
   seqClose(gds)
   
+  gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
   gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
   gds <- seqOpen(gdsfile)
   checkEquals(refDosage(gds), alleleDosage(gds, n=0))
@@ -240,4 +241,28 @@ test_alleleDosage <- function() {
   checkException(alleleDosage(gds, n=c(1,0)))
   
   seqClose(gds)
+}
+
+test_expandedAltDosage <- function() {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
+    gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
+    gds <- seqOpen(gdsfile)
+    ead <- expandedAltDosage(gds)
+    checkEquals(sum(nAlleles(gds) - 1), ncol(ead)) 
+
+    seqSetFilter(gds, variant.sel=(nAlleles(gds) == 3), verbose=FALSE)
+    ad <- lapply(1:2, function(n) alleleDosage(gds, n=n))
+    ead <- expandedAltDosage(gds)
+    checkEquals(ad[[1]], ead[,c(TRUE,FALSE)])
+    checkEquals(ad[[2]], ead[,c(FALSE,TRUE)])
+
+    seqResetFilter(gds, verbose=FALSE)
+    seqSetFilter(gds, variant.sel=(nAlleles(gds) == 4), verbose=FALSE)
+    ad <- lapply(1:3, function(n) alleleDosage(gds, n=n))
+    ead <- expandedAltDosage(gds)
+    checkEquals(ad[[1]], ead[,c(TRUE,FALSE,FALSE)])
+    checkEquals(ad[[2]], ead[,c(FALSE,TRUE,FALSE)])
+    checkEquals(ad[[3]], ead[,c(FALSE,FALSE,TRUE)])
+
+    seqClose(gds)
 }
