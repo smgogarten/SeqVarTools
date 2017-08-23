@@ -9,7 +9,7 @@ Author: Stephanie M. Gogarten, Xiuwen Zheng, Adrienne Stilp
 Maintainer: Stephanie M. Gogarten <sdmorris@uw.edu>, Xiuwen Zheng <zhengx@uw.edu>, Adrienne Stilp <amstilp@uw.edu>
 Depends: SeqArray (>= 1.11.17)
 Imports: grDevices, graphics, stats, methods, gdsfmt, GenomicRanges, IRanges, S4Vectors, GWASExactHW, Biobase, logistf
-Suggests: BiocGenerics, BiocStyle, RUnit
+Suggests: BiocGenerics, BiocStyle, RUnit, stringr
 License: GPL-3
 LazyData: yes
 biocViews: SNP, GeneticVariability, Sequencing, Genetics
