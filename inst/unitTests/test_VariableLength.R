@@ -60,13 +60,14 @@ test_parseVariableLength_length01 <- function() {
 }
 
 test_getVariableLength_DP <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   checkIdentical(.parseVariableLength(seqGetData(gds, "annotation/format/DP")),
                  getVariableLengthData(gds, "annotation/format/DP", use.names=FALSE))
   seqClose(gds)
 }
 
 test_getVariableLength_GL <- function() {
+  gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
   gds <- seqOpen(system.file("extdata", "gl_chr1.gds", package="SeqVarTools"))
   gl <- getVariableLengthData(gds, "annotation/format/GL", use.names=FALSE)
   dimnames(gl) <- NULL
@@ -75,6 +76,7 @@ test_getVariableLength_GL <- function() {
 }
 
 test_getVariableLength_apply <- function() {
+  gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
   gds <- seqOpen(system.file("extdata", "gl_chr1.gds", package="SeqVarTools"))
   var.id <- 2:6
   samp.id <- seqGetData(gds, "sample.id")[6:10]
@@ -88,6 +90,7 @@ test_getVariableLength_apply <- function() {
 }
 
 test_getVariableLength_AD <- function() {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
     gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
     gds <- seqOpen(gdsfile)
     ad <- getVariableLengthData(gds, "annotation/format/AD", use.names=FALSE)
@@ -97,6 +100,7 @@ test_getVariableLength_AD <- function() {
 }
 
 test_getVariableLength_AB <- function() {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
     gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
     gds <- seqOpen(gdsfile)
     ab <- getVariableLengthData(gds, "annotation/format/AB", use.names=FALSE)

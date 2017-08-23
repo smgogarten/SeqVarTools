@@ -140,7 +140,7 @@ applyMethod(gds, getGenotype, variant=var.id, sample=samp.id)
 @ 
 
 As an alternative to specifying variant ids, we can use a GRanges
-object to select a range on chromosome 22.  This feature is not available in \Rfunction{seqSetFilter}.
+object to select a range on chromosome 22.
 <<>>=
 library(GenomicRanges)
 gr <- GRanges(seqnames="22", IRanges(start=1, end=250000000))

@@ -64,10 +64,10 @@
   }
 }
 
-.parseNumAlleles <- function(x) {
-  #unlist(lapply(strsplit(x, ",", fixed=TRUE), length), use.names=FALSE)
-  str_count(x, ",") + 1L
-}
+## .parseNumAlleles <- function(x) {
+##   #unlist(lapply(strsplit(x, ",", fixed=TRUE), length), use.names=FALSE)
+##   str_count(x, ",") + 1L
+## }
 
 .maxAlleleLength <- function(x) {
   a <- gregexpr("[ACGT]+", x)
@@ -161,4 +161,14 @@
         subjectHits(ol)[queryHits(ol) == h]
     })
     query[hits[!duplicated(queryBySubject)]]
+}
+
+.testData <- function() {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
+    gdsfile <- seqExampleFileName("gds")
+    seqOpen(gdsfile)
+}
+
+.testSeqVarData <- function() {
+    SeqVarData(.testData())
 }

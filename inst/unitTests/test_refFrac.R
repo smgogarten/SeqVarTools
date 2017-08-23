@@ -6,6 +6,7 @@ test_refFrac_excep <- function() {
 }
 
 test_refFrac <- function() {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
     gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
     gds <- seqOpen(gdsfile)
     seqSetFilter(gds, variant.sel=isSNV(gds))

@@ -1,5 +1,5 @@
 test_titv_bysamp <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   ref <- refChar(gds)
   alt <- altChar(gds)
   ti <- SeqVarTools:::.isTransition(ref, alt)
@@ -13,7 +13,7 @@ test_titv_bysamp <- function() {
 }
 
 test_titv_bysamp_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
@@ -26,7 +26,7 @@ test_titv_bysamp_apply <- function() {
 }
 
 test_titv_byvar_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)

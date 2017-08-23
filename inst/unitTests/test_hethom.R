@@ -1,5 +1,5 @@
 test_hethom_sum <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   nsamp <- SeqVarTools:::.nSamp(gds)
   nvar <- SeqVarTools:::.nVar(gds)
   
@@ -20,7 +20,7 @@ test_hethom_sum <- function() {
 }
 
 test_hom_sum <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   checkEquals(homozygosity(gds, allele="any"),
               homozygosity(gds, allele="ref") + homozygosity(gds, allele="alt"))
   checkEquals(homozygosity(gds, allele="any", margin="by.sample"),
@@ -30,7 +30,7 @@ test_hom_sum <- function() {
 }
 
 test_heterozygosity <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   geno <- seqGetData(gds, "genotype")
   checkIdentical(colSums(geno[1,,] != geno[2,,], na.rm=TRUE) /
                  colSums(!is.na(geno[1,,]) & !is.na(geno[2,,])),
@@ -42,7 +42,7 @@ test_heterozygosity <- function() {
 }
 
 test_homozygosity_any <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   geno <- seqGetData(gds, "genotype")
   hom <- geno[1,,] == geno[2,,]
   checkIdentical(colSums(hom, na.rm=TRUE) /
@@ -55,7 +55,7 @@ test_homozygosity_any <- function() {
 }
 
 test_homozygosity_ref <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   geno <- seqGetData(gds, "genotype")
   hom <- geno[1,,] == geno[2,,] & geno[1,,] == 0
   checkIdentical(colSums(hom, na.rm=TRUE) /
@@ -68,7 +68,7 @@ test_homozygosity_ref <- function() {
 }
 
 test_homozygosity_alt <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   geno <- seqGetData(gds, "genotype")
   hom <- geno[1,,] == geno[2,,] & geno[1,,] > 0
   checkIdentical(colSums(hom, na.rm=TRUE) /
@@ -81,7 +81,7 @@ test_homozygosity_alt <- function() {
 }
 
 test_hethom <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   hh <- hethom(gds)
   geno <- seqGetData(gds, "genotype")
   hom <- geno[1,,] == geno[2,,] & geno[1,,] > 0
@@ -95,7 +95,7 @@ test_hethom <- function() {
 }
 
 test_heterozygosity_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
@@ -112,7 +112,7 @@ test_heterozygosity_apply <- function() {
 }
 
 test_homozygosity_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)

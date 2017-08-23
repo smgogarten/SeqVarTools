@@ -1,5 +1,5 @@
 test_applyMethod_util <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- seqGetData(gds, "variant.id") 
   checkIdentical(var.id,
                  SeqVarTools:::.applyMethod(gds, seqGetData, var.name="variant.id"))
@@ -14,7 +14,7 @@ test_applyMethod_util <- function() {
 }
 
 test_rangesToID <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   chrom <- seqGetData(gds, "chromosome")
   var.id <- seqGetData(gds, "variant.id")[chrom == 1]
   pos <- seqGetData(gds, "position")[chrom == 1]
@@ -24,7 +24,7 @@ test_rangesToID <- function() {
 }
   
 test_applyMethod_vector <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- seqGetData(gds, "variant.id") 
   checkIdentical(var.id[1:5],
                  applyMethod(gds, seqGetData, variant=var.id[1:5], var.name="variant.id"))
@@ -32,7 +32,7 @@ test_applyMethod_vector <- function() {
 }
 
 test_applyMethod_ranges <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   chrom <- seqGetData(gds, "chromosome")
   var.id <- seqGetData(gds, "variant.id")[chrom == 1]
   pos <- seqGetData(gds, "position")[chrom == 1]
@@ -43,7 +43,7 @@ test_applyMethod_ranges <- function() {
 }
 
 test_applyMethod_missing <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- seqGetData(gds, "variant.id") 
   checkIdentical(var.id,
                  applyMethod(gds, seqGetData, var.name="variant.id"))
@@ -51,7 +51,7 @@ test_applyMethod_missing <- function() {
 }
 
 test_applyMethod_pushpop <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   sample.id <- seqGetData(gds, "sample.id")
   seqSetFilter(gds, sample.id=sample.id[1:5], variant.id=1:10)
   samp.orig <- seqGetData(gds, "sample.id")
