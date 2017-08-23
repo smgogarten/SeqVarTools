@@ -1,5 +1,5 @@
 test_pca <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   pc <- pca(gds, eigen.cnt=8)
   checkEquals(8, length(pc$eigenval))
   checkEquals(c(length(seqGetData(gds, "sample.id")), 8),
@@ -8,7 +8,7 @@ test_pca <- function() {
 }
 
 test_pca_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)

@@ -25,7 +25,7 @@ test_genoMatch <- function() {
 }
 
 test_duplicateDiscordance_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   sample.id <- seqGetData(gds, "sample.id")
   samples <- data.frame(subject.id=c(rep(c("subj1", "subj2"), each=2), sample.id[5:length(sample.id)]),
                         sample.id=sample.id,
@@ -191,6 +191,7 @@ test_matchSamples <- function() {
 
 
 test_duplicateDiscordanceAcrossDatasets <- function() {
+  gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
   
   filename <- seqExampleFileName("gds")
   tmpfile <- tempfile()
@@ -289,6 +290,7 @@ test_duplicateDiscordanceAcrossDatasets <- function() {
 
 
 test_duplicateDiscordanceAcrossDatasets_hethom <- function() {
+  gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
   
   filename <- seqExampleFileName("gds")
   tmpfile <- tempfile()

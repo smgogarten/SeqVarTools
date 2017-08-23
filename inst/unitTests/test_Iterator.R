@@ -1,14 +1,7 @@
 library(GenomicRanges)
 
-.testData <- function() {
-    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
-    gdsfile <- seqExampleFileName("gds")
-    gds <- seqOpen(gdsfile)
-    SeqVarData(gds)
-}
-
 test_restore_filter <- function() {
-    gds <- .testData()
+    gds <- SeqVarTools:::.testSeqVarData()
     seqSetFilter(gds, variant.sel=1:10, verbose=FALSE)
     checkEquals(1:10, seqGetData(gds, "variant.id"))
     SeqVarTools:::.emptyVarFilter(gds, verbose=FALSE)
@@ -22,7 +15,7 @@ test_restore_filter <- function() {
 }
 
 test_iterator_block <- function() {
-    gds <- .testData()
+    gds <- SeqVarTools:::.testSeqVarData()
     it <- SeqVarBlockIterator(gds, variantBlock=100, verbose=FALSE)
     checkEquals(1:100, seqGetData(it, "variant.id"))
     checkTrue(iterateFilter(it, verbose=FALSE))
@@ -31,7 +24,7 @@ test_iterator_block <- function() {
 }
 
 test_iterator_block_prev <- function() {
-    gds <- .testData()
+    gds <- SeqVarTools:::.testSeqVarData()
     var.sel <- sort(sample(1:SeqVarTools:::.nVar(gds), 250))
     seqSetFilter(gds, variant.sel=var.sel, verbose=FALSE)
     it <- SeqVarBlockIterator(gds, variantBlock=100, verbose=FALSE)
@@ -46,7 +39,7 @@ test_iterator_block_prev <- function() {
 }
 
 test_iterator_block_samples <- function() {
-    gds <- .testData()
+    gds <- SeqVarTools:::.testSeqVarData()
     samp.sel <- sort(sample(1:SeqVarTools:::.nSamp(gds), 50))
     seqSetFilter(gds, sample.sel=samp.sel, verbose=FALSE)
     it <- SeqVarBlockIterator(gds, variantBlock=100, verbose=FALSE)
@@ -57,7 +50,7 @@ test_iterator_block_samples <- function() {
 }
 
 test_iterator_range <- function() {
-    gds <- .testData()
+    gds <- SeqVarTools:::.testSeqVarData()
     gr <- GRanges(seqnames=rep(1,3), ranges=IRanges(start=c(1e6, 2e6, 3e6), width=1e6))
     it <- SeqVarRangeIterator(gds, variantRanges=gr, verbose=FALSE)
     checkEquals(1:3, seqGetData(it, "variant.id"))
@@ -71,7 +64,7 @@ test_iterator_range <- function() {
 }
 
 test_iterator_range_prev <- function() {
-    gds <- .testData()
+    gds <- SeqVarTools:::.testSeqVarData()
     seqSetFilter(gds, variant.sel=c(1,3,5,7), verbose=FALSE)
     gr <- GRanges(seqnames=rep(1,3), ranges=IRanges(start=c(1e6, 2e6, 3e6), width=1e6))
     it <- SeqVarRangeIterator(gds, variantRanges=gr, verbose=FALSE)
@@ -86,7 +79,7 @@ test_iterator_range_prev <- function() {
 }
 
 test_iterator_range_samples <- function() {
-    gds <- .testData()
+    gds <- SeqVarTools:::.testSeqVarData()
     samp.sel <- sort(sample(1:SeqVarTools:::.nSamp(gds), 50))
     seqSetFilter(gds, sample.sel=samp.sel, verbose=FALSE)
     gr <- GRanges(seqnames=rep(1,3), ranges=IRanges(start=c(1e6, 2e6, 3e6), width=1e6))
@@ -105,7 +98,7 @@ test_unique_overlaps <- function() {
 }
 
 test_iterator_window <- function() {
-    gds <- .testData()
+    gds <- SeqVarTools:::.testSeqVarData()
     seqSetFilterChrom(gds, include="22", verbose=FALSE)
     it <- SeqVarWindowIterator(gds, verbose=FALSE)
     checkTrue(all(width(it@variantRanges) == 10000))
@@ -122,7 +115,7 @@ test_iterator_window <- function() {
 }
 
 test_iterator_list <- function() {
-    gds <- .testData()
+    gds <- SeqVarTools:::.testSeqVarData()
     gr <- GRangesList(
         GRanges(seqnames=rep(1,2), ranges=IRanges(start=c(1e6, 3e6), width=1e6)),
         GRanges(seqnames=rep(1,2), ranges=IRanges(start=c(3e6, 34e6), width=1e6)))

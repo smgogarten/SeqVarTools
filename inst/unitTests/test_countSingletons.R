@@ -1,6 +1,6 @@
 
 test_countSingletons <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   geno <- altDosage(gds)
   hasalt <- geno > 0 & !is.na(geno)
   singleton <- colSums(hasalt) == 1

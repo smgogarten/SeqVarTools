@@ -1,5 +1,5 @@
 test_applyNames <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   samp.id <- as.character(seqGetData(gds, "sample.id"))
   var.id <- as.character(seqGetData(gds, "variant.id"))
   
@@ -25,7 +25,7 @@ test_applyNames <- function() {
 
 
 test_isVariant <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   geno <- seqGetData(gds, "genotype")
   var <- (!is.na(geno[1,,]) & geno[1,,] > 0) | (!is.na(geno[2,,]) & geno[2,,] > 0)
   dimnames(var) <- list(sample=NULL, variant=NULL)
@@ -34,7 +34,7 @@ test_isVariant <- function() {
 }
 
 test_isVariant_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
@@ -47,7 +47,7 @@ test_isVariant_apply <- function() {
 
 
 test_getGenotype <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   geno <- seqGetData(gds, "genotype")
   gc <- matrix(paste(geno[1,,], geno[2,,], sep="/"),
                nrow=dim(geno)[2], ncol=dim(geno)[3],
@@ -69,7 +69,7 @@ test_getGenotype_phased <- function() {
 }
 
 test_getGenotype_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
@@ -82,7 +82,7 @@ test_getGenotype_apply <- function() {
 
 
 test_getGenotypeAlleles <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   geno <- seqGetData(gds, "genotype")
   alleles <- list(refChar(gds), altChar(gds, n=1), altChar(gds, n=2))
   for (i in 1:2) {
@@ -130,7 +130,7 @@ test_getGenotypeAlleles_phased <- function() {
 }
 
 test_getGenotypeAlleles_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
@@ -142,7 +142,7 @@ test_getGenotypeAlleles_apply <- function() {
 }
 
 test_refDosage <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   geno <- getGenotype(gds)
   rd <- refDosage(gds)
   checkIdentical(geno %in% "0/0", rd %in% 2)
@@ -153,7 +153,7 @@ test_refDosage <- function() {
 }
 
 test_refDosage_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
@@ -199,15 +199,15 @@ test_altDosage <- function() {
 }
 
 test_alleleDosage <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
-  checkIdentical(refDosage(gds), alleleDosage(gds, n=0))
-  checkIdentical(altDosage(gds), alleleDosage(gds, n=1))
+  gds <- SeqVarTools:::.testData()
+  checkEquals(refDosage(gds), alleleDosage(gds, n=0))
+  checkEquals(altDosage(gds), alleleDosage(gds, n=1))
   seqClose(gds)
   
   gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
   gds <- seqOpen(gdsfile)
-  checkIdentical(refDosage(gds), alleleDosage(gds, n=0))
-  checkIdentical(altDosage(gds), 2-alleleDosage(gds, n=0))
+  checkEquals(refDosage(gds), alleleDosage(gds, n=0))
+  checkEquals(altDosage(gds), 2-alleleDosage(gds, n=0))
 
   ## different alleles for each variant
   nalleles <- nAlleles(gds)

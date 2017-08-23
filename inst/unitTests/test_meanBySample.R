@@ -1,5 +1,5 @@
 test_meanBySample <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   dp <- getVariableLengthData(gds, "annotation/format/DP", use.names=TRUE)
   checkEquals(rowMeans(dp, na.rm=TRUE),
               meanBySample(gds, "annotation/format/DP", use.names=TRUE))
@@ -7,7 +7,7 @@ test_meanBySample <- function() {
 }
 
 test_meanBySample_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)

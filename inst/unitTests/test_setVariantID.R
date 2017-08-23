@@ -1,4 +1,5 @@
 test_setVariantID <- function() {
+  gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
   oldfile <- system.file("extdata", "gl_chr1.gds", package="SeqVarTools")
   newfile <- tempfile()
   file.copy(oldfile, newfile)

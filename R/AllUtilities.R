@@ -162,3 +162,13 @@
     })
     query[hits[!duplicated(queryBySubject)]]
 }
+
+.testData <- function() {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
+    gdsfile <- seqExampleFileName("gds")
+    seqOpen(gdsfile)
+}
+
+.testSeqVarData <- function() {
+    SeqVarData(.testData())
+}

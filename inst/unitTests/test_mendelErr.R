@@ -132,7 +132,7 @@ test_yMaleErr <- function() {
 }
 
 test_mendelErr <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   data(pedigree)
   checkEquals(list(c(child="NA12878", mother="NA12892", father="NA12891")),
               SeqVarTools:::.triosFromPedigree(pedigree))
@@ -144,7 +144,7 @@ test_mendelErr <- function() {
 }
 
 test_mendelErr_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   data(pedigree)
   var.id <- 101:110
   seqSetFilter(gds, variant.id=var.id)

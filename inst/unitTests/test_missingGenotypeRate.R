@@ -1,5 +1,5 @@
 test_missingGenotypeRate <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   geno <- seqGetData(gds, "genotype")
   checkIdentical(colSums(is.na(geno[1,,])) / dim(geno)[2],
                  missingGenotypeRate(gds, "by.variant"))
@@ -9,7 +9,7 @@ test_missingGenotypeRate <- function() {
 }
 
 test_missingGenotypeRate_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)

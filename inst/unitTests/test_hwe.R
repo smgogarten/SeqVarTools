@@ -7,7 +7,7 @@ test_permute <- function() {
 }
 
 test_count <- function() {
-    gds <- seqOpen(seqExampleFileName("gds"))
+    gds <- SeqVarTools:::.testData()
     filt <- nAlleles(gds) == 2
     seqSetFilter(gds, variant.sel=filt)
     geno <- getGenotype(gds)
@@ -23,7 +23,7 @@ test_count <- function() {
 }
 
 test_hwe <- function() {
-    gds <- seqOpen(seqExampleFileName("gds"))
+    gds <- SeqVarTools:::.testData()
     af <- alleleFrequency(gds)
     biallelic <- nAlleles(gds) == 2
     mono <- af %in% c(0,1)

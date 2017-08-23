@@ -33,6 +33,7 @@ test_posNeg <- function() {
 
 
 test_alternateAlleleDetection <- function() {
+  gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
   
   filename <- seqExampleFileName("gds")
   tmpfile <- tempfile()

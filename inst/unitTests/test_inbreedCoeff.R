@@ -1,6 +1,6 @@
 
 test_inbreedCoeff_apply <- function() {
-  gds <- seqOpen(seqExampleFileName("gds"))
+  gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
   seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)

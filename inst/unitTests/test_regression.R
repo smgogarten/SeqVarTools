@@ -40,6 +40,7 @@ test_firth <- function() {
 }
 
 .testData <- function(binary=FALSE, nv=100) {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
     gds <- seqOpen(seqExampleFileName("gds"))
     seqSetFilter(gds, variant.id=1:nv, verbose=FALSE)
     
