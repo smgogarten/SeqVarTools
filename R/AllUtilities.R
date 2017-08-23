@@ -64,10 +64,10 @@
   }
 }
 
-.parseNumAlleles <- function(x) {
-  #unlist(lapply(strsplit(x, ",", fixed=TRUE), length), use.names=FALSE)
-  str_count(x, ",") + 1L
-}
+## .parseNumAlleles <- function(x) {
+##   #unlist(lapply(strsplit(x, ",", fixed=TRUE), length), use.names=FALSE)
+##   str_count(x, ",") + 1L
+## }
 
 .maxAlleleLength <- function(x) {
   a <- gregexpr("[ACGT]+", x)

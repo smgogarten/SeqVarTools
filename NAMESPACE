@@ -13,7 +13,6 @@ import(GenomicRanges)
 import(Biobase)
 import(logistf)
 importFrom(GWASExactHW, HWExact)
-importFrom(stringr, str_count)
 
 exportClasses(SeqVarData,
               SeqVarBlockIterator,

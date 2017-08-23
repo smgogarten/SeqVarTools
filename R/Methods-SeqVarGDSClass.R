@@ -41,7 +41,8 @@ setMethod("altChar",
 setMethod("nAlleles",
           "SeqVarGDSClass",
           function(gdsobj) {
-            .parseNumAlleles(seqGetData(gdsobj, "allele"))
+            #.parseNumAlleles(seqGetData(gdsobj, "allele"))
+            seqNumAllele(gdsobj)
           })
 
 

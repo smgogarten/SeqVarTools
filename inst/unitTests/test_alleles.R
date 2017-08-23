@@ -23,10 +23,10 @@ test_parseAltAllele_n3 <- function() {
   checkIdentical(c(NA,NA,NA,NA,"C","C"), SeqVarTools:::.parseAltAllele(x, n=3))
 }
 
-test_parseNumAlleles <- function() {
-  x <- c("A", "A,A", "A,A,A", "A,A,A,A")
-  checkIdentical(1:4, SeqVarTools:::.parseNumAlleles(x))
-}
+## test_parseNumAlleles <- function() {
+##   x <- c("A", "A,A", "A,A,A", "A,A,A,A")
+##   checkIdentical(1:4, SeqVarTools:::.parseNumAlleles(x))
+## }
 
 test_maxAlleleLength <- function() {
   x <- c("A,G", "AA,G", "A,GG", "A,G,T")
