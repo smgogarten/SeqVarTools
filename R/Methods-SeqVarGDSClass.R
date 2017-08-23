@@ -245,9 +245,12 @@ setMethod("titv",
 setMethod("alleleFrequency",
           "SeqVarGDSClass",
           function(gdsobj, n=0, use.names=FALSE) {
-            af <- seqApply(gdsobj, "genotype",
-                           function(x) {mean(x == n, na.rm=TRUE)},
-                           margin="by.variant", as.is="double")
+            ## af <- seqApply(gdsobj, "genotype",
+            ##                function(x) {mean(x == n, na.rm=TRUE)},
+            ##                margin="by.variant", as.is="double")
+            af <- seqAlleleFreq(gdsobj, ref.allele=n)
+            ## frequency of alt=2, etc. should be 0 if there is no such allele
+            af[is.na(af)] <- 0
             if (use.names)
               names(af) <- seqGetData(gdsobj, "variant.id")
             af
