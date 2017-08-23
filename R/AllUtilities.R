@@ -29,6 +29,10 @@
   seqSummary(gdsobj, "variant.id", check="none", verbose=FALSE)
 }
 
+.emptyVarFilter <- function(x, verbose=FALSE) {
+    seqSetFilter(x, variant.sel=raw(.nVarUnfiltered(x)), action="push+set", verbose=verbose)
+}
+
 .applyNames <- function(gdsobj, var) {
   if ("sample" %in% names(dimnames(var)))
     dimnames(var)$sample <- seqGetData(gdsobj, "sample.id")
@@ -144,4 +148,17 @@
         c(nAA=.nHomRef(x), nAa=.nHetRef(x), naa=.nHomAlt(x))
     }, margin="by.variant", as.is="list")
     as.data.frame(do.call(rbind, n))
+}
+
+# behaves like subsetByOverlaps, except removes query ranges that have
+# duplicate sets of overlapping subject ranges
+.subsetByUniqueOverlaps <- function(query, subject) {
+    ol <- findOverlaps(query, subject)
+    # look for any subject ranges that have identical query ranges
+    # we want to eliminate these
+    hits <- unique(queryHits(ol))
+    queryBySubject <- lapply(hits, function(h) {
+        subjectHits(ol)[queryHits(ol) == h]
+    })
+    query[hits[!duplicated(queryBySubject)]]
 }

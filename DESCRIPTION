@@ -19,6 +19,7 @@ Collate:
   AllUtilities.R
   Methods-SeqVarGDSClass.R
   Methods-SeqVarData.R
+  Methods-Iterator.R
   duplicateDiscordance.R
   hwe.R
   inbreedCoeff.R

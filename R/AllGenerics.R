@@ -147,3 +147,37 @@ setGeneric("variantData",
 setGeneric("variantData<-",
            function(x, value)
              standardGeneric("variantData<-"))
+
+
+## Iterators
+setGeneric("variantBlock",
+           function(x)
+               standardGeneric("variantBlock"))
+
+setGeneric("lastVariant",
+           function(x)
+               standardGeneric("lastVariant"))
+
+setGeneric("lastVariant<-",
+           function(x, value)
+               standardGeneric("lastVariant<-"))
+
+setGeneric("variantRanges",
+           function(x)
+               standardGeneric("variantRanges"))
+
+setGeneric("lastRange",
+           function(x)
+               standardGeneric("lastRange"))
+
+setGeneric("lastRange<-",
+           function(x, value)
+               standardGeneric("lastRange<-"))
+
+setGeneric("iterateFilter",
+           function(x, ...)
+               standardGeneric("iterateFilter"))
+
+setGeneric("restoreFilter",
+           function(x, ...)
+               standardGeneric("restoreFilter"))

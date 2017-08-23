@@ -15,11 +15,21 @@ import(logistf)
 importFrom(GWASExactHW, HWExact)
 importFrom(stringr, str_count)
 
-exportClasses(SeqVarData)
+exportClasses(SeqVarData,
+              SeqVarBlockIterator,
+              SeqVarRangeIterator,
+              SeqVarWindowIterator,
+              SeqVarListIterator)
 
 exportMethods(sampleData, "sampleData<-",
               variantData, "variantData<-",
               granges,
+              variantBlock,
+              lastVariant, "lastVariant<-",
+              variantRanges,
+              lastRange, "lastRange<-",
+              iterateFilter,
+              restoreFilter,
               applyMethod,
               refChar,
               altChar,
@@ -52,4 +62,8 @@ exportMethods(sampleData, "sampleData<-",
               regression)
 
 export(SeqVarData,
+       SeqVarBlockIterator,
+       SeqVarRangeIterator,
+       SeqVarWindowIterator,
+       SeqVarListIterator,
        setVariantID)
