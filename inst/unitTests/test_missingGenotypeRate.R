@@ -5,6 +5,10 @@ test_missingGenotypeRate <- function() {
                  missingGenotypeRate(gds, "by.variant"))
   checkIdentical(rowSums(is.na(geno[1,,])) / dim(geno)[3],
                  missingGenotypeRate(gds, "by.sample"))
+  checkIdentical(as.character(seqGetData(gds, "variant.id")),
+                 names(missingGenotypeRate(gds, "by.variant", use.names=TRUE)))
+  checkIdentical(seqGetData(gds, "sample.id"),
+                 names(missingGenotypeRate(gds, "by.sample", use.names=TRUE)))
   seqClose(gds)
 }
 

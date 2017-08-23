@@ -257,22 +257,33 @@ setMethod("missingGenotypeRate",
           function(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE) {
             margin <- match.arg(margin)
             if (margin == "by.variant") {
-              miss <- seqApply(gdsobj, "genotype",
-                               function(x) {sum(is.na(x[1,]))},
-                               margin=margin, as.is="integer")
+              miss <- seqMissing(gdsobj, per.variant=TRUE)
               if (use.names)
                 names(miss) <- seqGetData(gdsobj, "variant.id")
-              miss / .nSamp(gdsobj)
             } else {
-              miss <- integer(.nSamp(gdsobj))
-              ## use "<<-" operator to find "miss" in the parent environment
-              seqApply(gdsobj, "genotype",
-                       function(x) {miss <<- miss + is.na(x[1,])},
-                       margin="by.variant", as.is="none")
+              miss <- seqMissing(gdsobj, per.variant=FALSE)
               if (use.names)
                 names(miss) <- seqGetData(gdsobj, "sample.id")
-              miss / .nVar(gdsobj)
             } 
+            miss
+
+##             if (margin == "by.variant") {
+##               miss <- seqApply(gdsobj, "genotype",
+##                                function(x) {sum(is.na(x[1,]))},
+##                                margin=margin, as.is="integer")
+##               if (use.names)
+##                 names(miss) <- seqGetData(gdsobj, "variant.id")
+##               miss / .nSamp(gdsobj)
+##             } else {
+##               miss <- integer(.nSamp(gdsobj))
+##               ## use "<<-" operator to find "miss" in the parent environment
+##               seqApply(gdsobj, "genotype",
+##                        function(x) {miss <<- miss + is.na(x[1,])},
+##                        margin="by.variant", as.is="none")
+##               if (use.names)
+##                 names(miss) <- seqGetData(gdsobj, "sample.id")
+##               miss / .nVar(gdsobj)
+##             } 
 
 ## REPLACE when by.sample works in seqApply
 ##              miss <- seqApply(gdsobj, "genotype",
