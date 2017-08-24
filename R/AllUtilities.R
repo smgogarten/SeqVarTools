@@ -29,8 +29,22 @@
   seqSummary(gdsobj, "variant.id", check="none", verbose=FALSE)
 }
 
+.emptySampFilter <- function(x, verbose=FALSE) {
+    seqSetFilter(x, sample.sel=raw(.nSampUnfiltered(x)), action="push+set", verbose=verbose)
+}
+
 .emptyVarFilter <- function(x, verbose=FALSE) {
     seqSetFilter(x, variant.sel=raw(.nVarUnfiltered(x)), action="push+set", verbose=verbose)
+}
+
+.emptyDim <- function(x) {
+    .nSamp(x) == 0 | .nVar(x) == 0
+}
+
+.emptyGenoMatrix <- function(x, use.names=FALSE) {
+    m <- matrix(nrow=.nSamp(x), ncol=.nVar(x),
+                dimnames=list(sample=NULL, variant=NULL))
+    if (use.names) .applyNames(x, m) else m
 }
 
 .applyNames <- function(gdsobj, var) {

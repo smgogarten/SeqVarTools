@@ -74,6 +74,7 @@ setMethod("isSNV",
 setMethod("getGenotype",
           "SeqVarGDSClass",
           function(gdsobj, use.names=TRUE) {
+            if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
             gc <- seqApply(gdsobj, c(geno="genotype", phase="phase"),
                            function(x) {sep=ifelse(x$phase, "|", "/")
                                         paste0(x$geno[1,], sep, x$geno[2,])},
@@ -87,6 +88,7 @@ setMethod("getGenotype",
 setMethod("getGenotypeAlleles",
           "SeqVarGDSClass",
           function(gdsobj, use.names=TRUE, sort=FALSE) {
+            if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
             gc <- seqApply(gdsobj,
                            c(geno="genotype", phase="phase", allele="allele"),
                            function(x, sort) {
@@ -111,6 +113,7 @@ setMethod("getGenotypeAlleles",
 setMethod("refDosage",
           "SeqVarGDSClass",
           function(gdsobj, use.names=TRUE) {
+            if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
             rd <- seqApply(gdsobj, "genotype",
                            function(x) {colSums(x == 0)},
                            margin="by.variant", as.is="list")
@@ -122,6 +125,7 @@ setMethod("refDosage",
 setMethod("altDosage",
           "SeqVarGDSClass",
           function(gdsobj, use.names=TRUE) {
+            if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
             d <- seqApply(gdsobj, "genotype",
                            function(x) {colSums(x != 0)},
                            margin="by.variant", as.is="list")
@@ -133,6 +137,7 @@ setMethod("altDosage",
 setMethod("alleleDosage",
           c("SeqVarGDSClass", "numeric"),
           function(gdsobj, n=0, use.names=TRUE) {
+            if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
             if (length(n) == 1) n <- rep(n, .nVar(gdsobj))
             stopifnot(length(n) == .nVar(gdsobj))
             stopifnot(all(n <= nAlleles(gdsobj)))
@@ -166,6 +171,7 @@ setMethod("alleleDosage",
 setMethod("alleleDosage",
           c("SeqVarGDSClass", "list"),
           function(gdsobj, n, use.names=TRUE) {
+            if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
             stopifnot(length(n) == .nVar(gdsobj))
             samp.names <- if (use.names) seqGetData(gdsobj, "sample.id") else NULL
             d <- seqApply(gdsobj, "genotype",
@@ -183,6 +189,7 @@ setMethod("alleleDosage",
 setMethod("expandedAltDosage",
           "SeqVarGDSClass",
           function(gdsobj, use.names=TRUE) {
+            if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
             samp.names <- if (use.names) seqGetData(gdsobj, "sample.id") else NULL
             variant.id <- if (use.names) seqGetData(gdsobj, "variant.id") else NULL
             n <- nAlleles(gdsobj) - 1

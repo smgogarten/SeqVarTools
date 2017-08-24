@@ -266,3 +266,15 @@ test_expandedAltDosage <- function() {
 
     seqClose(gds)
 }
+
+test_empty <- function() {
+    gds <- SeqVarTools:::.testData()
+    SeqVarTools:::.emptyVarFilter(gds)
+    checkEquals(0, ncol(getGenotype(gds)))
+    checkEquals(0, ncol(getGenotypeAlleles(gds)))
+    checkEquals(0, ncol(refDosage(gds)))
+    checkEquals(0, ncol(altDosage(gds)))
+    checkEquals(0, ncol(expandedAltDosage(gds)))
+    checkEquals(0, ncol(alleleDosage(gds, n=0)))
+    seqClose(gds)
+}
