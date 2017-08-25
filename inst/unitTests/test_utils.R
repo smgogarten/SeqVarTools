@@ -55,4 +55,3 @@ test_emptyGenoMatrix <- function() {
 
     seqClose(gds)
 }
-

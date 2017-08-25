@@ -278,3 +278,42 @@ test_empty <- function() {
     checkEquals(0, ncol(alleleDosage(gds, n=0)))
     seqClose(gds)
 }
+
+test_expandedVariantIndex <- function() {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
+    gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
+    gds <- seqOpen(gdsfile)
+    ind <- expandedVariantIndex(gds)
+    checkEquals(sum(nAlleles(gds) - 1), length(ind)) 
+    ead <- expandedAltDosage(gds)
+    checkEquals(ncol(ead), length(ind))
+    checkEquals(colnames(ead), as.character(seqGetData(gds, "variant.id")[ind]))
+    checkEquals(as.vector(table(nAlleles(gds))), as.vector(table(table(ind))))
+    seqClose(gds)
+}
+
+test_variantInfo <- function() {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
+    gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
+    gds <- seqOpen(gdsfile)
+    
+    v <- variantInfo(gds, alleles=FALSE, expanded=FALSE)
+    checkEquals(SeqVarTools:::.nVar(gds), nrow(v))
+    
+    v <- variantInfo(gds, alleles=TRUE, expanded=FALSE)
+    checkTrue(all(c("ref", "alt") %in% names(v)))
+    
+    v <- variantInfo(gds, alleles=FALSE, expanded=TRUE)
+    na <- table(nAlleles(gds))
+    ai <- sapply(1:length(na), function(i) sum(na[i:length(na)]))
+    checkEquals(ai, as.vector(table(v$allele.index)))
+
+    v <- variantInfo(gds, alleles=TRUE, expanded=TRUE)
+    checkEquals(ai, as.vector(table(v$allele.index)))
+    for (i in 1:6) {
+        ac <- altChar(gds, n=i)
+        checkEquals(ac[!is.na(ac)], v$alt[v$allele.index == i])
+    }
+    
+    seqClose(gds)
+}

@@ -16,8 +16,7 @@
 \title{Get genotype data}
 
 \description{
-  Get matrix of genotype values from a GDS object as VCF-style character
-  strings
+  Get matrix of genotype values from a GDS object
 }
 
 \usage{

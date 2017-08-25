@@ -207,6 +207,38 @@ setMethod("expandedAltDosage",
             d
           })
 
+setMethod("expandedVariantIndex",
+          "SeqVarGDSClass",
+          function(gdsobj) {
+              nAlt <- nAlleles(gdsobj) - 1
+              rep(1:.nVar(gdsobj), nAlt)
+          })
+
+setMethod("variantInfo",
+          "SeqVarGDSClass",
+          function(gdsobj, alleles=TRUE, expanded=FALSE) {
+              x <- data.frame(variant.id=seqGetData(gdsobj, "variant.id"),
+                              chromosome=seqGetData(gdsobj, "chromosome"),
+                              position=seqGetData(gdsobj, "position"),
+                              stringsAsFactors=FALSE)
+              if (alleles) {
+                  allele <- seqGetData(gdsobj, "allele")
+                  x$ref <- .parseRefAllele(allele)
+                  x$alt <- .parseAltAllele(allele)
+              }
+              if (expanded) {
+                  if (alleles) {
+                      x <- separate_rows_(x, "alt", sep=",")
+                  } else {
+                      x <- x[expandedVariantIndex(gdsobj),]
+                  }
+                  x <- group_by_(x, "variant.id")
+                  x <- mutate_(x, allele.index=~1:n())
+                  x <- as.data.frame(x)
+              }
+              x
+          })
+
 setMethod("getVariableLengthData",
           c("SeqVarGDSClass", "character"),
           function(gdsobj, var.name, use.names=TRUE) {
@@ -456,4 +488,3 @@ setMethod("countSingletons",
                names(st) <- seqGetData(gdsobj, "sample.id")
              st
            })
-      
