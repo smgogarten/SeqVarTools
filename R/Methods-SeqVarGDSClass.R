@@ -210,8 +210,10 @@ setMethod("expandedAltDosage",
 setMethod("expandedVariantIndex",
           "SeqVarGDSClass",
           function(gdsobj) {
+              nv <- .nVar(gdsobj)
+              if (nv == 0) return(integer())
               nAlt <- nAlleles(gdsobj) - 1
-              rep(1:.nVar(gdsobj), nAlt)
+              rep(1:nv, nAlt)
           })
 
 setMethod("variantInfo",
@@ -221,6 +223,7 @@ setMethod("variantInfo",
                               chromosome=seqGetData(gdsobj, "chromosome"),
                               position=seqGetData(gdsobj, "position"),
                               stringsAsFactors=FALSE)
+              if (nrow(x) == 0) return(x)
               if (alleles) {
                   allele <- seqGetData(gdsobj, "allele")
                   x$ref <- .parseRefAllele(allele)

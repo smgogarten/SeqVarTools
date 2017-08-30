@@ -267,18 +267,6 @@ test_expandedAltDosage <- function() {
     seqClose(gds)
 }
 
-test_empty <- function() {
-    gds <- SeqVarTools:::.testData()
-    SeqVarTools:::.emptyVarFilter(gds)
-    checkEquals(0, ncol(getGenotype(gds)))
-    checkEquals(0, ncol(getGenotypeAlleles(gds)))
-    checkEquals(0, ncol(refDosage(gds)))
-    checkEquals(0, ncol(altDosage(gds)))
-    checkEquals(0, ncol(expandedAltDosage(gds)))
-    checkEquals(0, ncol(alleleDosage(gds, n=0)))
-    seqClose(gds)
-}
-
 test_expandedVariantIndex <- function() {
     gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
     gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
@@ -315,5 +303,21 @@ test_variantInfo <- function() {
         checkEquals(ac[!is.na(ac)], v$alt[v$allele.index == i])
     }
     
+    seqClose(gds)
+}
+
+test_empty <- function() {
+    gds <- SeqVarTools:::.testData()
+    SeqVarTools:::.emptyVarFilter(gds)
+    checkEquals(0, ncol(getGenotype(gds)))
+    checkEquals(0, ncol(getGenotypeAlleles(gds)))
+    checkEquals(0, ncol(refDosage(gds)))
+    checkEquals(0, ncol(altDosage(gds)))
+    checkEquals(0, ncol(expandedAltDosage(gds)))
+    checkEquals(0, ncol(alleleDosage(gds, n=0)))
+    checkEquals(0, length(expandedVariantIndex(gds)))
+    checkEquals(0, nrow(variantInfo(gds)))
+    checkEquals(0, nrow(variantInfo(gds, expanded=TRUE)))
+    checkEquals(0, nrow(variantInfo(gds, alleles=FALSE, expanded=TRUE)))
     seqClose(gds)
 }
