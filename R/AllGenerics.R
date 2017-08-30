@@ -50,6 +50,18 @@ setGeneric("alleleDosage",
            function(gdsobj, n, ...)
              standardGeneric("alleleDosage"))
 
+setGeneric("expandedAltDosage",
+           function(gdsobj, ...)
+             standardGeneric("expandedAltDosage"))
+
+setGeneric("expandedVariantIndex",
+           function(gdsobj, ...)
+             standardGeneric("expandedVariantIndex"))
+
+setGeneric("variantInfo",
+           function(gdsobj, ...)
+             standardGeneric("variantInfo"))
+
 setGeneric("getVariableLengthData",
            function(gdsobj, var.name, ...)
              standardGeneric("getVariableLengthData"))

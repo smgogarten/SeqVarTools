@@ -35,3 +35,23 @@ test_nVarUnfiltered <- function() {
   checkEquals(n, SeqVarTools:::.nVarUnfiltered(gds))
   seqClose(gds)
 }
+
+test_emptyGenoMatrix <- function() {
+    gds <- SeqVarTools:::.testData()
+    SeqVarTools:::.emptyVarFilter(gds)
+    checkTrue(SeqVarTools:::.emptyDim(gds))
+    m <- SeqVarTools:::.emptyGenoMatrix(gds, use.names=TRUE)
+    checkEquals(SeqVarTools:::.nSamp(gds), nrow(m))
+    checkEquals(0, ncol(m))
+    checkEquals(seqGetData(gds, "sample.id"), rownames(m))
+
+    seqResetFilter(gds, verbose=FALSE)
+    SeqVarTools:::.emptySampFilter(gds)
+    checkTrue(SeqVarTools:::.emptyDim(gds))
+    m <- SeqVarTools:::.emptyGenoMatrix(gds, use.names=TRUE)
+    checkEquals(SeqVarTools:::.nVar(gds), ncol(m))
+    checkEquals(0, nrow(m))
+    checkEquals(as.character(seqGetData(gds, "variant.id")), colnames(m))
+
+    seqClose(gds)
+}

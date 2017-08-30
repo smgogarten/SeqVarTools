@@ -3,19 +3,20 @@
 \alias{getGenotypeAlleles}
 \alias{refDosage}
 \alias{altDosage}
+\alias{expandedAltDosage}
 \alias{alleleDosage}
 \alias{getGenotype,SeqVarGDSClass-method}
 \alias{getGenotypeAlleles,SeqVarGDSClass-method}
 \alias{refDosage,SeqVarGDSClass-method}
 \alias{altDosage,SeqVarGDSClass-method}
+\alias{expandedAltDosage,SeqVarGDSClass-method}
 \alias{alleleDosage,SeqVarGDSClass,numeric-method}
 \alias{alleleDosage,SeqVarGDSClass,list-method}
 
 \title{Get genotype data}
 
 \description{
-  Get matrix of genotype values from a GDS object as VCF-style character
-  strings
+  Get matrix of genotype values from a GDS object
 }
 
 \usage{
@@ -23,6 +24,7 @@
 \S4method{getGenotypeAlleles}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sort=FALSE)
 \S4method{refDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
 \S4method{altDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
+\S4method{expandedAltDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
 \S4method{alleleDosage}{SeqVarGDSClass,numeric}(gdsobj, n=0, use.names=TRUE)
 \S4method{alleleDosage}{SeqVarGDSClass,list}(gdsobj, n, use.names=TRUE)
 }
@@ -73,6 +75,9 @@
   alternate allele: 2 for two alternate alleles ("1/1", "1/2", etc.), 1
   for one alternate allele, and 0 for no alternate allele (homozygous reference).
 
+  \code{expandedAltDosage} returns an integer matrix with the dosage of each
+  alternate allele as a separate column. A variant with 2 possible alternate alleles will have 2 columns of output, etc.
+
   \code{alleleDosage} with an integer argument returns an integer matrix with the dosage of the
   specified allele only: 2 for two copies of the allele ("0/0" if \code{n=0}, "1/1" if \code{n=1}, etc.), 1
   for one copy of the specified allele, and 0 for no copies of the allele.
@@ -92,14 +97,13 @@
 
 \examples{
 gds <- seqOpen(seqExampleFileName("gds"))
-variant.id <- seqGetData(gds, "variant.id")
-sample.id <- seqGetData(gds, "sample.id")
-seqSetFilter(gds, variant.id=variant.id[1:5],
-             sample.id=sample.id[1:10])
+seqSetFilter(gds, variant.sel=1323:1327, sample.sel=1:10)
+nAlleles(gds)
 getGenotype(gds)
 getGenotypeAlleles(gds)
 refDosage(gds)
 altDosage(gds)
+expandedAltDosage(gds)
 alleleDosage(gds, n=0)
 alleleDosage(gds, n=1)
 alleleDosage(gds, n=c(0,1,0,1,0))

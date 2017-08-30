@@ -89,5 +89,6 @@
   \itemize{
     \item Added iterator classes: SeqVarBlockIterator, SeqVarRangeIterator, SeqVarWindowIterator, SeqVarListIterator.
     \item Creating a SeqVarData object with missing sample or variant annotation will store 0-column data frames in sampleData or variantData, instead of duplicating sample.id and variant.id.
+    \item Added methods to return variant data in expanded form, with one row per alternate allele.
   }
 }

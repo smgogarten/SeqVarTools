@@ -13,6 +13,8 @@ import(GenomicRanges)
 import(Biobase)
 import(logistf)
 importFrom(GWASExactHW, HWExact)
+importFrom(dplyr, group_by_, mutate_)
+importFrom(tidyr, separate_rows_)
 
 exportClasses(SeqVarData,
               SeqVarBlockIterator,
@@ -40,6 +42,9 @@ exportMethods(sampleData, "sampleData<-",
               refDosage,
               altDosage,
               alleleDosage,
+              expandedAltDosage,
+              expandedVariantIndex,
+              variantInfo,
               getVariableLengthData,
               titv,
               alleleFrequency,
