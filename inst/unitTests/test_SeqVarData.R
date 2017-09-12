@@ -18,6 +18,7 @@
 
 test_SeqVarData <- function() {
     ## test creation from existing object
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
     gds.fn <- seqExampleFileName("gds")
     gds <- seqOpen(gds.fn)
     sample.id <- seqGetData(gds, "sample.id")
@@ -43,8 +44,7 @@ test_SeqVarData <- function() {
 }
 
 test_variantData <- function() {
-    gds.fn <- seqExampleFileName("gds")
-    gds <- seqOpen(gds.fn)
+    gds <- SeqVarTools:::.testData()
     adf <- .testVariantData(gds)
     svd <- SeqVarData(gds, variantData=adf)
     checkIdentical(adf$variant.id, seqGetData(svd, "variant.id"))
@@ -57,8 +57,7 @@ test_variantData <- function() {
 }
 
 test_filters <- function() {
-    gds.fn <- seqExampleFileName("gds")
-    gds <- seqOpen(gds.fn)
+    gds <- SeqVarTools:::.testData()
     sdf <- .testSampleData(gds)
     vdf <- .testVariantData(gds)
     svd <- SeqVarData(gds, sampleData=sdf, variantData=vdf)
@@ -69,8 +68,7 @@ test_filters <- function() {
 }
 
 test_replacement <- function() {
-    gds.fn <- seqExampleFileName("gds")
-    gds <- seqOpen(gds.fn)
+    gds <- SeqVarTools:::.testData()
     sdf <- .testSampleData(gds)
     vdf <- .testVariantData(gds)
     svd <- SeqVarData(gds, sampleData=sdf, variantData=vdf)
@@ -90,6 +88,7 @@ test_replacement <- function() {
 
 test_missing <- function() {
     ## test creation with missing arguments
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
     gds.fn <- seqExampleFileName("gds")
     svd <- SeqVarData(gds.fn)
     checkEquals(length(seqGetData(svd, "sample.id")), nrow(sampleData(svd)), checkNames=FALSE)
@@ -98,8 +97,7 @@ test_missing <- function() {
 }
 
 test_granges <- function() {
-    gds.fn <- seqExampleFileName("gds")
-    gds <- seqOpen(gds.fn)
+    gds <- SeqVarTools:::.testData()
     svd <- SeqVarData(gds)
     checkEquals(granges(gds), granges(svd))
     
@@ -111,8 +109,7 @@ test_granges <- function() {
 }
 
 test_filtered <- function() {
-    gds.fn <- seqExampleFileName("gds")
-    gds <- seqOpen(gds.fn)
+    gds <- SeqVarTools:::.testData()
     sdf <- .testSampleData(gds)
     vdf <- .testVariantData(gds)
     seqSetFilter(gds, sample.sel=1:10, variant.sel=1:10, verbose=FALSE)
