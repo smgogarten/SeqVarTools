@@ -13,6 +13,8 @@
 \alias{variantData<-,SeqVarData,AnnotatedDataFrame-method}
 \alias{granges}
 \alias{granges,SeqVarData-method}
+\alias{validateSex}
+\alias{validateSex,SeqVarData-method}
 
 \title{SeqVarData}
 
@@ -53,6 +55,10 @@
 			\code{granges(x)}:
 				Return a \code{\link{GRanges}} object with the columns of \code{variantData} as metadata columns.
 		}	
+		\item{}{
+			\code{validateSex(x)}:
+				Return the contents of a column named "sex" in \code{sampleData(x)}, provided the contents are valid (values either "M"/"F" or 1/2, or NA). If the column is missing or invalid, return \code{NULL}.
+		}	
 	}
 
 	See \code{\link{SeqVarGDSClass}} for additional methods.
@@ -85,6 +91,8 @@ meta <- data.frame(labelDescription=c("unique sample identifier",
 sample.data <- AnnotatedDataFrame(samp, meta)
 
 seqData <- SeqVarData(gds, sample.data)
+
+head(validateSex(seqData))
 
 ## add another annotation column
 sample.data$site <- sample(letters, length(sample.id), replace=TRUE)

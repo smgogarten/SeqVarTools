@@ -92,3 +92,9 @@
     \item Added methods to return variant data in expanded form, with one row per alternate allele.
   }
 }
+
+\section{Changes in version 1.15.3}{
+  \itemize{
+    \item alleleFrequency method accounts for sex when computing frequency for X and Y chromosomes.
+  }
+}

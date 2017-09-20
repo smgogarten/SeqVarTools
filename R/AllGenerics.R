@@ -160,6 +160,10 @@ setGeneric("variantData<-",
            function(x, value)
              standardGeneric("variantData<-"))
 
+setGeneric("validateSex",
+           function(x)
+             standardGeneric("validateSex"))
+
 
 ## Iterators
 setGeneric("variantBlock",

@@ -98,3 +98,78 @@ setMethod("granges",
               mcols(gr) <- cbind(mcols(gr), as(df, "DataFrame"))
               gr
           })
+
+
+setMethod("validateSex",
+          "SeqVarData",
+          function(x) {
+              sex <- sampleData(x)$sex
+              if (!is.null(sex)) {          
+                  if (all(sex %in% c(1,2,NA))) {
+                      sex <- c("M", "F")[sex]
+                  }
+                  if (!all(sex %in% c("M", "F", NA))) {
+                      sex <- NULL
+                  }
+              }
+              sex
+          })
+
+
+setMethod("alleleFrequency",
+          "SeqVarData",
+          function(gdsobj, ...) {
+              # check chromosome
+              chr <- seqGetData(gdsobj, "chromosome")
+              if (!any(chr %in% c("X", "Y"))) {
+                  callNextMethod(gdsobj, ...)
+              }
+
+              # check sex
+              sex <- validateSex(gdsobj)
+              if (is.null(sex)) {
+                  warning("No valid sex coding provided in sampleData. Frequencies will not be calculated correctly for X and Y chromosomes.")
+                  callNextMethod(gdsobj, ...)
+              }
+              female <- sex %in% "F"
+              male <- sex %in% "M"
+
+              # empty vector to fill in
+              freq <- rep(NA, length(chr))
+              
+              # autosomal
+              auto <- !(chr %in% c("X", "Y"))
+              if (any(auto)) {
+                  seqSetFilter(gdsobj, variant.sel=auto, action="push+intersect", verbose=FALSE)
+                  freq[auto] <- callNextMethod(gdsobj, ...)
+                  seqSetFilter(gdsobj, action="pop", verbose=FALSE)
+              }
+              
+              # X chrom
+              X <- chr %in% "X"
+              if (any(X)) {
+                  seqSetFilter(gdsobj, sample.sel=female, variant.sel=X, action="push+intersect", verbose=FALSE)
+                  freq.X.F <- callNextMethod(gdsobj, ...)
+                  n.F <- .nSamp(gdsobj) * (1-seqMissing(gdsobj))
+                  count.X.F <- freq.X.F * 2*n.F
+                  seqSetFilter(gdsobj, action="pop", verbose=FALSE)
+              
+                  seqSetFilter(gdsobj, sample.sel=male, variant.sel=X, action="push+intersect", verbose=FALSE)
+                  freq.X.M <- callNextMethod(gdsobj, ...)
+                  n.M <- .nSamp(gdsobj) * (1-seqMissing(gdsobj))
+                  count.X.M <- freq.X.M * n.M
+                  seqSetFilter(gdsobj, action="pop", verbose=FALSE)
+                  
+                  freq[X] <- (count.X.F + count.X.M)/(2*n.F + n.M)
+              }
+
+              # Y chrom
+              Y <- chr %in% "Y"
+              if (any(Y)) {
+                  seqSetFilter(gdsobj, sample.sel=male, variant.sel=Y, action="push+intersect", verbose=FALSE)
+                  freq[Y] <- callNextMethod(gdsobj, ...)
+                  seqSetFilter(gdsobj, action="pop", verbose=FALSE)
+              }
+
+              freq
+          })

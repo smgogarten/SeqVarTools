@@ -1,6 +1,7 @@
 \name{alleleFrequency}
 \alias{alleleFrequency}
 \alias{alleleFrequency,SeqVarGDSClass-method}
+\alias{alleleFrequency,SeqVarData-method}
 
 \title{Allele frequency}
 
@@ -8,6 +9,7 @@
 
 \usage{
 \S4method{alleleFrequency}{SeqVarGDSClass}(gdsobj, n=0, use.names=FALSE)
+\S4method{alleleFrequency}{SeqVarData}(gdsobj, ...)
 }
 
 \arguments{
@@ -17,11 +19,14 @@
   alternate allele, and so on.}
   \item{use.names}{A logical indicating whether to assign variant IDs
     as names of the output vector.}
+  \item{...}{Arguments to be passed to the parent method.}
 }
 
 \details{
   Frequency can be calculated over any allele, specified by the argument
   \code{n}.  Default is the reference allele frequency (\code{n=0}).
+
+  The \code{\link{SeqVarData}} method will calculate frequency correctly for X and Y chromosomes, provided a column "sex" is included in the sampleData slot with values "M"/"F" or 1/2. Arguments given to this method are passed to the parent method for \code{\link{SeqVarGDSClass}}.
 }
 
 \value{

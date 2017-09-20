@@ -26,3 +26,45 @@ test_alleleFrequency_apply <- function() {
                  applyMethod(gds, alleleFrequency, variant=var.id, sample=samp.id))
   seqClose(gds)
 }
+
+test_alleleFrequency_sex <- function() {
+    # make up file with sex chroms
+    gds.fn <- tempfile()
+    invisible(file.copy(seqExampleFileName("gds"), gds.fn))
+    gds <- openfn.gds(gds.fn, readonly=FALSE)
+    node <- index.gdsn(gds, "chromosome")
+    compression.gdsn(node, "")
+    chr <- read.gdsn(node)
+    chr[chr == 1] <- "X"
+    chr[chr == 2] <- "Y"
+    write.gdsn(node, chr)
+    closefn.gds(gds)
+    
+    gds <- seqOpen(gds.fn)
+    sample.id <- seqGetData(gds, "sample.id")
+    df <- data.frame(sample.id=sample.id,
+                     sex=sample(c("M","F"), replace=TRUE, length(sample.id)),
+                     stringsAsFactors=FALSE)
+    svd <- SeqVarData(gds, sampleData=AnnotatedDataFrame(df))
+
+    af <- alleleFrequency(svd)
+
+    geno <- refDosage(svd, use.names=FALSE)
+    auto <- chr %in% 1:22
+    checkEquals(0.5*colMeans(geno[,auto], na.rm=TRUE), af[auto])
+    
+    X <- chr == "X"
+    female <- df$sex == "F"
+    male <- df$sex == "M"
+    F.count <- colSums(geno[female, X], na.rm=TRUE)
+    F.nsamp <- colSums(!is.na(geno[female, X]))
+    M.count <- 0.5*colSums(geno[male, X], na.rm=TRUE)
+    M.nsamp <- colSums(!is.na(geno[male, X]))
+    checkEquals((F.count + M.count)/(2*F.nsamp + M.nsamp), af[X])
+
+    Y <- chr == "Y"
+    checkEquals(0.5*colMeans(geno[male,Y], na.rm=TRUE), af[Y])
+
+    unlink(gds.fn)
+    seqClose(gds)
+}

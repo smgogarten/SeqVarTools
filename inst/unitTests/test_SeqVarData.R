@@ -121,3 +121,14 @@ test_filtered <- function() {
     checkEquals(seqGetData(svd, "variant.id"), variantData(svd)$variant.id)
     seqClose(svd)
 }
+
+test_validateSex <- function() {
+    svd <- SeqVarTools:::.testSeqVarData()
+    checkTrue(is.null(validateSex(svd)))
+    sdf <- .testSampleData(svd)
+    sampleData(svd) <- sdf
+    checkTrue(!is.null(validateSex(svd)))
+    sampleData(svd)$sex <- sample(c(1,2,NA), nrow(sdf), replace=TRUE)
+    checkTrue(setequal(c("M","F",NA), validateSex(svd)))
+    seqClose(svd)
+}

@@ -186,3 +186,9 @@
 .testSeqVarData <- function() {
     SeqVarData(.testData())
 }
+
+.alleleCount <- function(gdsobj, n=0) {
+    freq <- seqAlleleFreq(gdsobj, ref.allele=n)
+    nsamp <- .nSamp(gdsobj)*(1-seqMissing(gdsobj))
+    2*freq*nsamp
+}
