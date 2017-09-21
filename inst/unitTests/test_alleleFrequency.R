@@ -19,9 +19,9 @@ test_alleleFrequency_apply <- function() {
   gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
-  seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
+  seqSetFilter(gds, variant.id=var.id, sample.id=samp.id, verbose=FALSE)
   af <- alleleFrequency(gds)
-  seqSetFilter(gds)
+  seqSetFilter(gds, verbose=FALSE)
   checkIdentical(af,
                  applyMethod(gds, alleleFrequency, variant=var.id, sample=samp.id))
   seqClose(gds)
@@ -45,7 +45,7 @@ test_alleleFrequency_sex <- function() {
     df <- data.frame(sample.id=sample.id,
                      sex=sample(c("M","F"), replace=TRUE, length(sample.id)),
                      stringsAsFactors=FALSE)
-    svd <- SeqVarData(gds, sampleData=AnnotatedDataFrame(df))
+    svd <- SeqVarData(gds, sampleData=Biobase::AnnotatedDataFrame(df))
 
     af <- alleleFrequency(svd)
 
@@ -64,6 +64,10 @@ test_alleleFrequency_sex <- function() {
 
     Y <- chr == "Y"
     checkEquals(0.5*colMeans(geno[male,Y], na.rm=TRUE), af[Y])
+
+    # PAR
+    af <- alleleFrequency(svd, PAR=GRanges("X", IRanges(start=c(1e6,3e6), end=c(2e6,4e6))))
+    checkEquals(0.5*colMeans(geno[,1:7], na.rm=TRUE), af[1:7])
 
     unlink(gds.fn)
     seqClose(gds)

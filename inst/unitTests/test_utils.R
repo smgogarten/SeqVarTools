@@ -1,3 +1,10 @@
+test_rangesTo <- function() {
+    gds <- SeqVarTools:::.testData()
+    ranges <- GRanges("1", IRanges(start=c(1e6,3e6), end=c(2e6,4e6)))
+    checkEquals(1:7, SeqVarTools:::.rangesToSel(gds, ranges))
+    checkEquals(1:7, SeqVarTools:::.rangesToID(gds, ranges))
+}
+
 test_nSamp <- function() {
   gds <- SeqVarTools:::.testData()
   n <- sum(seqGetFilter(gds)$sample.sel)

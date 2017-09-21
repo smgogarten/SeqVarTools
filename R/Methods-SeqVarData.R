@@ -118,11 +118,19 @@ setMethod("validateSex",
 
 setMethod("alleleFrequency",
           "SeqVarData",
-          function(gdsobj, ...) {
+          function(gdsobj, ..., sex.adjust=TRUE, PAR=NULL) {
+              if (!sex.adjust) {
+                  callNextMethod(gdsobj, ...)
+              }
+              
               # check chromosome
               chr <- seqGetData(gdsobj, "chromosome")
               if (!any(chr %in% c("X", "Y"))) {
                   callNextMethod(gdsobj, ...)
+              }
+              if (!is.null(PAR)) {
+                  # treat pseduoautosomal region like autosomes
+                  chr[.rangesToSel(gdsobj, PAR)] <- "XY"
               }
 
               # check sex
@@ -136,7 +144,7 @@ setMethod("alleleFrequency",
 
               # empty vector to fill in
               freq <- rep(NA, length(chr))
-              
+
               # autosomal
               auto <- !(chr %in% c("X", "Y"))
               if (any(auto)) {

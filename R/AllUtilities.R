@@ -11,6 +11,11 @@
   mcols(subsetByOverlaps(gds.ranges, ranges))$id
 }
 
+.rangesToSel <- function(gdsobj, ranges) {
+  gds.ranges <- granges(gdsobj)
+  queryHits(findOverlaps(gds.ranges, ranges))
+}
+
 .nSamp <- function(gdsobj) {
   #sum(seqGetFilter(gdsobj)$sample.sel)
   seqSummary(gdsobj, "genotype", check="none", verbose=FALSE)$seldim[2L]
