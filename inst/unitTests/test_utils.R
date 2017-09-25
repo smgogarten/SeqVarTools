@@ -3,6 +3,11 @@ test_rangesTo <- function() {
     ranges <- GRanges("1", IRanges(start=c(1e6,3e6), end=c(2e6,4e6)))
     checkEquals(1:7, SeqVarTools:::.rangesToSel(gds, ranges))
     checkEquals(1:7, SeqVarTools:::.rangesToID(gds, ranges))
+
+    # check empty ranges
+    ranges <- GRanges("X", IRanges(start=c(1e6,3e6), end=c(2e6,4e6)))
+    checkEquals(0, length(SeqVarTools:::.rangesToSel(gds, ranges)))
+    seqClose(gds)
 }
 
 test_nSamp <- function() {

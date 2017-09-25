@@ -118,38 +118,35 @@ setMethod("validateSex",
 
 setMethod("alleleFrequency",
           "SeqVarData",
-          function(gdsobj, ..., sex.adjust=TRUE, PAR=NULL) {
+          function(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, genome.build=c("hg19", "hg38")) {
               if (!sex.adjust) {
-                  callNextMethod(gdsobj, ...)
+                  callNextMethod(gdsobj, n=n, use.names=use.names)
               }
               
               # check chromosome
-              chr <- seqGetData(gdsobj, "chromosome")
+              chr <- chromWithPAR(gdsobj, genome.build)
               if (!any(chr %in% c("X", "Y"))) {
-                  callNextMethod(gdsobj, ...)
-              }
-              if (!is.null(PAR)) {
-                  # treat pseduoautosomal region like autosomes
-                  chr[.rangesToSel(gdsobj, PAR)] <- "XY"
+                  callNextMethod(gdsobj, n=n, use.names=use.names)
               }
 
               # check sex
               sex <- validateSex(gdsobj)
               if (is.null(sex)) {
                   warning("No valid sex coding provided in sampleData. Frequencies will not be calculated correctly for X and Y chromosomes.")
-                  callNextMethod(gdsobj, ...)
+                  callNextMethod(gdsobj, n=n, use.names=use.names)
               }
               female <- sex %in% "F"
               male <- sex %in% "M"
 
               # empty vector to fill in
               freq <- rep(NA, length(chr))
+              if (use.names) names(freq) <- seqGetData(gdsobj, "variant.id")
 
               # autosomal
               auto <- !(chr %in% c("X", "Y"))
               if (any(auto)) {
                   seqSetFilter(gdsobj, variant.sel=auto, action="push+intersect", verbose=FALSE)
-                  freq[auto] <- callNextMethod(gdsobj, ...)
+                  freq[auto] <- callNextMethod(gdsobj, n=n, use.names=FALSE)
                   seqSetFilter(gdsobj, action="pop", verbose=FALSE)
               }
               
@@ -157,13 +154,13 @@ setMethod("alleleFrequency",
               X <- chr %in% "X"
               if (any(X)) {
                   seqSetFilter(gdsobj, sample.sel=female, variant.sel=X, action="push+intersect", verbose=FALSE)
-                  freq.X.F <- callNextMethod(gdsobj, ...)
+                  freq.X.F <- callNextMethod(gdsobj, n=n, use.names=FALSE)
                   n.F <- .nSamp(gdsobj) * (1-seqMissing(gdsobj))
                   count.X.F <- freq.X.F * 2*n.F
                   seqSetFilter(gdsobj, action="pop", verbose=FALSE)
               
                   seqSetFilter(gdsobj, sample.sel=male, variant.sel=X, action="push+intersect", verbose=FALSE)
-                  freq.X.M <- callNextMethod(gdsobj, ...)
+                  freq.X.M <- callNextMethod(gdsobj, n=n, use.names=FALSE)
                   n.M <- .nSamp(gdsobj) * (1-seqMissing(gdsobj))
                   count.X.M <- freq.X.M * n.M
                   seqSetFilter(gdsobj, action="pop", verbose=FALSE)
@@ -175,7 +172,7 @@ setMethod("alleleFrequency",
               Y <- chr %in% "Y"
               if (any(Y)) {
                   seqSetFilter(gdsobj, sample.sel=male, variant.sel=Y, action="push+intersect", verbose=FALSE)
-                  freq[Y] <- callNextMethod(gdsobj, ...)
+                  freq[Y] <- callNextMethod(gdsobj, n=n, use.names=use.names)
                   seqSetFilter(gdsobj, action="pop", verbose=FALSE)
               }
 

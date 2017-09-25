@@ -9,7 +9,7 @@
 
 \usage{
 \S4method{alleleFrequency}{SeqVarGDSClass}(gdsobj, n=0, use.names=FALSE)
-\S4method{alleleFrequency}{SeqVarData}(gdsobj, ..., sex.adjust=TRUE, PAR=NULL)
+\S4method{alleleFrequency}{SeqVarData}(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, genome.build=c("hg19", "hg38"))
 }
 
 \arguments{
@@ -19,9 +19,8 @@
   alternate allele, and so on.}
   \item{use.names}{A logical indicating whether to assign variant IDs
     as names of the output vector.}
-  \item{...}{Arguments to be passed to the parent method.}
-  \item{sex.adjust}{Logical for whether to adjust frequency calculations based on sex. If \code{TRUE}, X chromosome frequency will be calculated assuming the dosage of the specifed allele for males is half that for females. Y chromosome frequency will be calculated using males only.}
-  \item{PAR}{A \code{\link{GRanges}} object with ranges to be treated as pseudoautosomal. If \code{PAR} is not \code{NULL}, the frequency for those ranges will be calculated as for autosomes.}
+  \item{sex.adjust}{Logical for whether to adjust frequency calculations based on sex. If \code{TRUE}, X chromosome frequency (excluding the PAR) will be calculated assuming the dosage of the specifed allele for males is half that for females. Y chromosome frequency will be calculated using males only.}
+  \item{genome.build}{A character sting indicating genome build.}
 }
 
 \details{
@@ -38,6 +37,7 @@
 \author{Stephanie Gogarten}
 
 \seealso{
+  \code{\link{chromWithPAR}},
   \code{\link{SeqVarGDSClass}},
   \code{\link{applyMethod}},
   \code{\link{heterozygosity}}

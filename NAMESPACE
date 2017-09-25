@@ -64,7 +64,8 @@ exportMethods(sampleData, "sampleData<-",
               refFrac,
               refFracOverHets,
               refFracPlot,
-              regression)
+              regression,
+              chromWithPAR)
 
 export(SeqVarData,
        SeqVarBlockIterator,

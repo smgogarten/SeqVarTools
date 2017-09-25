@@ -50,6 +50,7 @@ test_alleleFrequency_sex <- function() {
     af <- alleleFrequency(svd)
 
     geno <- refDosage(svd, use.names=FALSE)
+    chr <- chromWithPAR(gds)
     auto <- chr %in% 1:22
     checkEquals(0.5*colMeans(geno[,auto], na.rm=TRUE), af[auto])
     
@@ -66,9 +67,13 @@ test_alleleFrequency_sex <- function() {
     checkEquals(0.5*colMeans(geno[male,Y], na.rm=TRUE), af[Y])
 
     # PAR
-    af <- alleleFrequency(svd, PAR=GRanges("X", IRanges(start=c(1e6,3e6), end=c(2e6,4e6))))
-    checkEquals(0.5*colMeans(geno[,1:7], na.rm=TRUE), af[1:7])
+    checkTrue(all(chr[1:3] == "PAR"))
+    checkEquals(0.5*colMeans(geno[,1:3], na.rm=TRUE), af[1:3])
 
-    unlink(gds.fn)
+    # names
+    af <- alleleFrequency(svd, use.names=TRUE)
+    checkEquals(as.character(seqGetData(svd, "variant.id")), names(af))
+    
     seqClose(gds)
+    unlink(gds.fn)
 }

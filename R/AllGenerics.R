@@ -28,6 +28,10 @@ setGeneric("isSNV",
            function(gdsobj, ...)
              standardGeneric("isSNV"))
 
+setGeneric("chromWithPAR",
+           function(gdsobj, ...)
+             standardGeneric("chromWithPAR"))
+
 
 ## data retrieval and formatting
 setGeneric("getGenotype",

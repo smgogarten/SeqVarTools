@@ -13,7 +13,8 @@
 
 .rangesToSel <- function(gdsobj, ranges) {
   gds.ranges <- granges(gdsobj)
-  queryHits(findOverlaps(gds.ranges, ranges))
+  # don't warn if no sequence levels in common
+  queryHits(suppressWarnings(findOverlaps(gds.ranges, ranges)))
 }
 
 .nSamp <- function(gdsobj) {
