@@ -23,6 +23,14 @@ test_iterator_block <- function() {
     seqClose(it)
 }
 
+test_iterator_block_large <- function() {
+    gds <- SeqVarTools:::.testSeqVarData()
+    it <- SeqVarBlockIterator(gds, variantBlock=10000, verbose=FALSE)
+    checkEquals(1:SeqVarTools:::.nVar(it), seqGetData(it, "variant.id"))
+    checkTrue(!iterateFilter(it, verbose=FALSE))
+    seqClose(it)
+}
+
 test_iterator_block_prev <- function() {
     gds <- SeqVarTools:::.testSeqVarData()
     var.sel <- sort(sample(1:SeqVarTools:::.nVar(gds), 250))

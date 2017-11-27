@@ -1,6 +1,10 @@
 
 SeqVarBlockIterator <- function(seqData, variantBlock=10000, verbose=TRUE) {
     class(seqData) <- "SeqVarBlockIterator"
+
+    if (variantBlock > .nVar(seqData)) {
+        variantBlock <- .nVar(seqData)
+    }
     seqData@variantBlock <- as.integer(variantBlock)
 
     ## set filter to first block (store original with push to stack)
