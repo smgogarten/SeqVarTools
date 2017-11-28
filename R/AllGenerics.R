@@ -170,34 +170,26 @@ setGeneric("validateSex",
 
 
 ## Iterators
+setGeneric("variantFilter",
+           function(x)
+               standardGeneric("variantFilter"))
+
+setGeneric("lastFilter",
+           function(x)
+               standardGeneric("lastFilter"))
+
+setGeneric("lastFilter<-",
+           function(x, value)
+               standardGeneric("lastFilter<-"))
+
 setGeneric("variantBlock",
            function(x)
                standardGeneric("variantBlock"))
-
-setGeneric("lastVariant",
-           function(x)
-               standardGeneric("lastVariant"))
-
-setGeneric("lastVariant<-",
-           function(x, value)
-               standardGeneric("lastVariant<-"))
 
 setGeneric("variantRanges",
            function(x)
                standardGeneric("variantRanges"))
 
-setGeneric("lastRange",
-           function(x)
-               standardGeneric("lastRange"))
-
-setGeneric("lastRange<-",
-           function(x, value)
-               standardGeneric("lastRange<-"))
-
 setGeneric("iterateFilter",
            function(x, ...)
                standardGeneric("iterateFilter"))
-
-setGeneric("restoreFilter",
-           function(x, ...)
-               standardGeneric("restoreFilter"))

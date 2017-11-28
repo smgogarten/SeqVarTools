@@ -170,17 +170,26 @@
     as.data.frame(do.call(rbind, n))
 }
 
+.subjectByQuery <- function(query, subject, hits.only=FALSE) {
+    ol <- findOverlaps(query, subject)
+    if (hits.only) {
+        hits <- unique(queryHits(ol))
+    } else {
+        hits <- seq_along(query)
+    }
+    subj.hits <- lapply(hits, function(h) {
+        subjectHits(ol)[queryHits(ol) == h]
+    })
+    list(queryHits=hits, subjectHits=subj.hits)
+}
+
 # behaves like subsetByOverlaps, except removes query ranges that have
 # duplicate sets of overlapping subject ranges
 .subsetByUniqueOverlaps <- function(query, subject) {
-    ol <- findOverlaps(query, subject)
     # look for any subject ranges that have identical query ranges
     # we want to eliminate these
-    hits <- unique(queryHits(ol))
-    queryBySubject <- lapply(hits, function(h) {
-        subjectHits(ol)[queryHits(ol) == h]
-    })
-    query[hits[!duplicated(queryBySubject)]]
+    sbq <- .subjectByQuery(query, subject, hits.only=TRUE)
+    query[sbq$queryHits[!duplicated(sbq$subjectHits)]]
 }
 
 .testData <- function() {

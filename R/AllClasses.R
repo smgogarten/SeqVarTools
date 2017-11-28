@@ -2,18 +2,19 @@ setClass("SeqVarData", contains="SeqVarGDSClass",
          slots=c(sampleData = "AnnotatedDataFrame",
                  variantData = "AnnotatedDataFrame"))
 
-setClass("SeqVarBlockIterator", contains="SeqVarData",
-         slots=c(variantBlock="integer", # number of variants
-                 lastVariant="environment")) # allow pass-by-reference for this slot
+setClass("SeqVarIterator", contains="SeqVarData",
+         slots=c(variantFilter="list",
+                 lastFilter="environment")) # allow pass-by-reference for this slot
 
-setClass("SeqVarRangeIterator", contains="SeqVarData",
-         slots=c(variantRanges="GRanges",
-                 lastRange="environment"))
+setClass("SeqVarBlockIterator", contains="SeqVarIterator",
+         slots=c(variantBlock="integer")) # number of variants
+
+setClass("SeqVarRangeIterator", contains="SeqVarIterator",
+         slots=c(variantRanges="GRanges"))
 
 setClass("SeqVarWindowIterator", contains="SeqVarRangeIterator",
          slots=c(windowSize="integer", # base pairs
                  windowShift="integer"))
 
-setClass("SeqVarListIterator", contains="SeqVarData",
-         slots=c(variantRanges="GRangesList",
-                 lastRange="environment"))
+setClass("SeqVarListIterator", contains="SeqVarIterator",
+         slots=c(variantRanges="GRangesList"))

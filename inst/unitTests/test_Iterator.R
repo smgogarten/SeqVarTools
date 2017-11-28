@@ -1,18 +1,18 @@
 library(GenomicRanges)
 
-test_restore_filter <- function() {
-    gds <- SeqVarTools:::.testSeqVarData()
-    seqSetFilter(gds, variant.sel=1:10, verbose=FALSE)
-    checkEquals(1:10, seqGetData(gds, "variant.id"))
-    SeqVarTools:::.emptyVarFilter(gds, verbose=FALSE)
-    checkEquals(integer(), seqGetData(gds, "variant.id"))
-    restoreFilter(gds, verbose=FALSE)
-    checkEquals(1:10, seqGetData(gds, "variant.id"))
-    SeqVarTools:::.emptyVarFilter(gds, verbose=FALSE)
-    restoreFilter(gds, verbose=FALSE)
-    checkEquals(1:10, seqGetData(gds, "variant.id"))
-    seqClose(gds)
-}
+## test_restore_filter <- function() {
+##     gds <- SeqVarTools:::.testSeqVarData()
+##     seqSetFilter(gds, variant.sel=1:10, verbose=FALSE)
+##     checkEquals(1:10, seqGetData(gds, "variant.id"))
+##     SeqVarTools:::.emptyVarFilter(gds, verbose=FALSE)
+##     checkEquals(integer(), seqGetData(gds, "variant.id"))
+##     restoreFilter(gds, verbose=FALSE)
+##     checkEquals(1:10, seqGetData(gds, "variant.id"))
+##     SeqVarTools:::.emptyVarFilter(gds, verbose=FALSE)
+##     restoreFilter(gds, verbose=FALSE)
+##     checkEquals(1:10, seqGetData(gds, "variant.id"))
+##     seqClose(gds)
+## }
 
 test_iterator_block <- function() {
     gds <- SeqVarTools:::.testSeqVarData()
@@ -101,6 +101,10 @@ test_iterator_range_samples <- function() {
 test_unique_overlaps <- function() {
     subject <- GRanges(seqnames="1", ranges=IRanges(seq(10,50,10), (seq(10,50,10))))
     query <- GRanges(seqnames="1", ranges=IRanges(c(1,5,9,25,25,29), c(5,15,18,45,55,41)))
+    chk <- list(queryHits=2:6, subjectHits=list(1, 1, 3:4, 3:5, 3:4))
+    checkEquals(chk, SeqVarTools:::.subjectByQuery(query, subject, hits.only=TRUE))
+    chk <- list(queryHits=1:6, subjectHits=list(integer(0), 1, 1, 3:4, 3:5, 3:4))
+    checkEquals(chk, SeqVarTools:::.subjectByQuery(query, subject, hits.only=FALSE))
     keep <- c(2,4,5)
     checkEquals(query[keep], SeqVarTools:::.subsetByUniqueOverlaps(query, subject))
 }
@@ -117,7 +121,8 @@ test_iterator_window <- function() {
         i <- i + 1
     }
     checkEquals(length(var), length(it@variantRanges))
-    restoreFilter(it, verbose=FALSE)
+    #restoreFilter(it, verbose=FALSE)
+    seqSetFilterChrom(gds, include="22", verbose=FALSE)
     checkEquals(sort(unique(unlist(var))), seqGetData(it, "variant.id"))
     seqClose(it)
 }

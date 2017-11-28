@@ -1,6 +1,8 @@
 \name{Iterator}
 \docType{class}
 
+\alias{SeqVarIterator}
+\alias{SeqVarIterator-class}
 \alias{SeqVarBlockIterator}
 \alias{SeqVarBlockIterator-class}
 \alias{SeqVarRangeIterator}
@@ -9,30 +11,20 @@
 \alias{SeqVarWindowIterator-class}
 \alias{SeqVarListIterator}
 \alias{SeqVarListIterator-class}
+\alias{iterateFilter}
+\alias{iterateFilter,SeqVarIterator-method}
+\alias{lastFilter}
+\alias{lastFilter,SeqVarIterator-method}
+\alias{lastFilter<-}
+\alias{lastFilter<-,SeqVarIterator,numeric-method}
+\alias{variantFilter}
+\alias{variantFilter,SeqVarIterator-method}
 \alias{variantBlock}
 \alias{variantBlock,SeqVarBlockIterator-method}
-\alias{lastVariant}
-\alias{lastVariant,SeqVarBlockIterator-method}
-\alias{lastVariant<-}
-\alias{lastVariant<-,SeqVarBlockIterator,numeric-method}
 \alias{variantRanges}
 \alias{variantRanges,SeqVarRangeIterator-method}
-\alias{lastRange}
-\alias{lastRange,SeqVarRangeIterator-method}
-\alias{lastRange<-}
-\alias{lastRange<-,SeqVarRangeIterator,numeric-method}
 \alias{variantRanges}
 \alias{variantRanges,SeqVarListIterator-method}
-\alias{lastRange}
-\alias{lastRange,SeqVarListIterator-method}
-\alias{lastRange<-}
-\alias{lastRange<-,SeqVarListIterator,numeric-method}
-\alias{iterateFilter}
-\alias{iterateFilter,SeqVarBlockIterator-method}
-\alias{iterateFilter,SeqVarRangeIterator-method}
-\alias{iterateFilter,SeqVarListIterator-method}
-\alias{restoreFilter}
-\alias{restoreFilter,SeqVarGDSClass-method}
 
 \title{Iterators}
 
@@ -103,15 +95,13 @@
   \describe{
     \item{}{\code{iterateFilter(x)}: Advance the filter to the next block, range, or set of ranges. Returns \code{TRUE} while there are still variants left to be read, \code{FALSE} if the end of iteration is reached.
     }
-    \item{}{\code{restoreFilter(x)}: Restore the filter to its value prior to the creation of the Iterator object.
+    \item{}{\code{lastFilter(x)}, \code{lastFilter(x)<- value}: Get or set the last filter index from the previous call to \code{iterateFilter}.
     }
     \item{}{\code{variantBlock(x)}: Get the size of the variant block.
     }
-    \item{}{\code{lastVariant(x)}, \code{lastVariant(x)<- value}: Get or set the last variant from the previous call to \code{iterateFilter}.
+    \item{}{\code{variantFilter(x)}: Get the list of variant indices.
     }
     \item{}{\code{variantRanges(x)}: Get the variant ranges.
-    }
-    \item{}{\code{lastRange(x)}, \code{lastRange(x)<- value}: Get or set the last range (for \code{SeqVarRangeIterator}) or set of ranges (for \code{SeqVarListIterator}) from the previous call to \code{iterateFilter}.
     }
   }
 }
@@ -134,7 +124,7 @@ iterator <- SeqVarBlockIterator(seqData, variantBlock=10)
 seqGetData(iterator, "variant.id")
 iterateFilter(iterator)
 seqGetData(iterator, "variant.id")
-restoreFilter(iterator)
+seqResetFilter(iterator)
 
 # iterate by ranges
 library(GenomicRanges)
@@ -146,7 +136,7 @@ granges(iterator)
 iterateFilter(iterator)
 granges(iterator)
 iterateFilter(iterator)
-restoreFilter(iterator)
+seqResetFilter(iterator)
 
 # iterate by windows
 seqSetFilterChrom(seqData, include="22")
@@ -155,7 +145,7 @@ seqGetData(iterator, "variant.id")
 while (iterateFilter(iterator)) {
     print(seqGetData(iterator, "variant.id"))
 }
-restoreFilter(iterator)
+seqResetFilter(iterator)
 
 # iterate by list of ranges
 gr <- GRangesList(
@@ -166,7 +156,7 @@ granges(iterator)
 iterateFilter(iterator)
 granges(iterator)
 iterateFilter(iterator)
-restoreFilter(iterator)
+seqResetFilter(iterator)
 
 seqClose(iterator)
 }
