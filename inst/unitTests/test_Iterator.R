@@ -1,19 +1,5 @@
 library(GenomicRanges)
 
-## test_restore_filter <- function() {
-##     gds <- SeqVarTools:::.testSeqVarData()
-##     seqSetFilter(gds, variant.sel=1:10, verbose=FALSE)
-##     checkEquals(1:10, seqGetData(gds, "variant.id"))
-##     SeqVarTools:::.emptyVarFilter(gds, verbose=FALSE)
-##     checkEquals(integer(), seqGetData(gds, "variant.id"))
-##     restoreFilter(gds, verbose=FALSE)
-##     checkEquals(1:10, seqGetData(gds, "variant.id"))
-##     SeqVarTools:::.emptyVarFilter(gds, verbose=FALSE)
-##     restoreFilter(gds, verbose=FALSE)
-##     checkEquals(1:10, seqGetData(gds, "variant.id"))
-##     seqClose(gds)
-## }
-
 test_iterator_block <- function() {
     gds <- SeqVarTools:::.testSeqVarData()
     it <- SeqVarBlockIterator(gds, variantBlock=100, verbose=FALSE)
@@ -121,7 +107,6 @@ test_iterator_window <- function() {
         i <- i + 1
     }
     checkEquals(length(var), length(it@variantRanges))
-    #restoreFilter(it, verbose=FALSE)
     seqSetFilterChrom(gds, include="22", verbose=FALSE)
     checkEquals(sort(unique(unlist(var))), seqGetData(it, "variant.id"))
     seqClose(it)

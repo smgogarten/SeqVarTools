@@ -34,7 +34,6 @@ SeqVarBlockIterator <- function(seqData, variantBlock=10000, verbose=TRUE) {
 
 
 SeqVarRangeIterator <- function(seqData, variantRanges, verbose=TRUE) {
-
     ## original filter
     current.sel <- which(seqGetFilter(seqData)$variant.sel)
 

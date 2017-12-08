@@ -98,3 +98,9 @@
     \item alleleFrequency method accounts for sex when computing frequency for X and Y chromosomes.
   }
 }
+
+\section{Changes in version 1.17.2}{
+  \itemize{
+    \item Change implementation of iterator classes to identify indices of selected variants on object creation and store in variantList slot. All iterator classes now extend new class SeqVarIterator.
+  }
+}
