@@ -220,8 +220,8 @@ setMethod("variantInfo",
           "SeqVarGDSClass",
           function(gdsobj, alleles=TRUE, expanded=FALSE) {
               x <- data.frame(variant.id=seqGetData(gdsobj, "variant.id"),
-                              chromosome=seqGetData(gdsobj, "chromosome"),
-                              position=seqGetData(gdsobj, "position"),
+                              chr=seqGetData(gdsobj, "chromosome"),
+                              pos=seqGetData(gdsobj, "position"),
                               stringsAsFactors=FALSE)
               if (nrow(x) == 0) return(x)
               if (alleles) {
