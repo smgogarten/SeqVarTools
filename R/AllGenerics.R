@@ -193,3 +193,7 @@ setGeneric("variantRanges",
 setGeneric("iterateFilter",
            function(x, ...)
                standardGeneric("iterateFilter"))
+
+setGeneric("currentRanges",
+           function(x)
+               standardGeneric("currentRanges"))

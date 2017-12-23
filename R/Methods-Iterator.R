@@ -152,3 +152,23 @@ setMethod("variantRanges",
           function(x) {
               x@variantRanges
           })
+
+
+setMethod("currentRanges",
+          "SeqVarBlockIterator",
+          function(x) {
+              granges(x)
+          })
+
+setMethod("currentRanges",
+          "SeqVarRangeIterator",
+          function(x) {
+              variantRanges(x)[lastFilter(x)]
+          })
+
+setMethod("currentRanges",
+          "SeqVarListIterator",
+          function(x) {
+              variantRanges(x)[[lastFilter(x)]]
+          })
+

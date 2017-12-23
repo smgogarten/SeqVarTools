@@ -23,8 +23,11 @@
 \alias{variantBlock,SeqVarBlockIterator-method}
 \alias{variantRanges}
 \alias{variantRanges,SeqVarRangeIterator-method}
-\alias{variantRanges}
 \alias{variantRanges,SeqVarListIterator-method}
+\alias{currentRanges}
+\alias{currentRanges,SeqVarBlockIterator-method}
+\alias{currentRanges,SeqVarRangeIterator-method}
+\alias{currentRanges,SeqVarListIterator-method}
 
 \title{Iterators}
 
@@ -102,6 +105,8 @@
     \item{}{\code{variantFilter(x)}: Get the list of variant indices.
     }
     \item{}{\code{variantRanges(x)}: Get the variant ranges.
+    }
+    \item{}{\code{currentRanges(x)}: Get the ranges selected in the current iteration.
     }
   }
 }

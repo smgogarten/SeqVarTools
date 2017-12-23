@@ -6,6 +6,7 @@ test_iterator_block <- function() {
     checkEquals(1:100, seqGetData(it, "variant.id"))
     checkTrue(iterateFilter(it, verbose=FALSE))
     checkEquals(101:200, seqGetData(it, "variant.id"))
+    checkEquals(granges(it), currentRanges(it))
     seqClose(it)
 }
 
@@ -14,6 +15,7 @@ test_iterator_block_large <- function() {
     it <- SeqVarBlockIterator(gds, variantBlock=10000, verbose=FALSE)
     checkEquals(1:SeqVarTools:::.nVar(it), seqGetData(it, "variant.id"))
     checkTrue(!iterateFilter(it, verbose=FALSE))
+    checkEquals(GRanges(), currentRanges(it), checkNames=FALSE)
     seqClose(it)
 }
 
@@ -48,6 +50,7 @@ test_iterator_range <- function() {
     gr <- GRanges(seqnames=rep(1,3), ranges=IRanges(start=c(1e6, 2e6, 3e6), width=1e6))
     it <- SeqVarRangeIterator(gds, variantRanges=gr, verbose=FALSE)
     checkEquals(1:3, seqGetData(it, "variant.id"))
+    checkEquals(gr[1], currentRanges(it))
     checkTrue(iterateFilter(it, verbose=FALSE))
     checkEquals(integer(), seqGetData(it, "variant.id"))
     checkTrue(iterateFilter(it, verbose=FALSE))
@@ -119,6 +122,7 @@ test_iterator_list <- function() {
         GRanges(seqnames=rep(1,2), ranges=IRanges(start=c(3e6, 34e6), width=1e6)))
     it <- SeqVarListIterator(gds, variantRanges=gr, verbose=FALSE)
     checkEquals(1:7, seqGetData(it, "variant.id"))
+    checkEquals(gr[[1]], currentRanges(it))
     checkTrue(iterateFilter(it, verbose=FALSE))
     checkEquals(4:11, seqGetData(it, "variant.id"))
     checkTrue(!iterateFilter(it, verbose=FALSE))
