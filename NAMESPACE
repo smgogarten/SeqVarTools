@@ -23,7 +23,8 @@ exportClasses(SeqVarData,
               SeqVarWindowIterator,
               SeqVarListIterator)
 
-exportMethods(sampleData, "sampleData<-",
+exportMethods(show,
+              sampleData, "sampleData<-",
               variantData, "variantData<-",
               validateSex,
               granges,

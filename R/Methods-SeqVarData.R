@@ -50,7 +50,19 @@ setValidity("SeqVarData",
                 TRUE
             })
 
-            
+setMethod("show",
+          "SeqVarData",
+          function(object) {
+              cat(class(object), "object\n")
+              cat(" | GDS:\n")
+              print(object)
+              cat(" | sampleData:\n")
+              show(sampleData(object))
+              cat(" | variantData:\n")
+              show(variantData(object))
+          })
+
+
 setMethod("sampleData",
           "SeqVarData",
           function(x) {

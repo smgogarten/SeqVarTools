@@ -11,6 +11,9 @@
 \alias{SeqVarWindowIterator-class}
 \alias{SeqVarListIterator}
 \alias{SeqVarListIterator-class}
+\alias{show,SeqVarIterator-method}
+\alias{show,SeqVarRangeIterator-method}
+\alias{show,SeqVarListIterator-method}
 \alias{iterateFilter}
 \alias{iterateFilter,SeqVarIterator-method}
 \alias{lastFilter}

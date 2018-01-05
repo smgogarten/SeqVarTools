@@ -3,6 +3,7 @@
 
 \alias{SeqVarData-class}
 \alias{SeqVarData}
+\alias{show,SeqVarData-method}
 \alias{sampleData}
 \alias{sampleData,SeqVarData-method}
 \alias{sampleData<-}

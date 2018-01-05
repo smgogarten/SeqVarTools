@@ -172,3 +172,32 @@ setMethod("currentRanges",
               variantRanges(x)[[lastFilter(x)]]
           })
 
+
+setMethod("show",
+          "SeqVarIterator",
+          function(object) {
+              cat(class(object), "object; on iteration",
+                  lastFilter(object), "of", length(variantFilter(object)), "\n")
+              cat(" | GDS:\n")
+              print(object)
+              cat(" | sampleData:\n")
+              show(sampleData(object))
+              cat(" | variantData:\n")
+              show(variantData(object))
+          })
+
+setMethod("show",
+          "SeqVarRangeIterator",
+          function(object) {
+              callNextMethod(object)
+              cat(" | variantRanges:\n")
+              show(variantRanges(object))
+          })
+
+setMethod("show",
+          "SeqVarListIterator",
+          function(object) {
+              callNextMethod(object)
+              cat(" | variantRanges:\n")
+              show(variantRanges(object))
+          })
