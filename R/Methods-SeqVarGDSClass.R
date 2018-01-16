@@ -126,12 +126,16 @@ setMethod("refDosage",
 
 setMethod("altDosage",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=TRUE, ...) {
+          function(gdsobj, use.names=TRUE, sparse=FALSE, ...) {
             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
             d <- seqBlockApply(gdsobj, "genotype",
-                               function(x) {colSums(x != 0)},
-                               margin="by.variant", as.is="list", ...)
-            d <- do.call(cbind, d)
+                               function(x) {
+                                   m <- colSums(x != 0)
+                                   if (sparse) m <- Matrix(m, sparse=TRUE)
+                                   m
+                               }, margin="by.variant", as.is="list", ...)
+            #d <- do.call(cbind, d)
+            d <- Reduce(cbind, d[-1], d[[1]])
             if (use.names) {
                 dimnames(d) <- list(sample=NULL, variant=NULL)
                 .applyNames(gdsobj, d)
@@ -192,7 +196,7 @@ setMethod("alleleDosage",
 
 setMethod("expandedAltDosage",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=TRUE) {
+          function(gdsobj, use.names=TRUE, sparse=FALSE) {
             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
 
             n <- nAlleles(gdsobj) - 1
@@ -205,12 +209,16 @@ setMethod("expandedAltDosage",
                           function(index, x) {
                               tmp <- lapply(1:n[index], function(allele) colSums(x == allele))
                               var.names <- rep(variant.id[index], n[index])
-                              matrix(unlist(tmp, use.names=FALSE), ncol=length(tmp),
-                                     dimnames=list(sample=samp.names, variant=var.names))
+                              m <- matrix(unlist(tmp, use.names=FALSE), ncol=length(tmp),
+                                          dimnames=list(sample=samp.names, variant=var.names))
+                              if (sparse) m <- Matrix(m, sparse=TRUE)
+                              m
                           },
                           margin="by.variant", as.is="list",
                           var.index="relative")
-            d <- do.call(cbind, d)
+            #https://stackoverflow.com/questions/37581417/getting-node-stack-overflow-when-cbind-multiple-sparse-matrices
+            #d <- do.call(cbind, d)
+            d <- Reduce(cbind, d[-1], d[[1]])
             if (use.names) names(dimnames(d)) <- c("sample", "variant")
             d
           })

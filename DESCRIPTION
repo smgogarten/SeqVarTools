@@ -8,7 +8,9 @@ Description: An interface to the fast-access storage format for VCF
 Author: Stephanie M. Gogarten, Xiuwen Zheng, Adrienne Stilp
 Maintainer: Stephanie M. Gogarten <sdmorris@uw.edu>
 Depends: SeqArray
-Imports: grDevices, graphics, stats, methods, gdsfmt, GenomicRanges, IRanges, S4Vectors, GWASExactHW, Biobase, logistf, dplyr, tidyr
+Imports: grDevices, graphics, stats, methods,
+	 Biobase, gdsfmt, GenomicRanges, IRanges, S4Vectors,
+	 GWASExactHW, logistf, Matrix, dplyr, tidyr
 Suggests: BiocGenerics, BiocStyle, RUnit, stringr
 License: GPL-3
 LazyData: yes
