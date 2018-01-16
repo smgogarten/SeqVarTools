@@ -112,26 +112,30 @@ setMethod("getGenotypeAlleles",
 
 setMethod("refDosage",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=TRUE) {
+          function(gdsobj, use.names=TRUE, ...) {
             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
-            rd <- seqApply(gdsobj, "genotype",
-                           function(x) {colSums(x == 0)},
-                           margin="by.variant", as.is="list")
-            rd <- matrix(unlist(rd, use.names=FALSE), ncol=length(rd),
-                         dimnames=list(sample=NULL, variant=NULL))
-            if (use.names) .applyNames(gdsobj, rd) else rd
+            d <- seqBlockApply(gdsobj, "genotype",
+                               function(x) {colSums(x == 0)},
+                               margin="by.variant", as.is="list", ...)
+            d <- do.call(cbind, d)
+            if (use.names) {
+                dimnames(d) <- list(sample=NULL, variant=NULL)
+                .applyNames(gdsobj, d)
+            } else d
           })
 
 setMethod("altDosage",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=TRUE) {
+          function(gdsobj, use.names=TRUE, ...) {
             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
-            d <- seqApply(gdsobj, "genotype",
-                           function(x) {colSums(x != 0)},
-                           margin="by.variant", as.is="list")
-            d <- matrix(unlist(d, use.names=FALSE), ncol=length(d),
-                         dimnames=list(sample=NULL, variant=NULL))
-            if (use.names) .applyNames(gdsobj, d) else d
+            d <- seqBlockApply(gdsobj, "genotype",
+                               function(x) {colSums(x != 0)},
+                               margin="by.variant", as.is="list", ...)
+            d <- do.call(cbind, d)
+            if (use.names) {
+                dimnames(d) <- list(sample=NULL, variant=NULL)
+                .applyNames(gdsobj, d)
+            } else d
           })
 
 setMethod("alleleDosage",
@@ -190,9 +194,13 @@ setMethod("expandedAltDosage",
           "SeqVarGDSClass",
           function(gdsobj, use.names=TRUE) {
             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
+
+            n <- nAlleles(gdsobj) - 1
+            # if we have only biallelic variants, faster to use altDosage
+            if (all(n == 1)) return(altDosage(gdsobj, use.names=use.names))
+            
             samp.names <- if (use.names) seqGetData(gdsobj, "sample.id") else NULL
             variant.id <- if (use.names) seqGetData(gdsobj, "variant.id") else NULL
-            n <- nAlleles(gdsobj) - 1
             d <- seqApply(gdsobj, "genotype",
                           function(index, x) {
                               tmp <- lapply(1:n[index], function(allele) colSums(x == allele))

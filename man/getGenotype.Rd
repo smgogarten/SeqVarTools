@@ -22,8 +22,8 @@
 \usage{
 \S4method{getGenotype}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
 \S4method{getGenotypeAlleles}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sort=FALSE)
-\S4method{refDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
-\S4method{altDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
+\S4method{refDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, ...)
+\S4method{altDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, ...)
 \S4method{expandedAltDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
 \S4method{alleleDosage}{SeqVarGDSClass,numeric}(gdsobj, n=0, use.names=TRUE)
 \S4method{alleleDosage}{SeqVarGDSClass,list}(gdsobj, n, use.names=TRUE)
@@ -38,6 +38,7 @@
   \item{n}{An integer, vector, or list indicating which allele(s) to return dosage
   for.  \code{n=0} is the reference allele, \code{n=1} is the first
   alternate allele, and so on.}
+  \item{...}{Arguments to pass to \code{\link{seqBlockApply}}}
 }
 
 \details{
