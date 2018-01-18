@@ -48,7 +48,7 @@
 \seealso{
   \code{\link{SeqVarGDSClass}},
   \code{\link{applyMethod}},
-  \code{\link[SeqArray]{seqGetData}}
+  \code{\link{seqGetData}}
 }
 
 \examples{

@@ -91,8 +91,8 @@
 \seealso{
   \code{\link{SeqVarGDSClass}},
   \code{\link{applyMethod}},
-  \code{\link[SeqArray]{seqGetData}},
-  \code{\link[SeqArray]{seqSetFilter}},
+  \code{\link{seqGetData}},
+  \code{\link{seqSetFilter}},
   \code{\link{alleleFrequency}}
 }
 
