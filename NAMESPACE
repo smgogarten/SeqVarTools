@@ -15,6 +15,7 @@ import(logistf)
 importFrom(GWASExactHW, HWExact)
 importFrom(dplyr, group_by_, mutate_)
 importFrom(tidyr, separate_rows_)
+importFrom(Matrix, Matrix)
 
 exportClasses(SeqVarData,
               SeqVarIterator,

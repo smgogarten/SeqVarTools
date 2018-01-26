@@ -23,8 +23,8 @@
 \S4method{getGenotype}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
 \S4method{getGenotypeAlleles}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sort=FALSE)
 \S4method{refDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, ...)
-\S4method{altDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, ...)
-\S4method{expandedAltDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
+\S4method{altDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sparse=FALSE, ...)
+\S4method{expandedAltDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sparse=FALSE)
 \S4method{alleleDosage}{SeqVarGDSClass,numeric}(gdsobj, n=0, use.names=TRUE)
 \S4method{alleleDosage}{SeqVarGDSClass,list}(gdsobj, n, use.names=TRUE)
 }
@@ -35,10 +35,11 @@
     variant IDs as dimnames of the resulting matrix.}
   \item{sort}{Logical for whether to sort alleles lexographically ("G/T"
     instead of "T/G").}
+  \item{sparse}{Logical for whether to return the alterate allele dosage as a sparse matrix using the \pkg{link{Matrix}} package. In most cases, setting \code{sparse=TRUE} will dramatically reduce the size of the returned object.}
   \item{n}{An integer, vector, or list indicating which allele(s) to return dosage
   for.  \code{n=0} is the reference allele, \code{n=1} is the first
   alternate allele, and so on.}
-  \item{...}{Arguments to pass to \code{\link{seqBlockApply}}}
+  \item{...}{Arguments to pass to \code{\link{seqBlockApply}}, e.g. \code{bsize} to set the block size.}
 }
 
 \details{
@@ -61,7 +62,7 @@
   genotypes.
 
   \code{getGenotype} returns alleles as "0", "1", "2", etc. indicating
-  refernence and alternate alleles.
+  reference and alternate alleles.
 
   \code{getGenotypeAlleles} returns alleles as "A", "C", "G", "T".
   \code{sort=TRUE} sorts lexographically, which may be useful for
