@@ -201,7 +201,7 @@ setMethod("expandedAltDosage",
 
             n <- nAlleles(gdsobj) - 1
             # if we have only biallelic variants, faster to use altDosage
-            if (all(n == 1)) return(altDosage(gdsobj, use.names=use.names))
+            if (all(n == 1)) return(altDosage(gdsobj, use.names=use.names, sparse=sparse))
             
             samp.names <- if (use.names) seqGetData(gdsobj, "sample.id") else NULL
             variant.id <- if (use.names) seqGetData(gdsobj, "variant.id") else NULL
