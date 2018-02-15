@@ -124,7 +124,7 @@ setMethod("iterateFilter",
               ## set filter for next element
               if (lastFilter(x) < length(variantFilter(x))) {
                   i <- lastFilter(x) + 1
-                  seqSetFilter(x, variantFilter(x)[[i]], verbose=verbose)
+                  seqSetFilter(x, variant.sel=variantFilter(x)[[i]], verbose=verbose)
                   lastFilter(x) <- i
                   return(TRUE)
               } else {
