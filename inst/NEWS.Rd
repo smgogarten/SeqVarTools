@@ -104,3 +104,10 @@
     \item Change implementation of iterator classes to identify indices of selected variants on object creation and store in variantList slot. All iterator classes now extend new class SeqVarIterator.
   }
 }
+
+\section{Changes in version 1.17.6}{
+  \itemize{
+    \item Add option to return alternate allele dosage in a sparse matrix using the Matrix package.
+    \item Improve speed of reading dosages by using seqBlockApply.
+  }
+}
