@@ -132,20 +132,20 @@ setMethod("alleleFrequency",
           "SeqVarData",
           function(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, genome.build=c("hg19", "hg38")) {
               if (!sex.adjust) {
-                  callNextMethod(gdsobj, n=n, use.names=use.names)
+                  return(callNextMethod(gdsobj, n=n, use.names=use.names))
               }
               
               # check chromosome
               chr <- chromWithPAR(gdsobj, genome.build)
               if (!any(chr %in% c("X", "Y"))) {
-                  callNextMethod(gdsobj, n=n, use.names=use.names)
+                  return(callNextMethod(gdsobj, n=n, use.names=use.names))
               }
 
               # check sex
               sex <- validateSex(gdsobj)
               if (is.null(sex)) {
                   warning("No valid sex coding provided in sampleData. Frequencies will not be calculated correctly for X and Y chromosomes.")
-                  callNextMethod(gdsobj, n=n, use.names=use.names)
+                  return(callNextMethod(gdsobj, n=n, use.names=use.names))
               }
               female <- sex %in% "F"
               male <- sex %in% "M"

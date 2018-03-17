@@ -77,3 +77,13 @@ test_alleleFrequency_sex <- function() {
     seqClose(gds)
     unlink(gds.fn)
 }
+
+test_alleleFrequency_nosex <- function() {
+    gds <- SeqVarTools:::.testSeqVarData()
+    # make sure there is no warning when we don't want to check sex
+    options(warn=2)
+    tmp <- alleleFrequency(gds, sex.adjust=FALSE)
+    tmp <- alleleFrequency(gds, sex.adjust=TRUE) # no sex chrom in this data
+    options(warn=1)
+    seqClose(gds)
+}
