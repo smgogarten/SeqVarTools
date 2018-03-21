@@ -334,6 +334,19 @@ setMethod("alleleFrequency",
             af
           })
 
+## n=0: REF allele count
+## n>0: count of nth ALT allele
+setMethod("alleleCount",
+          "SeqVarGDSClass",
+          function(gdsobj, n=0, use.names=FALSE) {
+            ac <- seqAlleleCount(gdsobj, ref.allele=n)
+            ## count of alt=2, etc. should be 0 if there is no such allele
+            ac[is.na(ac)] <- 0
+            if (use.names)
+              names(ac) <- seqGetData(gdsobj, "variant.id")
+            ac
+          })
+
 setMethod("missingGenotypeRate",
           "SeqVarGDSClass",
           function(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE) {

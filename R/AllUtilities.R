@@ -35,6 +35,10 @@
   seqSummary(gdsobj, "variant.id", check="none", verbose=FALSE)
 }
 
+.nSampObserved <- function(gdsobj) {
+  .nSamp(gdsobj) * (1-seqMissing(gdsobj))
+}
+
 .emptySampFilter <- function(x, verbose=FALSE) {
     seqSetFilter(x, sample.sel=raw(.nSampUnfiltered(x)), action="push+set", verbose=verbose)
 }

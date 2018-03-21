@@ -113,3 +113,8 @@
     \item Bug fix in alleleFrequency method for SeqVarData where frequency calculation was done twice because the first calculation was not returned.
   }
 }
+\section{Changes in version 1.17.8}{
+  \itemize{
+    \item Add method alleleCount to return count of alleles.
+  }
+}
