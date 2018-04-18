@@ -129,3 +129,12 @@ test_iterator_list <- function() {
     checkEquals(integer(), seqGetData(it, "variant.id"))
     seqClose(it)
 }
+
+test_iterator_list_duplicates <- function() {
+    gds <- SeqVarTools:::.testSeqVarData()
+    gr <- granges(gds)
+    grl <- GRangesList(gr[c(1,1,2)])
+    it <- SeqVarListIterator(gds, variantRanges=grl, verbose=FALSE)
+    checkEquals(1:2, seqGetData(it, "variant.id"))
+    seqClose(it)
+}
