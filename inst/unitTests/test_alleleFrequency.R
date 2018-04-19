@@ -39,6 +39,7 @@ test_alleleFrequency_sex <- function() {
     chr[chr == 2] <- "Y"
     write.gdsn(node, chr)
     closefn.gds(gds)
+    seqOptimize(gds.fn, target="chromosome", verbose=FALSE)
     
     gds <- seqOpen(gds.fn)
     sample.id <- seqGetData(gds, "sample.id")
@@ -101,6 +102,7 @@ test_alleleCount_sex <- function() {
     chr[chr == 2] <- "Y"
     write.gdsn(node, chr)
     closefn.gds(gds)
+    seqOptimize(gds.fn, target="chromosome", verbose=FALSE)
     
     gds <- seqOpen(gds.fn)
     sample.id <- seqGetData(gds, "sample.id")
