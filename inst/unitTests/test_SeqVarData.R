@@ -103,7 +103,9 @@ test_granges <- function() {
     
     vdf <- .testVariantData(gds)
     variantData(svd) <- vdf
-    checkEquals(pData(vdf)[,-1,drop=FALSE], as.data.frame(S4Vectors::mcols(granges(svd))))
+    x <- pData(vdf)[,-1,drop=FALSE]
+    row.names(x) <- as.character(row.names(x))
+    checkEquals(x, as.data.frame(S4Vectors::mcols(granges(svd))), checkNames=FALSE)
     
     seqClose(svd)
 }
