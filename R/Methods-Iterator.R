@@ -172,6 +172,22 @@ setMethod("currentRanges",
               variantRanges(x)[[lastFilter(x)]]
           })
 
+setMethod("currentVariants",
+          "SeqVarIterator",
+          function(x) {
+              variant <- granges(x)
+              range <- currentRanges(x)
+              mergeByOverlaps(variant, range)
+          })
+
+setMethod("currentVariants",
+          "SeqVarBlockIterator",
+          function(x) {
+              df <- as(granges(x), "DataFrame")
+              names(df)[1] <- "variant"
+              df
+          })
+
 
 setMethod("show",
           "SeqVarIterator",

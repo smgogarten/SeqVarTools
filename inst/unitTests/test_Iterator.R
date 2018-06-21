@@ -138,3 +138,101 @@ test_iterator_list_duplicates <- function() {
     checkEquals(1:2, seqGetData(it, "variant.id"))
     seqClose(it)
 }
+
+
+.testVarData <- function() {
+    gds <- SeqVarTools:::.testSeqVarData()
+    vdf <- Biobase::AnnotatedDataFrame(data.frame(
+        variant.id=seqGetData(gds, "variant.id"),
+        weight=1, stringsAsFactors=FALSE))
+    variantData(gds) <- vdf
+    gds
+}
+
+test_currentRanges_block <- function() {
+    gds <- .testVarData()
+    it <- SeqVarBlockIterator(gds, variantBlock=10, verbose=FALSE)
+    checkEquals(currentRanges(it)$weight, rep(1,10))
+    seqClose(it)
+}
+
+test_currentRanges_list <- function() {
+    gds <- SeqVarTools:::.testSeqVarData()
+    gr <- GRangesList(
+        GRanges(seqnames=rep(1,2), ranges=IRanges(start=c(1e6, 3e6), width=1e6), weight=rep(1,2)),
+        GRanges(seqnames=rep(1,2), ranges=IRanges(start=c(3e6, 34e6), width=1e6), weight=rep(2,2)))
+    it <- SeqVarListIterator(gds, variantRanges=gr, verbose=FALSE)
+    checkEquals(currentRanges(it)$weight, c(1,1))
+    iterateFilter(it, verbose=FALSE)
+    checkEquals(currentRanges(it)$weight, c(2,2))
+    seqClose(it)
+}
+
+test_currentRanges_range <- function() {
+    gds <- SeqVarTools:::.testSeqVarData()
+    gr <- GRanges(seqnames=rep(1,3), ranges=IRanges(start=c(1e6, 2e6, 3e6), width=1e6), weight=rep(1,3))
+    it <- SeqVarRangeIterator(gds, variantRanges=gr, verbose=FALSE)
+    checkEquals(currentRanges(it)$weight, 1)
+    iterateFilter(it, verbose=FALSE)
+    checkEquals(currentRanges(it)$weight, 1)
+    seqClose(it)
+}
+
+test_currentVariants_window <- function() {
+    gds <- .testVarData()
+    it <- SeqVarWindowIterator(gds, verbose=FALSE)
+    checkTrue(all(currentVariants(it)$weight == 1))
+    seqClose(it)
+}
+
+test_currentVariants_range <- function() {
+    gds <- .testVarData()
+    gr <- GRanges(seqnames=rep(1,2), ranges=IRanges(start=c(1e6, 3e6), width=1e6), weight2=rep(2,2))
+    it <- SeqVarRangeIterator(gds, variantRanges=gr, verbose=FALSE)
+    cv <- currentVariants(it)
+    checkEquals(rownames(cv), as.character(1:3))
+    checkEquals(cv$weight, rep(1,3))
+    checkEquals(cv$weight2, rep(2,3))
+    iterateFilter(it, verbose=FALSE)
+    cv <- currentVariants(it)
+    checkEquals(rownames(cv), as.character(4:7))
+    checkEquals(cv$weight, rep(1,4))
+    checkEquals(cv$weight2, rep(2,4))
+    seqClose(it)
+}
+
+test_currentVariants_list <- function() {
+    gds <- .testVarData()
+    gr <- GRangesList(
+        GRanges(seqnames=rep(1,2), ranges=IRanges(start=c(1e6, 3e6), width=1e6), weight2=rep(2,2)),
+        GRanges(seqnames=rep(1,2), ranges=IRanges(start=c(3e6, 34e6), width=1e6), weight2=rep(3,2)))
+    it <- SeqVarListIterator(gds, variantRanges=gr, verbose=FALSE)
+    cv <- currentVariants(it)
+    checkEquals(rownames(cv), as.character(1:7))
+    checkEquals(cv$weight, rep(1,7))
+    checkEquals(cv$weight2, rep(2,7))
+    iterateFilter(it, verbose=FALSE)
+    cv <- currentVariants(it)
+    checkEquals(rownames(cv), as.character(4:11))
+    checkEquals(cv$weight, rep(1,8))
+    checkEquals(cv$weight2, rep(3,8))
+    seqClose(it)
+}
+
+test_currentVariants_block <- function() {
+    gds <- .testVarData()
+    it <- SeqVarBlockIterator(gds, verbose=FALSE)
+    cv <- currentVariants(it)
+    checkEquals(names(cv), c("variant", "weight"))
+    checkEquals(rownames(cv), as.character(seqGetData(it, "variant.id")))
+    checkTrue(all(cv$weight == 1))
+    seqClose(it)
+}
+
+test_currentVariants_no_variantData <- function() {
+    gds <- SeqVarTools:::.testSeqVarData()
+    it <- SeqVarWindowIterator(gds, verbose=FALSE)
+    cv <- currentVariants(it)
+    checkEquals(names(cv), c("variant", "range"))
+    seqClose(it)
+}
