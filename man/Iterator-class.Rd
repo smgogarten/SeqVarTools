@@ -31,6 +31,9 @@
 \alias{currentRanges,SeqVarBlockIterator-method}
 \alias{currentRanges,SeqVarRangeIterator-method}
 \alias{currentRanges,SeqVarListIterator-method}
+\alias{currentVariants}
+\alias{currentVariants,SeqVarIterator-method}
+\alias{currentVariants,SeqVarBlockIterator-method}
 
 \title{Iterators}
 
@@ -110,6 +113,8 @@
     \item{}{\code{variantRanges(x)}: Get the variant ranges.
     }
     \item{}{\code{currentRanges(x)}: Get the ranges selected in the current iteration.
+    }
+    \item{}{\code{currentVariants(x)}: Get the variants selected in the current iteration. Returns a \code{\link{DataFrame}} where the row name is the variant.id, "variant" is the variant position as a \code{link{GRanges}}, "range" is the range the variant is from, and any columns in either \code{\link{variantData}} or the metadata columns of \code{currentRanges} are included.
     }
   }
 }
