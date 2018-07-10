@@ -8,7 +8,8 @@
 \description{Find discordance rate for duplicate sample pairs}
 
 \usage{
-\S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", check.phase=FALSE, verbose=TRUE)
+%\S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", check.phase=FALSE, verbose=TRUE)
+\S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", by.variant=FALSE, all.pairs=TRUE, verbose=TRUE)
 \S4method{duplicateDiscordance}{SeqVarData,SeqVarData}(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), match.variants.on=c("alleles", "position"), discordance.type=c("genotype", "hethom"), by.variant=FALSE, verbose=TRUE)
 }
 
@@ -18,20 +19,17 @@
   \item{match.samples.on}{Character string or vector of strings indicating which column should be used for matching samples. See details.}
   \item{match.variants.on}{Character string of length one indicating how to match variants. See details.}
   \item{discordance.type}{Character string describing how discordances should be calculated. See details.}
-  \item{check.phase}{A logical indicating whether phase should be
-  considered when calculating discordance.}
+  %\item{check.phase}{A logical indicating whether phase should be considered when calculating discordance.}
   \item{by.variant}{Calculate discordance by variant, otherwise by sample}
+  \item{all.pairs}{Logical for whether to include all possible pairs of samples (\code{all.pairs=TRUE}) or only the first pair per subject (\code{all.pairs=FALSE}).}
   \item{verbose}{A logical indicating whether to print progress messages.}
 }
 
 \details{
-  For calls that involve only one gds file,
-  duplicate discordance is calculated by sample pair and by variant.  If
-  there are more than two samples per subject in \code{samples}, only the first two
-  samples are used and a warning message is printed.
-  If \code{check.phase=TRUE}, variants with mismatched phase are
-  considered discordant.  If \code{check.phase=FALSE}, phase is ignored.
-  
+  %For calls that involve only one gds file, duplicate discordance is calculated by sample pair and by variant.  If there are more than two samples per subject in \code{samples}, only the first two samples are used and a warning message is printed.
+  %If \code{check.phase=TRUE}, variants with mismatched phase are considered discordant.  If \code{check.phase=FALSE}, phase is ignored.
+  For calls that involve only one gds file, duplicate discordance is calculated by matching samples on common values of a column in \code{\link{sampleData}}. If \code{all.pairs=TRUE}, every possible pair of samples is included, so there may be multiple pairs per subject. If \code{all.pairs=FALSE}, only the first pair for each subject is used.
+ 
   For calls that involve two gds files, 
   duplicate discordance is calculated by matching sample pairs and variants between the two data sets. 
   Only biallelic SNVs are considered in the comparison.
