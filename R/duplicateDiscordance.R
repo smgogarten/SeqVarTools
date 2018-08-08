@@ -166,6 +166,11 @@ duplicateDiscordance1 <-
   sel
 }
 
+.getNonMissing <- function(geno1, geno2){
+  sel <- (geno1 != "miss") & (geno2 != "miss")
+  sel
+}
+
 
 .matchVariants <- function(gr1, gr2, match.on=c("alleles", "position"), allowOverlaps=TRUE){
   
@@ -463,9 +468,9 @@ setMethod("duplicateDiscordance",
                   if (verbose) message("sample pair ", i, " of ", nsamp)
                   
                   ## get genotypes for all samples
-                  seqSetFilter(gdsobj, sample.id=unlist(samp.pairs[i,], use.names=FALSE),
+                  seqSetFilter(gdsobj, sample.id=unlist(samp.pairs[i,-1], use.names=FALSE),
                                verbose=FALSE)
-                  geno <- refDosage(gdsobj)
+                  geno <- refDosage(gdsobj, use.names=FALSE)
                   dos1 <- geno[1,]
                   dos2 <- geno[2,]
                   rm(geno)
@@ -522,4 +527,88 @@ setMethod("duplicateDiscordance",
                   return(var.df)
               }
               
+          })
+
+
+
+setMethod("duplicateDiscordance",
+          c("SeqVarIterator", "missing"),
+          function(gdsobj,  match.samples.on="subject.id", by.variant=FALSE, all.pairs=TRUE, verbose=TRUE){
+              
+              ## samples should have columns of sample.id, subject.id
+              ## find matching sample pairs for subjects (one sample per subject)
+              samples <- pData(sampleData(gdsobj))
+              if (!(match.samples.on %in% names(samples))) stop(sprintf("%s is not a column in sampleData", match.samples.on))
+              samples <- samples[, c("sample.id", match.samples.on)]
+              names(samples)[2] <- "subject.id"
+              
+              samp.pairs <- .samplePairs(samples, all.pairs=all.pairs)
+              sample.id <- unique(c(samp.pairs$sample.id.1, samp.pairs$sample.id.2))
+
+              ## get original sample filter
+              filt.orig <- seqGetFilter(gdsobj)$sample.sel
+              seqSetFilter(gdsobj, sample.id=sample.id, verbose=FALSE)
+              sample.id <- seqGetData(gdsobj, "sample.id") # in case order is different
+
+              nsamp <- nrow(samp.pairs)
+              
+              # results
+              res <- list()
+              n.iter <- length(variantFilter(gdsobj))
+              b <- 1
+              iterate <- TRUE
+              while (iterate) {
+                  ## get genotypes for all samples
+                  geno <- refDosage(gdsobj, use.names=FALSE)
+                  class <- .getGenotypeClass(geno)
+                  rownames(class) <- sample.id
+                  rm(geno)
+                  
+                  class1 <- class[samp.pairs$sample.id.1,]
+                  class2 <- class[samp.pairs$sample.id.2,]
+                  
+                  if (!by.variant){
+                      res[[b]] <- cbind(
+                          n.variants = rowSums(.getNonMissing(class1, class2)),
+                          n.concordant = rowSums(.getMatchesConc(class1, class2)),
+                          n.alt = rowSums(.getAlt(class1, class2)),
+                          n.alt.conc = rowSums(.getMatchesAltConc(class1, class2)),
+                          n.het.ref = rowSums(.getMatchesHetRef(class1, class2)),
+                          n.het.alt = rowSums(.getMatchesHetAlt(class1, class2)),
+                          n.ref.alt = rowSums(.getMatchesRefAlt(class1, class2))
+                      )
+                  } else {
+                      res[[b]] <- data.frame(
+                          variant.id = seqGetData(gdsobj, "variant.id"),
+                          n.samples = colSums(.getNonMissing(class1, class2)),
+                          n.concordant = colSums(.getMatchesConc(class1, class2)),
+                          n.alt = colSums(.getAlt(class1, class2)),
+                          n.alt.conc = colSums(.getMatchesAltConc(class1, class2)),
+                          n.het.ref = colSums(.getMatchesHetRef(class1, class2)),
+                          n.het.alt = colSums(.getMatchesHetAlt(class1, class2)),
+                          n.ref.alt = colSums(.getMatchesRefAlt(class1, class2))
+                      )
+                  }
+                  
+                  if (verbose & b %% 100 == 0) {
+                      message(paste("Iteration", b , "of", n.iter, "completed"))
+                  }
+                  b <- b + 1
+                  iterate <- iterateFilter(gdsobj, verbose=FALSE)
+              }
+              
+              ## reset original sample filter
+              seqSetFilter(gdsobj, sample.sel=filt.orig, verbose=FALSE)
+
+              # return results data frame
+              if (!by.variant){
+                  ## sum over variant blocks
+                  res <- do.call(`+`, res)
+                  subj.df <- cbind(samp.pairs, res)
+                  return(subj.df)
+                  
+              } else {
+                  var.df <- do.call(rbind, res)
+                  return(var.df)
+              }
           })
