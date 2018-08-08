@@ -564,8 +564,8 @@ setMethod("duplicateDiscordance",
                   rownames(class) <- sample.id
                   rm(geno)
                   
-                  class1 <- class[samp.pairs$sample.id.1,]
-                  class2 <- class[samp.pairs$sample.id.2,]
+                  class1 <- class[samp.pairs$sample.id.1,,drop=FALSE]
+                  class2 <- class[samp.pairs$sample.id.2,,drop=FALSE]
                   
                   if (!by.variant){
                       res[[b]] <- cbind(
