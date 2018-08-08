@@ -603,7 +603,7 @@ setMethod("duplicateDiscordance",
               # return results data frame
               if (!by.variant){
                   ## sum over variant blocks
-                  res <- do.call(`+`, res)
+                  res <- Reduce(`+`, res)
                   subj.df <- cbind(samp.pairs, res)
                   return(subj.df)
                   

@@ -109,7 +109,7 @@ test_duplicateDiscordance_iterator <- function() {
   disc.subj <- duplicateDiscordance(seqData, by.variant=FALSE, all.pairs=TRUE, verbose=FALSE)
   disc.var <- duplicateDiscordance(seqData, by.variant=TRUE, all.pairs=TRUE, verbose=FALSE)
 
-  it <- SeqVarBlockIterator(seqData, variantBlock=1000, verbose=FALSE)
+  it <- SeqVarBlockIterator(seqData, variantBlock=500, verbose=FALSE)
   disc.subj.it <- duplicateDiscordance(it, by.variant=FALSE, all.pairs=TRUE, verbose=FALSE)
   resetIterator(it, verbose=FALSE)
   disc.var.it <- duplicateDiscordance(it, by.variant=TRUE, all.pairs=TRUE, verbose=FALSE)
