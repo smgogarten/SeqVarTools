@@ -16,6 +16,8 @@
 \alias{show,SeqVarListIterator-method}
 \alias{iterateFilter}
 \alias{iterateFilter,SeqVarIterator-method}
+\alias{resetIterator}
+\alias{resetIterator,SeqVarIterator-method}
 \alias{lastFilter}
 \alias{lastFilter,SeqVarIterator-method}
 \alias{lastFilter<-}
@@ -52,7 +54,7 @@
 
 	For \code{SeqVarListIterator}, each call to \code{iterateFilter} will select the next set of ranges in \code{variantRanges}.
 
-	Any filter set on the object previously will be applied in addition to the selected blocks or ranges. The original filter can be restored after iteration by calling \code{restoreFilter}.
+	Any filter set on the object previously will be applied in addition to the selected blocks or ranges.
 }
 
 
@@ -116,6 +118,8 @@
     }
     \item{}{\code{currentVariants(x)}: Get the variants selected in the current iteration. Returns a \code{\link{DataFrame}} where the row name is the variant.id, "variant" is the variant position as a \code{link{GRanges}}, "range" is the range the variant is from, and any columns in either \code{\link{variantData}} or the metadata columns of \code{currentRanges} are included.
     }
+    \item{}{\code{resetIterator(x)}: Set the filter to the first block, range, or set of ranges (the same variants that are selected when the iterator object is created).
+    }
   }
 }
 
@@ -169,7 +173,7 @@ granges(iterator)
 iterateFilter(iterator)
 granges(iterator)
 iterateFilter(iterator)
-seqResetFilter(iterator)
+resetIterator(iterator)
 
 seqClose(iterator)
 }

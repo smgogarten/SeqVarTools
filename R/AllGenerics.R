@@ -198,6 +198,10 @@ setGeneric("iterateFilter",
            function(x, ...)
                standardGeneric("iterateFilter"))
 
+setGeneric("resetIterator",
+           function(x, ...)
+               standardGeneric("resetIterator"))
+
 setGeneric("currentRanges",
            function(x)
                standardGeneric("currentRanges"))

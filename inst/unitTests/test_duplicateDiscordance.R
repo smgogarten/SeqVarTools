@@ -1,7 +1,7 @@
 library(Biobase)
 library(GenomicRanges)
 
-test_samplePairs <- function() {
+test_samplePairs1 <- function() {
   samples <- data.frame(sample.id=paste("samp", 1:10, sep=""),
                         subject.id=paste("subj", c(1,1,2,2,3,3,4,4,4,5), sep=""),
                         stringsAsFactors=FALSE)
@@ -9,7 +9,30 @@ test_samplePairs <- function() {
                         sample2=paste("samp", c(2,4,6,8), sep=""),
                         row.names=paste("subj", 1:4, sep=""),
                         stringsAsFactors=FALSE)
-  checkIdentical(subj.df, SeqVarTools:::.samplePairs(samples))
+  checkIdentical(subj.df, SeqVarTools:::.samplePairs1(samples))
+}
+
+test_samplePairs <- function() {
+  samples <- data.frame(sample.id=paste("samp", 1:10, sep=""),
+                        subject.id=paste("subj", c(1,1,2,2,3,3,4,4,4,5), sep=""),
+                        stringsAsFactors=FALSE)
+  subj.df <- data.frame(subject.id=paste("subj", 1:4, sep=""),
+                        sample.id.1=paste("samp", c(1,3,5,7), sep=""),
+                        sample.id.2=paste("samp", c(2,4,6,8), sep=""),
+                        stringsAsFactors=FALSE)
+  sp <- SeqVarTools:::.samplePairs(samples, all.pairs=FALSE)
+  checkIdentical(subj.df, sp)
+  sp1 <- suppressWarnings(SeqVarTools:::.samplePairs1(samples))
+  checkIdentical(row.names(sp1), sp$subject.id)
+  checkIdentical(sp1$sample1, sp$sample.id.1)
+  checkIdentical(sp1$sample2, sp$sample.id.2)
+
+  subj.df <- data.frame(subject.id=paste("subj", c(1:4,4,4), sep=""),
+                        sample.id.1=paste("samp", c(1,3,5,7,7,8), sep=""),
+                        sample.id.2=paste("samp", c(2,4,6,8,9,9), sep=""),
+                        stringsAsFactors=FALSE)
+  sp <- SeqVarTools:::.samplePairs(samples, all.pairs=TRUE)
+  checkIdentical(subj.df, sp)
 }
 
 test_genoMatch <- function() {
@@ -24,7 +47,29 @@ test_genoMatch <- function() {
   checkIdentical(match.unphase, SeqVarTools:::.genoMatch(geno, check.phase=FALSE))
 }
 
-test_duplicateDiscordance_apply <- function() {
+## test_duplicateDiscordance_apply <- function() {
+##   gds <- SeqVarTools:::.testData()
+##   sample.id <- seqGetData(gds, "sample.id")
+##   samples <- data.frame(subject.id=c(rep(c("subj1", "subj2"), each=2), sample.id[5:length(sample.id)]),
+##                         sample.id=sample.id,
+##                         stringsAsFactors=FALSE)
+##   var.id <- 101:110
+  
+##   seqData <- SeqVarData(gds, sampleData=AnnotatedDataFrame(samples))
+  
+##   seqSetFilter(gds, variant.id=var.id, sample.id=sample.id[1:4])
+  
+##   disc <- duplicateDiscordance(seqData)
+##   seqSetFilter(gds)
+##   checkIdentical(disc,
+##                  applyMethod(seqData, duplicateDiscordance,
+##                              variant=var.id))
+##   seqClose(gds)
+## }
+
+
+
+test_duplicateDiscordance <- function() {
   gds <- SeqVarTools:::.testData()
   sample.id <- seqGetData(gds, "sample.id")
   samples <- data.frame(subject.id=c(rep(c("subj1", "subj2"), each=2), sample.id[5:length(sample.id)]),
@@ -34,13 +79,44 @@ test_duplicateDiscordance_apply <- function() {
   
   seqData <- SeqVarData(gds, sampleData=AnnotatedDataFrame(samples))
   
-  seqSetFilter(gds, variant.id=var.id, sample.id=sample.id[1:4])
+  seqSetFilter(gds, variant.id=var.id, sample.id=sample.id[1:4], verbose=FALSE)
+  disc1 <- SeqVarTools:::duplicateDiscordance1(seqData, verbose=FALSE)
+  disc.subj <- duplicateDiscordance(seqData, by.variant=FALSE, all.pairs=FALSE, verbose=FALSE)
+  disc.var <- duplicateDiscordance(seqData, by.variant=TRUE, all.pairs=FALSE, verbose=FALSE)
+
+  checkEquals(disc.subj$subject.id, row.names(disc1$by.subject))
+  checkEquals(disc.subj$sample.id.1, disc1$by.subject$sample1)
+  checkEquals(disc.subj$sample.id.2, disc1$by.subject$sample2)
+  checkEquals(disc.subj$n.variants, disc1$by.subject$num.var)
+  checkEquals(disc.subj$n.concordant, disc1$by.subject$num.var - disc1$by.subject$num.discord)
+
+  checkEquals(disc.var$variant.id, as.integer(rownames(disc1$by.variant)))
+  checkEquals(disc.var$n.samples, disc1$by.variant$num.pair)
+  checkEquals(disc.var$n.concordant, disc1$by.variant$num.pair - disc1$by.variant$num.discord)
   
-  disc <- duplicateDiscordance(seqData)
-  seqSetFilter(gds)
-  checkIdentical(disc,
-                 applyMethod(seqData, duplicateDiscordance,
-                             variant=var.id))
+  seqClose(gds)
+}
+
+
+test_duplicateDiscordance_iterator <- function() {
+  gds <- SeqVarTools:::.testData()
+  sample.id <- seqGetData(gds, "sample.id")
+  samples <- data.frame(subject.id=c(rep(c("subj1", "subj2"), each=3), sample.id[7:length(sample.id)]),
+                        sample.id=sample.id,
+                        stringsAsFactors=FALSE)
+  
+  seqData <- SeqVarData(gds, sampleData=AnnotatedDataFrame(samples))
+  disc.subj <- duplicateDiscordance(seqData, by.variant=FALSE, all.pairs=TRUE, verbose=FALSE)
+  disc.var <- duplicateDiscordance(seqData, by.variant=TRUE, all.pairs=TRUE, verbose=FALSE)
+
+  it <- SeqVarBlockIterator(seqData, variantBlock=500, verbose=FALSE)
+  disc.subj.it <- duplicateDiscordance(it, by.variant=FALSE, all.pairs=TRUE, verbose=FALSE)
+  resetIterator(it, verbose=FALSE)
+  disc.var.it <- duplicateDiscordance(it, by.variant=TRUE, all.pairs=TRUE, verbose=FALSE)
+
+  checkEquals(disc.subj, disc.subj.it)
+  checkEquals(disc.var, disc.var.it)
+
   seqClose(gds)
 }
 
@@ -69,7 +145,6 @@ test_getMatchesConc <- function(){
 test_getAlt <- function(){
   df <- .getTestGeno()
   truth <- c(F, T, T, F, T, T, T, F, T, T, T, F, F, F, F, F)
-  
   checkEquals(SeqVarTools:::.getAlt(df$geno1, df$geno2), truth)
   checkIdentical(SeqVarTools:::.getAlt(df$geno1, df$geno2), SeqVarTools:::.getAlt(df$geno2, df$geno1))  
 }
@@ -78,7 +153,6 @@ test_getAlt <- function(){
 test_getMatchesAltConc <- function(){
   df <- .getTestGeno()
   truth <- c(F, F, F, F, F, T, F, F, F, F, T, F, F, F, F, F)
-  
   checkEquals(SeqVarTools:::.getMatchesAltConc(df$geno1, df$geno2), truth)
   checkIdentical(SeqVarTools:::.getMatchesAltConc(df$geno1, df$geno2), SeqVarTools:::.getMatchesAltConc(df$geno2, df$geno1))
 }
@@ -86,9 +160,7 @@ test_getMatchesAltConc <- function(){
 
 test_getMatchesHetRef <- function(){
   df <- .getTestGeno()
-  
   truth <- c(F, T, F, F, T, F, F, F, F, F, F, F, F, F, F, F)
-
   checkEquals(SeqVarTools:::.getMatchesHetRef(df$geno1, df$geno2), truth)
   checkIdentical(SeqVarTools:::.getMatchesHetRef(df$geno1, df$geno2), SeqVarTools:::.getMatchesHetRef(df$geno2, df$geno1))
 }
@@ -96,7 +168,6 @@ test_getMatchesHetRef <- function(){
 test_getMatchesHetAlt <- function(){
   df <- .getTestGeno()
   truth <- c(F, F, F, F, F, F, T, F, F, T, F, F, F, F, F, F)
-    
   checkEquals(SeqVarTools:::.getMatchesHetAlt(df$geno1, df$geno2), truth)
   checkIdentical(SeqVarTools:::.getMatchesHetAlt(df$geno1, df$geno2), SeqVarTools:::.getMatchesHetAlt(df$geno2, df$geno1))
 }
@@ -110,15 +181,20 @@ test_getMatchesRefAlt <- function() {
 }
 
 test_getMatchesHetHom <- function (){
-  
   df <- .getTestGeno()
   truth <- c(T, F, T, F, F, T, F, F, T, F, T, F, F, F, F, F)
   checkEquals(SeqVarTools:::.getMatchesHetHom(df$geno1, df$geno2), truth)
   checkIdentical(SeqVarTools:::.getMatchesHetHom(df$geno1, df$geno2), SeqVarTools:::.getMatchesHetHom(df$geno2, df$geno1))
 }
 
+test_getNonMissing <- function (){
+  df <- .getTestGeno()
+  truth <- c(T, T, T, F, T, T, T, F, T, T, T, F, F, F, F, F)
+  checkEquals(SeqVarTools:::.getNonMissing(df$geno1, df$geno2), truth)
+  checkIdentical(SeqVarTools:::.getNonMissing(df$geno1, df$geno2), SeqVarTools:::.getNonMissing(df$geno2, df$geno1))
+}
+
 test_getGentoypeClass <- function() {
-  
   vals <- c(NA, 0, 1, 2)
   class <- SeqVarTools:::.getGenotypeClass(vals)
   checkEquals(class, c("miss", "alt", "het", "ref"))
@@ -188,7 +264,6 @@ test_matchSamples <- function() {
   checkEquals(nrow(chk), 5)
   
 }
-
 
 test_duplicateDiscordanceAcrossDatasets <- function() {
   gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)

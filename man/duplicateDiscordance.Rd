@@ -2,13 +2,16 @@
 \alias{duplicateDiscordance}
 \alias{duplicateDiscordance,SeqVarData,missing-method}
 \alias{duplicateDiscordance,SeqVarData,SeqVarData-method}
+\alias{duplicateDiscordance,SeqVarIterator,missing-method}
 
 \title{Duplicate discordance}
 
 \description{Find discordance rate for duplicate sample pairs}
 
 \usage{
-\S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", check.phase=FALSE, verbose=TRUE)
+%\S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", check.phase=FALSE, verbose=TRUE)
+\S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", by.variant=FALSE, all.pairs=TRUE, verbose=TRUE)
+\S4method{duplicateDiscordance}{SeqVarIterator,missing}(gdsobj, match.samples.on="subject.id", by.variant=FALSE, all.pairs=TRUE, verbose=TRUE)
 \S4method{duplicateDiscordance}{SeqVarData,SeqVarData}(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), match.variants.on=c("alleles", "position"), discordance.type=c("genotype", "hethom"), by.variant=FALSE, verbose=TRUE)
 }
 
@@ -18,20 +21,17 @@
   \item{match.samples.on}{Character string or vector of strings indicating which column should be used for matching samples. See details.}
   \item{match.variants.on}{Character string of length one indicating how to match variants. See details.}
   \item{discordance.type}{Character string describing how discordances should be calculated. See details.}
-  \item{check.phase}{A logical indicating whether phase should be
-  considered when calculating discordance.}
+  %\item{check.phase}{A logical indicating whether phase should be considered when calculating discordance.}
   \item{by.variant}{Calculate discordance by variant, otherwise by sample}
+  \item{all.pairs}{Logical for whether to include all possible pairs of samples (\code{all.pairs=TRUE}) or only the first pair per subject (\code{all.pairs=FALSE}).}
   \item{verbose}{A logical indicating whether to print progress messages.}
 }
 
 \details{
-  For calls that involve only one gds file,
-  duplicate discordance is calculated by sample pair and by variant.  If
-  there are more than two samples per subject in \code{samples}, only the first two
-  samples are used and a warning message is printed.
-  If \code{check.phase=TRUE}, variants with mismatched phase are
-  considered discordant.  If \code{check.phase=FALSE}, phase is ignored.
-  
+  %For calls that involve only one gds file, duplicate discordance is calculated by sample pair and by variant.  If there are more than two samples per subject in \code{samples}, only the first two samples are used and a warning message is printed.
+  %If \code{check.phase=TRUE}, variants with mismatched phase are considered discordant.  If \code{check.phase=FALSE}, phase is ignored.
+  For calls that involve only one gds file, duplicate discordance is calculated by matching samples on common values of a column in \code{\link{sampleData}}. If \code{all.pairs=TRUE}, every possible pair of samples is included, so there may be multiple pairs per subject. If \code{all.pairs=FALSE}, only the first pair for each subject is used.
+ 
   For calls that involve two gds files, 
   duplicate discordance is calculated by matching sample pairs and variants between the two data sets. 
   Only biallelic SNVs are considered in the comparison.
@@ -50,21 +50,21 @@
 }
 
 \value{
-  For calls involving one gds file, a list with the following elements:
-  \item{by.variant}{A data.frame with the number of discordances for
-  each variant, the
-  number of sample pairs with non-missing data, and the discordance rate
-  (num.discord / num.pair).  Row names are variant ids.}
-  \item{by.subject}{A data.frame with the sample ids for each pair, the
-  number of discordances, the number of non-missing variants, and the
-  discordance rate (num.discord / num.var).  Row.names are subject.id
-  (as given in \code{samples}).}
+  %% For calls involving one gds file, a list with the following elements:
+  %% \item{by.variant}{A data.frame with the number of discordances for
+  %% each variant, the
+  %% number of sample pairs with non-missing data, and the discordance rate
+  %% (num.discord / num.pair).  Row names are variant ids.}
+  %% \item{by.subject}{A data.frame with the sample ids for each pair, the
+  %% number of discordances, the number of non-missing variants, and the
+  %% discordance rate (num.discord / num.var).  Row.names are subject.id
+  %% (as given in \code{samples}).}
   
-  For calls involving two gds files,
+  %% For calls involving two gds files,
   A data frame with the following columns, depending on whether \code{by.variant=TRUE} or \code{FALSE}:
-\item{subjectID}{currently, this is the sample ID (\code{by.variant=FALSE} only)}
+\item{subject.id}{currently, this is the sample ID (\code{by.variant=FALSE} only)}
 \item{sample.id.1/variant.id.1}{sample id or variant id in the first gds file}
-\item{sample.id.2/variant.id.1}{sample id or variant id in the second gds file}
+\item{sample.id.2/variant.id.2}{sample id or variant id in the second gds file}
 \item{n.variants/n.samples}{the number of non-missing variants or samples that were compared}
 \item{n.concordant}{the number of concordant variants}
 \item{n.alt}{the number of variants involving the alternate allele in either sample}
@@ -79,7 +79,7 @@
 
 \seealso{
   \code{\link{SeqVarData}},
-  \code{\link{applyMethod}}
+  \code{\link{SeqVarIterator}}
 }
 
 \examples{
@@ -95,12 +95,19 @@ samples <- AnnotatedDataFrame(data.frame(data.frame(subject.id=rep(c("subj1", "s
                       stringsAsFactors=FALSE)))
 seqData <- SeqVarData(gds, sampleData=samples)
 
-# set a filter on the first four samples
+## set a filter on the first four samples
 seqSetFilter(seqData, sample.id=sample.id[1:4])
 
-disc <- duplicateDiscordance(seqData)
-head(disc$by.variant)
-disc$by.subject
+disc <- duplicateDiscordance(seqData, by.variant=FALSE)
+disc
+disc <- duplicateDiscordance(seqData, by.variant=TRUE)
+head(disc)
+
+## recommended to use an iterator object for large datasets
+iterator <- SeqVarBlockIterator(seqData)
+disc <- duplicateDiscordance(iterator, by.variant=FALSE)
+disc
+
 seqClose(gds)
 }
 

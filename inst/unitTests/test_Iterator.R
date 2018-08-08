@@ -236,3 +236,13 @@ test_currentVariants_no_variantData <- function() {
     checkEquals(names(cv), c("variant", "range"))
     seqClose(it)
 }
+
+test_resetIterator <- function() {
+    gds <- SeqVarTools:::.testSeqVarData()
+    it <- SeqVarBlockIterator(gds, variantBlock=1000, verbose=FALSE)
+    while(iterateFilter(it, verbose=FALSE)) {}
+    checkEquals(SeqVarTools:::.nVar(it), 0)
+    resetIterator(it, verbose=FALSE)
+    checkEquals(SeqVarTools:::.nVar(it), 1000)
+    seqClose(it)
+}
