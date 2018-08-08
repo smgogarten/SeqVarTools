@@ -133,6 +133,14 @@ setMethod("iterateFilter",
               }
           })
 
+setMethod("resetIterator",
+          "SeqVarIterator",
+          function(x, verbose=TRUE) {
+              ## set filter for first element
+              seqSetFilter(x, variant.sel=variantFilter(x)[[1]], verbose=verbose)
+              lastFilter(x) <- 1
+          })
+
 
 setMethod("variantBlock",
           "SeqVarBlockIterator",
