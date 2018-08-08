@@ -27,7 +27,7 @@
   stopifnot(all(c("sample.id", "subject.id") %in% names(samples)))
 
   ## keep only subjects with duplicate samples
-  subjects <- unique(samples$subject.id[duplicated(samples$subject.id)])
+  subjects <- unique(na.omit(samples$subject.id[duplicated(samples$subject.id)]))
   if (length(subjects) == 0) {
     stop("No duplicate samples - all values of subject.id are unique")
   }
