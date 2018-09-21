@@ -66,7 +66,13 @@ setMethod("show",
 setMethod("sampleData",
           "SeqVarData",
           function(x) {
-              x@sampleData[seqGetFilter(x)$sample.sel,]
+              sd <- x@sampleData
+              samp.sel <- seqGetFilter(x)$sample.sel
+              if (sum(samp.sel) == length(samp.sel)) {
+                  return(sd)
+              } else {
+                  return(sd[samp.sel,])
+              }
           })
 
 setReplaceMethod("sampleData",
@@ -85,7 +91,13 @@ setReplaceMethod("sampleData",
 setMethod("variantData",
           "SeqVarData",
           function(x) {
-              x@variantData[seqGetFilter(x)$variant.sel,]
+              vd <- x@variantData
+              var.sel <- seqGetFilter(x)$variant.sel
+              if (sum(var.sel) == length(var.sel)) {
+                  return(vd)
+              } else {
+                  return(vd[var.sel,])
+              }
           })
 
 setReplaceMethod("variantData",
