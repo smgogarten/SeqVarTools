@@ -118,3 +118,18 @@
     \item Add method alleleCount to return count of alleles.
   }
 }
+\section{Changes in version 1.19.2}{
+  \itemize{
+    \item Add methods currentVariants and currentRanges for SeqVarIterator classes.
+  }
+}
+\section{Changes in version 1.19.3}{
+  \itemize{
+    \item Rewrite the duplicateDiscordance method for a single GDS file to be much faster and return output consistent with the cross-file method.
+  }
+}
+\section{Changes in version 1.19.4}{
+  \itemize{
+    \item Reduce memory usage when creating a SeqVarData object.
+  }
+}

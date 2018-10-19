@@ -18,8 +18,9 @@
   \item{model.type}{the type of model to be run.  "linear" uses \code{\link{lm}}, "logistic" uses \code{\link{glm}} with \code{family=binomial()}, and "firth" uses \code{\link{logistf}}.}
 }
 
-%\details{
-%}
+\details{
+\code{regression} tests the additive effect of the reference allele.
+}
 
 \value{
 a data.frame with the following columns (if applicable):
