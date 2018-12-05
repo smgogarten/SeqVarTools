@@ -206,6 +206,12 @@
     SeqVarData(.testData())
 }
 
+.testDosageData <- function() {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
+    gdsfile <- system.file("extdata", "gl_chr1.gds", package="SeqVarTools")
+    seqOpen(gdsfile)
+}
+
 .alleleCount <- function(gdsobj, n=0) {
     freq <- seqAlleleFreq(gdsobj, ref.allele=n)
     nsamp <- .nSamp(gdsobj)*(1-seqMissing(gdsobj))
