@@ -70,6 +70,10 @@ setGeneric("getVariableLengthData",
            function(gdsobj, var.name, ...)
              standardGeneric("getVariableLengthData"))
 
+setGeneric("imputedDosage",
+           function(gdsobj, ...)
+             standardGeneric("imputedDosage"))
+
 
 ## metrics
 setGeneric("titv",

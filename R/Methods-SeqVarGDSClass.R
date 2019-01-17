@@ -291,6 +291,23 @@ setMethod("getVariableLengthData",
             if (use.names) .applyNames(gdsobj, var) else var
           })
 
+
+setMethod("imputedDosage",
+          "SeqVarGDSClass",
+          function(gdsobj, dosage.field="DS", use.names=TRUE) {
+            if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
+
+            d <- seqGetData(gdsobj, paste0("annotation/format/", dosage.field))
+            if (!all(d$length == 1)) stop("multiple dosage values per variant")
+            d <- d$data
+            if (use.names) {
+                dimnames(d) <- list(sample=NULL, variant=NULL)
+                .applyNames(gdsobj, d)
+            } else d
+          })
+          
+
+
 ## metrics    
 setMethod("titv",
           "SeqVarGDSClass",
