@@ -133,3 +133,8 @@
     \item Reduce memory usage when creating a SeqVarData object.
   }
 }
+\section{Changes in version 1.21.1}{
+  \itemize{
+    \item Add method to return imputed dosage.
+  }
+}
