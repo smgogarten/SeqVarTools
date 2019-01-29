@@ -247,12 +247,12 @@ setMethod("variantInfo",
               }
               if (expanded) {
                   if (alleles) {
-                      x <- separate_rows_(x, "alt", sep=",")
+                      x <- separate_rows(x, .data$alt, sep=",")
                   } else {
                       x <- x[expandedVariantIndex(gdsobj),]
                   }
-                  x <- group_by_(x, "variant.id")
-                  x <- mutate_(x, allele.index=~1:n())
+                  x <- group_by(x, .data$variant.id)
+                  x <- mutate(x, allele.index = 1:n())
                   x <- as.data.frame(x)
               }
               x
