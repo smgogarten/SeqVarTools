@@ -229,6 +229,8 @@ setMethod("expandedVariantIndex",
               nv <- .nVar(gdsobj)
               if (nv == 0) return(integer())
               nAlt <- nAlleles(gdsobj) - 1
+              # keep variants with no alternate alleles
+              nAlt[nAlt == 0] <- 1
               rep(1:nv, nAlt)
           })
 

@@ -280,6 +280,15 @@ test_expandedVariantIndex <- function() {
     seqClose(gds)
 }
 
+test_expandedVariantIndex_noAlt <- function() {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
+    gdsfile <- system.file("extdata", "gl_chr1.gds", package="SeqVarTools")
+    gds <- seqOpen(gdsfile)
+    ind <- expandedVariantIndex(gds)
+    checkEquals(1:9, ind) 
+    seqClose(gds)
+}
+
 test_variantInfo <- function() {
     gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
     gdsfile <- system.file("extdata", "hapmap_exome_chr22.gds", package="SeqVarTools")
