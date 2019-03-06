@@ -40,7 +40,8 @@
 # convert VCF to GDS keeping dosage field
 vcffile <- system.file("extdata", "gl_chr1.vcf", package="SeqVarTools")
 gdsfile <- tempfile()
-seqVCF2GDS(vcffile, gdsfile, fmt.import="DS", verbose=FALSE)
+seqVCF2GDS(vcffile, gdsfile, fmt.import="DS", storage.option="ZIP_RA",
+           verbose=FALSE)
 
 gds <- seqOpen(gdsfile)
 dos <- imputedDosage(gds)
