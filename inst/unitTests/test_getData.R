@@ -28,7 +28,6 @@ test_isVariant <- function() {
   gds <- SeqVarTools:::.testData()
   geno <- seqGetData(gds, "genotype")
   var <- (!is.na(geno[1,,]) & geno[1,,] > 0) | (!is.na(geno[2,,]) & geno[2,,] > 0)
-  dimnames(var) <- list(sample=NULL, variant=NULL)
   checkIdentical(var, isVariant(gds))
   seqClose(gds)
 }
@@ -37,9 +36,9 @@ test_isVariant_apply <- function() {
   gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
-  seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
+  seqSetFilter(gds, variant.id=var.id, sample.id=samp.id, verbose=FALSE)
   var <- isVariant(gds)
-  seqSetFilter(gds)
+  seqSetFilter(gds, verbose=FALSE)
   checkIdentical(var,
                  applyMethod(gds, isVariant, variant=var.id, sample=samp.id))
   seqClose(gds)
@@ -50,19 +49,21 @@ test_getGenotype <- function() {
   gds <- SeqVarTools:::.testData()
   geno <- seqGetData(gds, "genotype")
   gc <- matrix(paste(geno[1,,], geno[2,,], sep="/"),
-               nrow=dim(geno)[2], ncol=dim(geno)[3],
-               dimnames=list(sample=NULL, variant=NULL))
+               nrow=dim(geno)[2], ncol=dim(geno)[3])
   gc[gc == "NA/NA"] <- NA
   checkIdentical(gc, getGenotype(gds, use.names=FALSE))
+  dimnames(gc) <- list(sample=seqGetData(gds, "sample.id"),
+                       variant=seqGetData(gds, "variant.id"))
+  checkIdentical(gc, getGenotype(gds, use.names=TRUE))
   seqClose(gds)
 }
 
 test_getGenotype_phased <- function() {
+  gdsfmt::showfile.gds(closeall=TRUE)
   gds <- seqOpen(system.file("extdata", "gl_chr1.gds", package="SeqVarTools"))
   geno <- seqGetData(gds, "genotype")
   gc <- matrix(paste(geno[1,,], geno[2,,], sep="|"),
-               nrow=dim(geno)[2], ncol=dim(geno)[3],
-               dimnames=list(sample=NULL, variant=NULL))
+               nrow=dim(geno)[2], ncol=dim(geno)[3])
   gc[gc == "NA/NA"] <- NA
   checkIdentical(gc, getGenotype(gds, use.names=FALSE))
   seqClose(gds)
@@ -72,9 +73,9 @@ test_getGenotype_apply <- function() {
   gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
-  seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
+  seqSetFilter(gds, variant.id=var.id, sample.id=samp.id, verbose=FALSE)
   geno <- getGenotype(gds)
-  seqSetFilter(gds)
+  seqSetFilter(gds, verbose=FALSE)
   checkIdentical(geno,
                  applyMethod(gds, getGenotype, variant=var.id, sample=samp.id))
   seqClose(gds)
@@ -94,14 +95,17 @@ test_getGenotypeAlleles <- function() {
     }
   }
   gc <- matrix(paste(geno[1,,], geno[2,,], sep="/"),
-               nrow=dim(geno)[2], ncol=dim(geno)[3],
-               dimnames=list(sample=NULL, variant=NULL))
+               nrow=dim(geno)[2], ncol=dim(geno)[3])
   gc[gc == "NA/NA"] <- NA
   checkIdentical(gc, getGenotypeAlleles(gds, use.names=FALSE))
+  dimnames(gc) <- list(sample=seqGetData(gds, "sample.id"),
+                       variant=seqGetData(gds, "variant.id"))
+  checkIdentical(gc, getGenotypeAlleles(gds, use.names=TRUE))
   seqClose(gds)
 }
 
 test_getGenotypeAlleles_phased <- function() {
+  gdsfmt::showfile.gds(closeall=TRUE)
   gds <- seqOpen(system.file("extdata", "gl_chr1.gds", package="SeqVarTools"))
   geno <- seqGetData(gds, "genotype")
   alleles <- list(refChar(gds), altChar(gds, n=1), altChar(gds, n=2))
@@ -114,16 +118,14 @@ test_getGenotypeAlleles_phased <- function() {
     }
   }
   gc <- matrix(paste(geno[1,,], geno[2,,], sep="|"),
-               nrow=dim(geno)[2], ncol=dim(geno)[3],
-               dimnames=list(sample=NULL, variant=NULL))
+               nrow=dim(geno)[2], ncol=dim(geno)[3])
   gc[gc == "NA/NA"] <- NA
   checkIdentical(gc, getGenotypeAlleles(gds, use.names=FALSE))
 
   ## sort
   gc <- matrix(paste(pmin(geno[1,,], geno[2,,]),
                      pmax(geno[1,,], geno[2,,]), sep="/"),
-               nrow=dim(geno)[2], ncol=dim(geno)[3],
-               dimnames=list(sample=NULL, variant=NULL))
+               nrow=dim(geno)[2], ncol=dim(geno)[3])
   gc[gc == "NA/NA"] <- NA
   checkIdentical(gc, getGenotypeAlleles(gds, use.names=FALSE, sort=TRUE))
   seqClose(gds)
@@ -133,9 +135,9 @@ test_getGenotypeAlleles_apply <- function() {
   gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
-  seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
+  seqSetFilter(gds, variant.id=var.id, sample.id=samp.id, verbose=FALSE)
   geno <- getGenotypeAlleles(gds)
-  seqSetFilter(gds)
+  seqSetFilter(gds, verbose=FALSE)
   checkIdentical(geno,
                  applyMethod(gds, getGenotypeAlleles, variant=var.id, sample=samp.id))
   seqClose(gds)
@@ -156,9 +158,9 @@ test_refDosage_apply <- function() {
   gds <- SeqVarTools:::.testData()
   var.id <- 101:110
   samp.id <- seqGetData(gds, "sample.id")[6:10]
-  seqSetFilter(gds, variant.id=var.id, sample.id=samp.id)
+  seqSetFilter(gds, variant.id=var.id, sample.id=samp.id, verbose=FALSE)
   geno <- refDosage(gds)
-  seqSetFilter(gds)
+  seqSetFilter(gds, verbose=FALSE)
   checkIdentical(geno,
                  applyMethod(gds, refDosage, variant=var.id, sample=samp.id))
   seqClose(gds)
@@ -193,9 +195,11 @@ test_altDosage <- function() {
                   },
                   margin="by.variant", as.is="list",
                   var.index="relative")
-    d <- matrix(unlist(d, use.names=FALSE), ncol=length(d),
-                dimnames=list(sample=NULL, variant=NULL))
-    if (use.names) SeqVarTools:::.applyNames(gdsobj, d) else d
+    d <- matrix(unlist(d, use.names=FALSE), ncol=length(d))
+    if (use.names) {
+        dimnames(d) <- list(sample=NULL, variant=NULL)
+        SeqVarTools:::.applyNames(gdsobj, d)
+    } else d
 }
 
 test_alleleDosage <- function() {

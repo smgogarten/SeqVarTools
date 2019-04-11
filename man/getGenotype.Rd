@@ -20,8 +20,8 @@
 }
 
 \usage{
-\S4method{getGenotype}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
-\S4method{getGenotypeAlleles}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sort=FALSE)
+\S4method{getGenotype}{SeqVarGDSClass}(gdsobj, use.names=TRUE, ...)
+\S4method{getGenotypeAlleles}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sort=FALSE, ...)
 \S4method{refDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, ...)
 \S4method{altDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sparse=FALSE, ...)
 \S4method{expandedAltDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sparse=FALSE)
