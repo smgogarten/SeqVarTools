@@ -1,0 +1,138 @@
+%\VignetteIndexEntry{Iterators in SeqVarTools}
+%\VignetteDepends{SeqVarTools, GenomicRanges}
+\documentclass[11pt]{article}
+
+<<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
+BiocStyle::latex()
+@
+
+\begin{document}
+
+\title{Using Iterators in SeqVarTools}
+\author{Stephanie M. Gogarten}
+
+\maketitle
+\tableofcontents
+
+\section{Introduction}
+
+Iterators can be used to apply a user function to a
+\Rclass{SeqVarData} object. Creating the iterator defines the sets of
+variants returned on every subsequent call to
+\Rfunction{iterateFilter}. \Rfunction{iterateFilter} returns TRUE if
+there are more variants remaining, and FALSE when all variants have
+been returned.
+
+\section{Block iterators}
+
+The simplest type of iterator, a \Rclass{SeqVarBlockIterator}, returns variants in consecutive blocks.
+
+<<>>=
+library(SeqVarTools)
+gds <- seqOpen(seqExampleFileName("gds"))
+seqData <- SeqVarData(gds)
+iterator <- SeqVarBlockIterator(seqData, variantBlock=500)
+var.info <- list(variantInfo(iterator))
+i <- 2
+while(iterateFilter(iterator)) {
+    var.info[[i]] <- variantInfo(iterator)
+    i <- i + 1
+}
+lapply(var.info, head)
+seqResetFilter(seqData)
+@ 
+
+A filter can be applied before the iterator is created, and only
+variants included in the filter will be returned by the iterator.
+
+<<>>=
+seqSetFilter(seqData, variant.sel=1:100)
+iterator <- SeqVarBlockIterator(seqData, variantBlock=500)
+var.info <- variantInfo(iterator)
+nrow(var.info)
+iterateFilter(iterator)
+seqResetFilter(seqData)
+@ 
+
+
+\section{Range iterators}
+
+A \Rclass{GRanges} object can be used to create a
+\Rclass{SeqVarRangeIterator}, where every iteration returns the next
+range.
+
+<<>>=
+library(GenomicRanges)
+gr <- GRanges(seqnames=rep(1,3), 
+              ranges=IRanges(start=c(1e6, 2e6, 3e6), width=1e6))
+iterator <- SeqVarRangeIterator(seqData, variantRanges=gr)
+var.info <- list(variantInfo(iterator))
+i <- 2
+while(iterateFilter(iterator)) {
+    var.info[[i]] <- variantInfo(iterator)
+    i <- i + 1
+}
+lapply(var.info, head)
+seqResetFilter(seqData)
+@ 
+
+
+\section{Window iterators}
+
+Window iterators (\Rclass{SeqVarWindowIterator}) are a special class of range iterators. When the
+object is created, the ranges are generated automatically with a
+specified width and step size, covering the entire genome.
+
+<<>>=
+seqSetFilterChrom(seqData, include="22")
+iterator <- SeqVarWindowIterator(seqData, windowSize=10000, 
+                                 windowShift=5000)
+var.info <- list(variantInfo(iterator))
+i <- 2
+while(iterateFilter(iterator)) {
+    var.info[[i]] <- variantInfo(iterator)
+    i <- i + 1
+}
+lapply(var.info, head)
+seqResetFilter(seqData)
+@ 
+
+
+\section{List iterators}
+
+A \Rclass{SeqVarListIterator} can be used to specify particular
+variants to include in each iteration. The input is a
+\Rclass{GRangesList}, and each list element defines an iteration set.
+
+<<>>=
+gr <- GRangesList(
+  GRanges(seqnames=rep(22,2), 
+          ranges=IRanges(start=c(16e6, 17e6), width=1e6)),
+  GRanges(seqnames=rep(22,2), 
+          ranges=IRanges(start=c(18e6, 20e6), width=1e6)))
+iterator <- SeqVarListIterator(seqData, variantRanges=gr)
+var.info <- list(variantInfo(iterator))
+i <- 2
+while(iterateFilter(iterator)) {
+    var.info[[i]] <- variantInfo(iterator)
+    i <- i + 1
+}
+lapply(var.info, head)
+@ 
+
+After the last iteration, any methods used on the iterator object will
+return 0 variants. The \Rfunction{resetIterator} method can be used to
+reset an iterator back to the beginning.
+
+<<>>=
+variantInfo(iterator)
+resetIterator(iterator)
+variantInfo(iterator)
+@ 
+
+<<>>=
+seqClose(gds)
+@ 
+
+
+\end{document}
