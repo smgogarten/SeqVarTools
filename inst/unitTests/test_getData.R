@@ -69,6 +69,18 @@ test_getGenotype_phased <- function() {
   seqClose(gds)
 }
 
+test_getGenotype_haploid <- function() {
+  gdsfmt::showfile.gds(closeall=TRUE)
+  gds <- seqOpen(system.file("extdata", "1KG_chrY.gds", package="SeqVarTools"))
+  geno <- seqGetData(gds, "genotype")
+  gc <- geno[1,,]
+  checkIdentical(gc, getGenotype(gds, use.names=FALSE))
+  dimnames(gc) <- list(sample=seqGetData(gds, "sample.id"),
+                       variant=seqGetData(gds, "variant.id"))
+  checkIdentical(gc, getGenotype(gds, use.names=TRUE))
+  seqClose(gds)
+}
+
 test_getGenotype_apply <- function() {
   gds <- SeqVarTools:::.testData()
   var.id <- 101:110
@@ -128,6 +140,24 @@ test_getGenotypeAlleles_phased <- function() {
                nrow=dim(geno)[2], ncol=dim(geno)[3])
   gc[gc == "NA/NA"] <- NA
   checkIdentical(gc, getGenotypeAlleles(gds, use.names=FALSE, sort=TRUE))
+  seqClose(gds)
+}
+
+test_getGenotypeAlleles_haploid <- function() {
+  gdsfmt::showfile.gds(closeall=TRUE)
+  gds <- seqOpen(system.file("extdata", "1KG_chrY.gds", package="SeqVarTools"))
+  gc <- seqGetData(gds, "genotype")[1,,]
+  alleles <- list(refChar(gds), altChar(gds, n=1), altChar(gds, n=2), altChar(gds, n=3), altChar(gds, n=4))
+  for (j in 1:nrow(gc)) {
+      for (a in 0:4) {
+          x <- gc[j,] %in% a
+          gc[j,x] <- alleles[[a+1]][x]
+      }
+  }
+  checkIdentical(gc, getGenotypeAlleles(gds, use.names=FALSE))
+  dimnames(gc) <- list(sample=seqGetData(gds, "sample.id"),
+                       variant=seqGetData(gds, "variant.id"))
+  checkIdentical(gc, getGenotypeAlleles(gds, use.names=TRUE))
   seqClose(gds)
 }
 

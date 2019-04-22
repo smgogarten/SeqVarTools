@@ -17,6 +17,10 @@
   queryHits(suppressWarnings(findOverlaps(gds.ranges, ranges)))
 }
 
+.ploidy <- function(gdsobj) {
+  seqSummary(gdsobj, "genotype", check="none", verbose=FALSE)$dim[1L]
+}
+
 .nSamp <- function(gdsobj) {
   #sum(seqGetFilter(gdsobj)$sample.sel)
   seqSummary(gdsobj, "genotype", check="none", verbose=FALSE)$seldim[2L]

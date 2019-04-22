@@ -46,19 +46,18 @@
   In \code{getGenotype}, genotypes are coded as in the VCF file, where "0/0" is homozygous
   reference, "0/1" is heterozygous for the first alternate allele, "0/2"
   is heterozygous for the second alternate allele, etc.
-
   Separators are
   "/" for unphased and "|" for phased.  If \code{sort=TRUE}, all
   returned genotypes will be unphased.
   Missing genotypes are coded as \code{NA}.
-  
-  Only diploid genotypes (the first two alleles at a given site) are returned.
+  Only haploid or diploid genotypes (the first two alleles at a given site) are returned.
 
   If the argument \code{n} to\code{alleleDosage} is a single integer, the same allele is counted for all variants. If \code{n} is a vector with length=number of variants in the current filter, a different allele is counted for each variant. If \code{n} is a list, more than one allele can be counted for each variant. For example, if \code{n[[1]]=c(1,3)}, genotypes "0/1" and "0/3" will each have a dosage of 1 and genotype "1/3" will have a dosage of 2.
 }
 
 \value{
-  \code{getGenotype} and \code{getGenotypeAlleles} return a character matrix with dimensions [sample,variant] containing diploid
+  \code{getGenotype} and \code{getGenotypeAlleles} return a character
+  matrix with dimensions [sample,variant] containing haploid or diploid
   genotypes.
 
   \code{getGenotype} returns alleles as "0", "1", "2", etc. indicating

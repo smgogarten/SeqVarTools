@@ -138,3 +138,13 @@
     \item Add method to return imputed dosage.
   }
 }
+\section{Changes in version 1.21.4}{
+  \itemize{
+    \item Add vignette describing iterators.
+  }
+}
+\section{Changes in version 1.21.5}{
+  \itemize{
+    \item getGenotype and getGenotypeAlleles work for haploid genotypes.
+  }
+}
