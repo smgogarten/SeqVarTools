@@ -2,23 +2,25 @@ library(logistf)
 
 test_lm <- function() {
     n <- 100
-    dat <- data.frame(outcome=rnorm(n),
-                      covarA=rnorm(n),
-                      covarB=sample(letters[1:3], n, replace=TRUE),
-                      genotype=sample(0:2, n, replace=TRUE))
+    set.seed(900); outcome <- rnorm(n)
+    set.seed(901); covarA <- rnorm(n)
+    set.seed(902); covarB <- sample(letters[1:3], n, replace=TRUE)
+    set.seed(903); genotype <- sample(0:2, n, replace=TRUE)
+    dat <- data.frame(outcome, covarA, covarB, genotype)
     model.string <- "outcome ~ covarA + covarB + genotype"
 
     res <- SeqVarTools:::.runRegression(model.string, dat, "linear")
     exp <- lm(model.string, dat)
     checkEquals(summary(exp)$coef["genotype",1:2], res[1:2], check.names=FALSE)
 }
-    
+
 test_glm <- function() {
     n <- 100
-    dat <- data.frame(outcome=rbinom(n,1,0.3),
-                      covarA=rnorm(n),
-                      covarB=sample(letters[1:3], n, replace=TRUE),
-                      genotype=sample(0:2, n, replace=TRUE))
+    set.seed(904); outcome <- rbinom(n,1,0.3)
+    set.seed(905); covarA <- rnorm(n)
+    set.seed(906); covarB <- sample(letters[1:3], n, replace=TRUE)
+    set.seed(907); genotype <- sample(0:2, n, replace=TRUE)
+    dat <- data.frame(outcome, covarA, covarB, genotype)
     model.string <- "outcome ~ covarA + covarB + genotype"
 
     res <- SeqVarTools:::.runRegression(model.string, dat, "logistic")
@@ -28,10 +30,11 @@ test_glm <- function() {
 
 test_firth <- function() {
     n <- 100
-    dat <- data.frame(outcome=rbinom(n,1,0.3),
-                      covarA=rnorm(n),
-                      covarB=sample(letters[1:3], n, replace=TRUE),
-                      genotype=sample(0:2, n, replace=TRUE))
+    set.seed(908); outcome <- rbinom(n,1,0.3)
+    set.seed(909); covarA <- rnorm(n)
+    set.seed(910); covarB <- sample(letters[1:3], n, replace=TRUE)
+    set.seed(911); genotype <- sample(0:2, n, replace=TRUE)
+    dat <- data.frame(outcome, covarA, covarB, genotype)
     model.string <- "outcome ~ covarA + covarB + genotype"
 
     res <- SeqVarTools:::.runFirth(model.string, dat, geno.index=5)
@@ -47,10 +50,10 @@ test_firth <- function() {
     require(Biobase)
     sample.id <- seqGetData(gds, "sample.id")
     n <- length(sample.id)
-    df <- data.frame(sample.id=seqGetData(gds, "sample.id"),
-                     outcome=(if (binary) rbinom(n,1,0.3) else rnorm(n)),
-                     covarA=rnorm(n),
-                     covarB=factor(sample(letters[1:3], n, replace=TRUE)),
+    set.seed(912); outcome <- rbinom(n,1,0.3)
+    set.seed(913); covarA <- rnorm(n)
+    set.seed(914); covarB <- sample(letters[1:3], n, replace=TRUE)
+    df <- data.frame(sample.id, outcome, covarA, covarB,
                      stringsAsFactors=FALSE)
     adf <- AnnotatedDataFrame(df)
 
@@ -150,10 +153,11 @@ test_freq_mono <- function() {
 
 test_firth_badindex <- function() {
     n <- 100
-    dat <- data.frame(outcome=rbinom(n,1,0.3),
-                      covarA=rnorm(n),
-                      covarB=sample(letters[1:3], n, replace=TRUE),
-                      genotype=sample(0:2, n, replace=TRUE))
+    set.seed(916); outcome <- rbinom(n,1,0.3)
+    set.seed(917); covarA <- rnorm(n)
+    set.seed(918); covarB <- sample(letters[1:3], n, replace=TRUE)
+    set.seed(919); genotype <- sample(0:2, n, replace=TRUE)
+    dat <- data.frame(outcome, covarA, covarB, genotype)
     model.string <- "outcome ~ covarA + covarB + genotype"
 
     exp <- logistf(as.formula(model.string), dat)

@@ -43,9 +43,8 @@ test_alleleFrequency_sex <- function() {
     
     gds <- seqOpen(gds.fn)
     sample.id <- seqGetData(gds, "sample.id")
-    df <- data.frame(sample.id=sample.id,
-                     sex=sample(c("M","F"), replace=TRUE, length(sample.id)),
-                     stringsAsFactors=FALSE)
+    set.seed(44); sex <- sample(c("M","F"), replace=TRUE, length(sample.id))
+    df <- data.frame(sample.id, sex, stringsAsFactors=FALSE)
     svd <- SeqVarData(gds, sampleData=Biobase::AnnotatedDataFrame(df))
 
     af <- alleleFrequency(svd)
@@ -106,9 +105,8 @@ test_alleleCount_sex <- function() {
     
     gds <- seqOpen(gds.fn)
     sample.id <- seqGetData(gds, "sample.id")
-    df <- data.frame(sample.id=sample.id,
-                     sex=sample(c("M","F"), replace=TRUE, length(sample.id)),
-                     stringsAsFactors=FALSE)
+    set.seed(55); sex <- sample(c("M","F"), replace=TRUE, length(sample.id))
+    df <- data.frame(sample.id, sex, stringsAsFactors=FALSE)
     svd <- SeqVarData(gds, sampleData=Biobase::AnnotatedDataFrame(df))
 
     ac <- alleleCount(svd)

@@ -1,18 +1,16 @@
 .testSampleData <- function(gds) {
     require(Biobase)
     sample.id <- seqGetData(gds, "sample.id")
-    df <- data.frame(sample.id=sample.id,
-                     sex=sample(c("M","F"), replace=TRUE, length(sample.id)),
-                     stringsAsFactors=FALSE)
+    set.seed(66); sex <- sample(c("M","F"), replace=TRUE, length(sample.id))
+    df <- data.frame(sample.id, sex, stringsAsFactors=FALSE)
     AnnotatedDataFrame(df)
 }
 
 .testVariantData <- function(gds) {
     require(Biobase)
     variant.id <- seqGetData(gds, "variant.id")
-    df <- data.frame(variant.id=variant.id,
-                     weight=runif(length(variant.id)),
-                     stringsAsFactors=FALSE)
+    set.seed(77); weight <- runif(length(variant.id))
+    df <- data.frame(variant.id, weight, stringsAsFactors=FALSE)
     AnnotatedDataFrame(df)
 }
 
@@ -130,7 +128,7 @@ test_validateSex <- function() {
     sdf <- .testSampleData(svd)
     sampleData(svd) <- sdf
     checkTrue(!is.null(validateSex(svd)))
-    sampleData(svd)$sex <- sample(c(1,2,NA), nrow(sdf), replace=TRUE)
+    set.seed(88); sampleData(svd)$sex <- sample(c(1,2,NA), nrow(sdf), replace=TRUE)
     checkTrue(setequal(c("M","F",NA), validateSex(svd)))
     seqClose(svd)
 }
