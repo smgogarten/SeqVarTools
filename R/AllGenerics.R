@@ -88,6 +88,10 @@ setGeneric("alleleCount",
            function(gdsobj, ...)
              standardGeneric("alleleCount"))
 
+setGeneric("minorAlleleCount",
+           function(gdsobj, ...)
+             standardGeneric("minorAlleleCount"))
+
 setGeneric("missingGenotypeRate",
            function(gdsobj, ...)
              standardGeneric("missingGenotypeRate"))

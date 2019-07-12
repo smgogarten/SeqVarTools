@@ -264,3 +264,77 @@ setMethod("alleleCount",
 
               count
           })
+
+
+setMethod("minorAlleleCount",
+          "SeqVarData",
+          function(gdsobj, use.names=FALSE, sex.adjust=TRUE, genome.build=c("hg19", "hg38")) {
+              mac <- function(gdsobj, use.names=use.names) {
+                  ref.cnt <- alleleCount(gdsobj, n=0, use.names=use.names)
+                  n.obs <- .nSampObserved(gdsobj)
+                  pmin(ref.cnt, 2*n.obs - ref.cnt)
+              }
+              
+              if (!sex.adjust) {
+                  return(mac(gdsobj, use.names=use.names))
+              }
+              
+              # check chromosome
+              chr <- chromWithPAR(gdsobj, genome.build)
+              if (!any(chr %in% c("X", "Y"))) {
+                  return(mac(gdsobj, use.names=use.names))
+              }
+
+              # check sex
+              sex <- validateSex(gdsobj)
+              if (is.null(sex)) {
+                  warning("No valid sex coding provided in sampleData. Counts will not be calculated correctly for X and Y chromosomes.")
+                  return(mac(gdsobj, use.names=use.names))
+              }
+              female <- sex %in% "F"
+              male <- sex %in% "M"
+
+              # empty vector to fill in
+              count <- rep(NA, length(chr))
+              possible <- rep(NA, length(chr))
+              if (use.names) names(count) <- seqGetData(gdsobj, "variant.id")
+
+              # autosomal
+              auto <- !(chr %in% c("X", "Y"))
+              if (any(auto)) {
+                  seqSetFilter(gdsobj, variant.sel=auto, action="push+intersect", verbose=FALSE)
+                  count[auto] <- seqAlleleCount(gdsobj)
+                  possible[auto] <- 2 * .nSampObserved(gdsobj)
+                  seqSetFilter(gdsobj, action="pop", verbose=FALSE)
+              }
+              
+              # X chrom
+              X <- chr %in% "X"
+              if (any(X)) {
+                  seqSetFilter(gdsobj, sample.sel=female, variant.sel=X, action="push+intersect", verbose=FALSE)
+                  count.X.F <- seqAlleleCount(gdsobj)
+                  possible.X.F <- 2 * .nSampObserved(gdsobj)
+                  seqSetFilter(gdsobj, action="pop", verbose=FALSE)
+              
+                  seqSetFilter(gdsobj, sample.sel=male, variant.sel=X, action="push+intersect", verbose=FALSE)
+                  count.X.M <- seqAlleleCount(gdsobj)
+                  count.X.M <- count.X.M / 2 ## correct for X chromosome coded as diploid in males
+                  possible.X.M <- .nSampObserved(gdsobj)
+                  seqSetFilter(gdsobj, action="pop", verbose=FALSE)
+                  
+                  count[X] <- count.X.F + count.X.M
+                  possible[X] <- possible.X.F + possible.X.M
+              }
+
+              # Y chrom
+              Y <- chr %in% "Y"
+              if (any(Y)) {
+                  seqSetFilter(gdsobj, sample.sel=male, variant.sel=Y, action="push+intersect", verbose=FALSE)
+                  count[Y] <- seqAlleleCount(gdsobj)
+                  count[Y] <- count[Y] / 2 ## correct for Y chromosome coded as diploid in males
+                  possible[Y] <- .nSampObserved(gdsobj)
+                  seqSetFilter(gdsobj, action="pop", verbose=FALSE)
+              }
+
+              pmin(count, possible - count)
+          })

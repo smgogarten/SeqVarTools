@@ -126,6 +126,13 @@ test_alleleCount_sex <- function() {
     Y <- chr == "Y"
     checkEquals(0.5*colSums(geno[male,Y], na.rm=TRUE), ac[Y])
 
+    # MAC
+    mac <- minorAlleleCount(svd)
+    ac.alt <- alleleCount(svd, n=1) + alleleCount(svd, n=2)
+    minor <- ac < ac.alt
+    checkEquals(ac[minor], mac[minor])
+    checkEquals(ac.alt[!minor], mac[!minor])
+    
     # PAR
     checkTrue(all(chr[1:3] == "PAR"))
     checkEquals(colSums(geno[,1:3], na.rm=TRUE), ac[1:3])

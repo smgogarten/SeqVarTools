@@ -5,6 +5,8 @@
 \alias{alleleCount}
 \alias{alleleCount,SeqVarGDSClass-method}
 \alias{alleleCount,SeqVarData-method}
+\alias{minorAlleleCount}
+\alias{minorAlleleCount,SeqVarData-method}
 
 \title{Allele frequency}
 
@@ -15,6 +17,7 @@
 \S4method{alleleFrequency}{SeqVarData}(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, genome.build=c("hg19", "hg38"))
 \S4method{alleleCount}{SeqVarGDSClass}(gdsobj, n=0, use.names=FALSE)
 \S4method{alleleCount}{SeqVarData}(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, genome.build=c("hg19", "hg38"))
+\S4method{minorAlleleCount}{SeqVarData}(gdsobj, use.names=FALSE, sex.adjust=TRUE, genome.build=c("hg19", "hg38"))
 }
 
 \arguments{
@@ -33,6 +36,8 @@
   \code{n}.  Default is the reference allele frequency (\code{n=0}).
 
   The \code{\link{SeqVarData}} method will calculate frequency and count correctly for X and Y chromosomes, provided a column "sex" is included in the sampleData slot with values "M"/"F" or 1/2. Arguments given to this method are passed to the parent method for \code{\link{SeqVarGDSClass}}. The assumption is that genotypes for males on sex chromosomes are coded as diploid, "0/0" or "1/1". If this is not the case, use \code{sex.adjust=FALSE}.
+
+  For multiallelic variants, the minor allele count will be the smaller of the reference allele count or the sum of all alternate allele counts. 
 }
 
 \value{
