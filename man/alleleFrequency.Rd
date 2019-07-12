@@ -6,6 +6,7 @@
 \alias{alleleCount,SeqVarGDSClass-method}
 \alias{alleleCount,SeqVarData-method}
 \alias{minorAlleleCount}
+\alias{minorAlleleCount,SeqVarGDSClass-method}
 \alias{minorAlleleCount,SeqVarData-method}
 
 \title{Allele frequency}

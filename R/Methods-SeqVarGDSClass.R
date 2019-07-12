@@ -417,6 +417,17 @@ setMethod("alleleCount",
             ac
           })
 
+setMethod("minorAlleleCount",
+          "SeqVarGDSClass",
+          function(gdsobj, use.names=FALSE) {
+              ref.cnt <- seqAlleleCount(gdsobj)
+              n.obs <- .nSampObserved(gdsobj)
+              ac <- pmin(ref.cnt, 2*n.obs - ref.cnt)
+              if (use.names)
+                  names(ac) <- seqGetData(gdsobj, "variant.id")
+              ac
+          })
+
 setMethod("missingGenotypeRate",
           "SeqVarGDSClass",
           function(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE) {

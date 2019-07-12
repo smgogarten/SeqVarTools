@@ -269,27 +269,21 @@ setMethod("alleleCount",
 setMethod("minorAlleleCount",
           "SeqVarData",
           function(gdsobj, use.names=FALSE, sex.adjust=TRUE, genome.build=c("hg19", "hg38")) {
-              mac <- function(gdsobj, use.names=use.names) {
-                  ref.cnt <- alleleCount(gdsobj, n=0, use.names=use.names)
-                  n.obs <- .nSampObserved(gdsobj)
-                  pmin(ref.cnt, 2*n.obs - ref.cnt)
-              }
-              
               if (!sex.adjust) {
-                  return(mac(gdsobj, use.names=use.names))
+                  return(callNextMethod(gdsobj, use.names=use.names))
               }
               
               # check chromosome
               chr <- chromWithPAR(gdsobj, genome.build)
               if (!any(chr %in% c("X", "Y"))) {
-                  return(mac(gdsobj, use.names=use.names))
+                  return(callNextMethod(gdsobj, use.names=use.names))
               }
 
               # check sex
               sex <- validateSex(gdsobj)
               if (is.null(sex)) {
                   warning("No valid sex coding provided in sampleData. Counts will not be calculated correctly for X and Y chromosomes.")
-                  return(mac(gdsobj, use.names=use.names))
+                  return(callNextMethod(gdsobj, use.names=use.names))
               }
               female <- sex %in% "F"
               male <- sex %in% "M"
