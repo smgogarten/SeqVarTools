@@ -209,7 +209,7 @@ test_altDosage <- function() {
   checkEquals(hasalt & hasref, as.vector(d == 1))
   checkEquals(geno == "0/0", d == 0)
   checkIdentical(is.na(geno), is.na(d))
-  checkIdentical(refDosage(gds), 2-d)
+  checkEquals(refDosage(gds), 2-d)
   seqClose(gds)
 }
 

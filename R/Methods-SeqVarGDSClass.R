@@ -163,14 +163,18 @@ setMethod("refDosage",
           "SeqVarGDSClass",
           function(gdsobj, use.names=TRUE, ...) {
             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
-            d <- seqBlockApply(gdsobj, "genotype",
-                               function(x) {colSums(x == 0)},
-                               margin="by.variant", as.is="list", ...)
-            d <- do.call(cbind, d)
+            ## d <- seqBlockApply(gdsobj, "genotype",
+            ##                    function(x) {colSums(x == 0)},
+            ##                    margin="by.variant", as.is="list", ...)
+            ## d <- do.call(cbind, d)
+            d <- seqGetData(gdsobj, "$dosage", ...)
             if (use.names) {
-                dimnames(d) <- list(sample=NULL, variant=NULL)
-                .applyNames(gdsobj, d)
-            } else d
+                #dimnames(d) <- list(sample=NULL, variant=NULL)
+                d <- .applyNames(gdsobj, d)
+            } else {
+                dimnames(d) <- NULL
+            }
+            d
           })
 
 setMethod("altDosage",
@@ -190,6 +194,21 @@ setMethod("altDosage",
                 .applyNames(gdsobj, d)
             } else d
           })
+
+## uses too much memory
+## setMethod("altDosage2",
+##           "SeqVarGDSClass",
+##           function(gdsobj, use.names=TRUE, sparse=FALSE, ...) {
+##             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
+##             d <- seqGetData(gdsobj, "$dosage_alt", ...)
+##             if (sparse) d <- Matrix(d, sparse=TRUE)
+##             if (use.names) {
+##                 d <- .applyNames(gdsobj, d)
+##             } else {
+##                 dimnames(d) <- if (sparse) list(NULL,NULL) else NULL
+##             }
+##             d
+##           })
 
 setMethod("alleleDosage",
           c("SeqVarGDSClass", "numeric"),
