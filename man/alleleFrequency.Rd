@@ -15,10 +15,10 @@
 
 \usage{
 \S4method{alleleFrequency}{SeqVarGDSClass}(gdsobj, n=0, use.names=FALSE)
-\S4method{alleleFrequency}{SeqVarData}(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, genome.build=c("hg19", "hg38"))
+\S4method{alleleFrequency}{SeqVarData}(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, male.diploid=TRUE, genome.build=c("hg19", "hg38"))
 \S4method{alleleCount}{SeqVarGDSClass}(gdsobj, n=0, use.names=FALSE)
-\S4method{alleleCount}{SeqVarData}(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, genome.build=c("hg19", "hg38"))
-\S4method{minorAlleleCount}{SeqVarData}(gdsobj, use.names=FALSE, sex.adjust=TRUE, genome.build=c("hg19", "hg38"))
+\S4method{alleleCount}{SeqVarData}(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, male.diploid=TRUE, genome.build=c("hg19", "hg38"))
+\S4method{minorAlleleCount}{SeqVarData}(gdsobj, use.names=FALSE, sex.adjust=TRUE, male.diploid=TRUE, genome.build=c("hg19", "hg38"))
 }
 
 \arguments{
@@ -29,14 +29,15 @@
   \item{use.names}{A logical indicating whether to assign variant IDs
     as names of the output vector.}
   \item{sex.adjust}{Logical for whether to adjust frequency calculations based on sex. If \code{TRUE}, X chromosome frequency (excluding the PAR) will be calculated assuming the dosage of the specifed allele for males is half that for females. Y chromosome frequency will be calculated using males only.}
-  \item{genome.build}{A character sting indicating genome build.}
+  \item{male.diploid}{Logical for whether males on sex chromosomes are coded as diploid.}
+  \item{genome.build}{A character sting indicating genome build; used to identify pseudoautosomal regions on the X and Y chromosomes.}
 }
 
 \details{
   Frequency or count can be calculated over any allele, specified by the argument
   \code{n}.  Default is the reference allele frequency (\code{n=0}).
 
-  The \code{\link{SeqVarData}} method will calculate frequency and count correctly for X and Y chromosomes, provided a column "sex" is included in the sampleData slot with values "M"/"F" or 1/2. Arguments given to this method are passed to the parent method for \code{\link{SeqVarGDSClass}}. The assumption is that genotypes for males on sex chromosomes are coded as diploid, "0/0" or "1/1". If this is not the case, use \code{sex.adjust=FALSE}.
+  The \code{\link{SeqVarData}} method will calculate frequency and count correctly for X and Y chromosomes, provided a column "sex" is included in the sampleData slot with values "M"/"F" or 1/2. Arguments given to this method are passed to the parent method for \code{\link{SeqVarGDSClass}}. If the ploidy of the "genotype" node in the GDS file is 2, the default assumption is that genotypes for males on sex chromosomes are coded as diploid, "0/0" or "1/1". If this is not the case, use \code{male.diploid=FALSE}.
 
   For multiallelic variants, the minor allele count will be the smaller of the reference allele count or the sum of all alternate allele counts. 
 }

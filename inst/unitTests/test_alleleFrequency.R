@@ -27,7 +27,7 @@ test_alleleFrequency_apply <- function() {
   seqClose(gds)
 }
 
-test_alleleFrequency_sex <- function() {
+.testGdsXY <- function() {
     # make up file with sex chroms
     gds.fn <- tempfile()
     invisible(file.copy(seqExampleFileName("gds"), gds.fn))
@@ -40,23 +40,34 @@ test_alleleFrequency_sex <- function() {
     write.gdsn(node, chr)
     closefn.gds(gds)
     seqOptimize(gds.fn, target="chromosome", verbose=FALSE)
-    
     gds <- seqOpen(gds.fn)
     sample.id <- seqGetData(gds, "sample.id")
     set.seed(44); sex <- sample(c("M","F"), replace=TRUE, length(sample.id))
     df <- data.frame(sample.id, sex, stringsAsFactors=FALSE)
-    svd <- SeqVarData(gds, sampleData=Biobase::AnnotatedDataFrame(df))
+    SeqVarData(gds, sampleData=Biobase::AnnotatedDataFrame(df))
+}
+
+.cleanupGds <- function(gds) {
+    fn <- seqSummary(gds, check="none", verbose=FALSE)$filename
+    seqClose(gds)
+    unlink(fn)
+}
+
+
+test_alleleFrequency_sex <- function() {
+    svd <- .testGdsXY()
+    sex <- sampleData(svd)$sex
 
     af <- alleleFrequency(svd)
 
     geno <- refDosage(svd, use.names=FALSE)
-    chr <- chromWithPAR(gds)
+    chr <- chromWithPAR(svd)
     auto <- chr %in% 1:22
     checkEquals(0.5*colMeans(geno[,auto], na.rm=TRUE), af[auto])
     
     X <- chr == "X"
-    female <- df$sex == "F"
-    male <- df$sex == "M"
+    female <- sex == "F"
+    male <- sex == "M"
     F.count <- colSums(geno[female, X], na.rm=TRUE)
     F.nsamp <- colSums(!is.na(geno[female, X]))
     M.count <- 0.5*colSums(geno[male, X], na.rm=TRUE)
@@ -74,8 +85,7 @@ test_alleleFrequency_sex <- function() {
     af <- alleleFrequency(svd, use.names=TRUE)
     checkEquals(as.character(seqGetData(svd, "variant.id")), names(af))
     
-    seqClose(gds)
-    unlink(gds.fn)
+    .cleanupGds(svd)
 }
 
 test_alleleFrequency_nosex <- function() {
@@ -90,35 +100,19 @@ test_alleleFrequency_nosex <- function() {
 
 
 test_alleleCount_sex <- function() {
-    # make up file with sex chroms
-    gds.fn <- tempfile()
-    invisible(file.copy(seqExampleFileName("gds"), gds.fn))
-    gds <- openfn.gds(gds.fn, readonly=FALSE)
-    node <- index.gdsn(gds, "chromosome")
-    compression.gdsn(node, "")
-    chr <- read.gdsn(node)
-    chr[chr == 1] <- "X"
-    chr[chr == 2] <- "Y"
-    write.gdsn(node, chr)
-    closefn.gds(gds)
-    seqOptimize(gds.fn, target="chromosome", verbose=FALSE)
-    
-    gds <- seqOpen(gds.fn)
-    sample.id <- seqGetData(gds, "sample.id")
-    set.seed(55); sex <- sample(c("M","F"), replace=TRUE, length(sample.id))
-    df <- data.frame(sample.id, sex, stringsAsFactors=FALSE)
-    svd <- SeqVarData(gds, sampleData=Biobase::AnnotatedDataFrame(df))
+    svd <- .testGdsXY()
+    sex <- sampleData(svd)$sex
 
     ac <- alleleCount(svd)
 
     geno <- refDosage(svd, use.names=FALSE)
-    chr <- chromWithPAR(gds)
+    chr <- chromWithPAR(svd)
     auto <- chr %in% 1:22
     checkEquals(colSums(geno[,auto], na.rm=TRUE), ac[auto])
     
     X <- chr == "X"
-    female <- df$sex == "F"
-    male <- df$sex == "M"
+    female <- sex == "F"
+    male <- sex == "M"
     F.count <- colSums(geno[female, X], na.rm=TRUE)
     M.count <- 0.5*colSums(geno[male, X], na.rm=TRUE)
     checkEquals((F.count + M.count), ac[X])
@@ -141,6 +135,38 @@ test_alleleCount_sex <- function() {
     ac <- alleleCount(svd, use.names=TRUE)
     checkEquals(as.character(seqGetData(svd, "variant.id")), names(ac))
     
-    seqClose(gds)
-    unlink(gds.fn)
+    .cleanupGds(svd)
 }
+
+
+test_1KG_Y <- function() {
+    gdsfmt::showfile.gds(closeall=TRUE, verbose=FALSE)
+    gds.fn <- system.file("extdata", "1KG_chrY.gds", package="SeqVarTools")
+    
+    gds <- seqOpen(gds.fn)
+    sample.id <- seqGetData(gds, "sample.id")
+    df <- data.frame(sample.id, sex="M", stringsAsFactors=FALSE)
+    svd <- SeqVarData(gds, sampleData=Biobase::AnnotatedDataFrame(df))
+
+    af <- alleleFrequency(svd)
+
+    geno <- refDosage(svd, use.names=FALSE)
+    chr <- chromWithPAR(gds)
+    checkTrue(all(chr == "Y"))
+    
+    checkEquals(colMeans(geno, na.rm=TRUE), af)
+
+    # AC
+    ac <- alleleCount(svd)
+    checkEquals(colSums(geno, na.rm=TRUE), ac)
+
+    # MAC
+    mac <- minorAlleleCount(svd)
+    ac.alt <- alleleCount(svd, n=1) + alleleCount(svd, n=2) + alleleCount(svd, n=3) + alleleCount(svd, n=4) 
+    minor <- ac < ac.alt
+    checkEquals(ac[minor], mac[minor])
+    checkEquals(ac.alt[!minor], mac[!minor])
+    
+    seqClose(gds)
+}
+
