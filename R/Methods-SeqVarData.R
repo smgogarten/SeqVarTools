@@ -185,7 +185,7 @@ setMethod("alleleFrequency",
                   n.F <- .nSampObserved(gdsobj)
                   #count.X.F <- freq.X.F * 2*n.F
                   count.X.F <- seqAlleleCount(gdsobj, ref.allele=n)
-                  count.X.F[is.na(count.X.F)] <- 0
+                  count.X.F[is.na(count.X.F)] <- 0L
                   seqSetFilter(gdsobj, action="pop", verbose=FALSE)
               
                   seqSetFilter(gdsobj, sample.sel=male, variant.sel=X, action="push+intersect", verbose=FALSE)
@@ -196,7 +196,7 @@ setMethod("alleleFrequency",
                   if (male.diploid) {
                       count.X.M <- count.X.M / 2
                   }
-                  count.X.M[is.na(count.X.M)] <- 0
+                  count.X.M[is.na(count.X.M)] <- 0L
                   seqSetFilter(gdsobj, action="pop", verbose=FALSE)
                   
                   freq[X] <- (count.X.F + count.X.M)/(2*n.F + n.M)
@@ -320,7 +320,7 @@ setMethod("minorAlleleCount",
               if (any(auto)) {
                   seqSetFilter(gdsobj, variant.sel=auto, action="push+intersect", verbose=FALSE)
                   count[auto] <- seqAlleleCount(gdsobj)
-                  possible[auto] <- 2 * .nSampObserved(gdsobj)
+                  possible[auto] <- 2L * .nSampObserved(gdsobj)
                   seqSetFilter(gdsobj, action="pop", verbose=FALSE)
               }
               
@@ -329,7 +329,7 @@ setMethod("minorAlleleCount",
               if (any(X)) {
                   seqSetFilter(gdsobj, sample.sel=female, variant.sel=X, action="push+intersect", verbose=FALSE)
                   count.X.F <- seqAlleleCount(gdsobj)
-                  possible.X.F <- 2 * .nSampObserved(gdsobj)
+                  possible.X.F <- 2L * .nSampObserved(gdsobj)
                   seqSetFilter(gdsobj, action="pop", verbose=FALSE)
               
                   seqSetFilter(gdsobj, sample.sel=male, variant.sel=X, action="push+intersect", verbose=FALSE)

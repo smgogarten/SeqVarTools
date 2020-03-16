@@ -430,7 +430,7 @@ setMethod("alleleCount",
           function(gdsobj, n=0, use.names=FALSE) {
             ac <- seqAlleleCount(gdsobj, ref.allele=n)
             ## count of alt=2, etc. should be 0 if there is no such allele
-            ac[is.na(ac)] <- 0
+            ac[is.na(ac)] <- 0L
             if (use.names)
               names(ac) <- seqGetData(gdsobj, "variant.id")
             ac
@@ -441,7 +441,7 @@ setMethod("minorAlleleCount",
           function(gdsobj, use.names=FALSE) {
               ref.cnt <- seqAlleleCount(gdsobj)
               n.obs <- .nSampObserved(gdsobj)
-              ac <- pmin(ref.cnt, 2*n.obs - ref.cnt)
+              ac <- pmin(ref.cnt, 2L*n.obs - ref.cnt)
               if (use.names)
                   names(ac) <- seqGetData(gdsobj, "variant.id")
               ac

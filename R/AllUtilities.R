@@ -42,9 +42,9 @@
 .nSampObserved <- function(gdsobj) {
   ns <- .nSamp(gdsobj)
   if (ns > 0) {
-      return(ns * (1-seqMissing(gdsobj)))
+      return(as.integer(round(ns * (1-seqMissing(gdsobj)))))
   } else {
-      return(rep(0, .nVar(gdsobj)))
+      return(rep(0L, .nVar(gdsobj)))
   }
 }
 
