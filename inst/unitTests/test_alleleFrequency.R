@@ -170,3 +170,30 @@ test_1KG_Y <- function() {
     seqClose(gds)
 }
 
+
+test_alleleCount_allF <- function() {
+    svd <- .testGdsXY()
+    sex <- sampleData(svd)$sex
+    seqSetFilter(svd, sample.sel=(sex == "F"), verbose=FALSE)
+
+    ac <- alleleCount(svd)
+
+    geno <- refDosage(svd, use.names=FALSE)
+    chr <- chromWithPAR(svd)
+    
+    X <- chr == "X"
+    F.count <- colSums(geno[, X], na.rm=TRUE)
+    checkEquals((F.count), ac[X])
+
+    Y <- chr == "Y"
+    checkTrue(all(ac[Y] == 0))
+
+    # MAC
+    mac <- minorAlleleCount(svd)
+    ac.alt <- alleleCount(svd, n=1) + alleleCount(svd, n=2)
+    minor <- ac < ac.alt
+    checkEquals(ac[minor], mac[minor])
+    checkEquals(ac.alt[!minor], mac[!minor])
+    
+    .cleanupGds(svd)
+}

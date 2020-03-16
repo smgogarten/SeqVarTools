@@ -67,3 +67,19 @@ test_emptyGenoMatrix <- function() {
 
     seqClose(gds)
 }
+
+test_nSampObserved <- function() {
+    gds <- SeqVarTools:::.testData()
+    nso <- SeqVarTools:::.nSampObserved(gds)
+    checkEquals(SeqVarTools:::.nVar(gds), length(nso))
+    checkEquals(SeqVarTools:::.nSamp(gds), max(nso))
+    seqClose(gds)
+}
+
+test_nSamp_empty <- function() {
+    gds <- SeqVarTools:::.testData()
+    seqSetFilter(gds, sample.sel=rep(SeqVarTools:::.nSamp(gds), FALSE), verbose=FALSE)
+    checkEquals(0, SeqVarTools:::.nSamp(gds))
+    checkEquals(rep(0, SeqVarTools:::.nVar(gds)), SeqVarTools:::.nSampObserved(gds))
+    seqClose(gds)
+}

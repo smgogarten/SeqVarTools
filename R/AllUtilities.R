@@ -40,7 +40,12 @@
 }
 
 .nSampObserved <- function(gdsobj) {
-  .nSamp(gdsobj) * (1-seqMissing(gdsobj))
+  ns <- .nSamp(gdsobj)
+  if (ns > 0) {
+      return(ns * (1-seqMissing(gdsobj)))
+  } else {
+      return(rep(0, .nVar(gdsobj)))
+  }
 }
 
 .emptySampFilter <- function(x, verbose=FALSE) {
