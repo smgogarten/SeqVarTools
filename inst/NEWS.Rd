@@ -148,3 +148,13 @@
     \item getGenotype and getGenotypeAlleles work for haploid genotypes.
   }
 }
+\section{Changes in version 1.23.1}{
+  \itemize{
+    \item Add minorAlleleCount method.
+  }
+}
+\section{Changes in version 1.25.1}{
+  \itemize{
+    \item Bug fix in minorAlleleCount when all samples have the same sex.
+  }
+}
