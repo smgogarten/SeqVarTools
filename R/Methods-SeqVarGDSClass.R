@@ -370,8 +370,10 @@ setMethod("imputedDosage",
             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
 
             d <- seqGetData(gdsobj, paste0("annotation/format/", dosage.field))
-            if (!all(d$length == 1)) stop("multiple dosage values per variant")
-            d <- d$data
+            if (!is.null(names(d))) {
+                if (!all(d$length == 1)) stop("multiple dosage values per variant")
+                d <- d$data
+            }
             if (use.names) {
                 dimnames(d) <- list(sample=NULL, variant=NULL)
                 .applyNames(gdsobj, d)

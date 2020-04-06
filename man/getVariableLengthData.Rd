@@ -69,19 +69,6 @@ head(gl.array[1,,])
 head(gl.array[2,,])
 head(gl.array[3,,])
 
-## genotype dosage
-ds <- seqGetData(gds, "annotation/format/DS")
-names(ds)
-ds$length
-## 1 value per variant
-dim(ds$data)
-## 85 samples (rows) and 9 variants (columns)
-
-ds.array <- getVariableLengthData(gds, "annotation/format/DS")
-dim(ds.array)
-## 85 samples x 9 variants
-head(ds.array)
-
 seqClose(gds)
 }
 
