@@ -9,13 +9,15 @@
 }
 
 \usage{
-\S4method{isVariant}{SeqVarGDSClass}(gdsobj, use.names=FALSE)
+\S4method{isVariant}{SeqVarGDSClass}(gdsobj, use.names=FALSE, parallel=FALSE)
 }
 
 \arguments{
   \item{gdsobj}{A \code{\link{SeqVarGDSClass}} object with VCF data.}
   \item{use.names}{A logical indicating whether to assign sample and
     variant IDs as dimnames of the resulting matrix.}
+  \item{parallel}{Logical, numeric, or other value to control parallel
+    processing; see \code{\link{seqParallel}} for details.}
 }
 
 \details{

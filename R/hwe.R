@@ -9,8 +9,8 @@
 
 setMethod("hwe",
           "SeqVarGDSClass",
-          function(gdsobj, permute=FALSE) {
-              counts <- .countGenotypes(gdsobj, permute)
+          function(gdsobj, permute=FALSE, parallel=FALSE) {
+              counts <- .countGenotypes(gdsobj, permute, parallel=parallel)
 
               afreq <- (2*counts$nAA + counts$nAa) / (2*rowSums(counts))
               p <- HWExact(counts)

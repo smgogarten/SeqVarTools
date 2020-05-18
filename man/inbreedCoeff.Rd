@@ -7,7 +7,8 @@
 \description{Calculates the inbreeding coefficient by variant or by sample}
 
 \usage{
-\S4method{inbreedCoeff}{SeqVarGDSClass}(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE)
+\S4method{inbreedCoeff}{SeqVarGDSClass}(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE,
+    parallel=FALSE)
 }
 
 \arguments{
@@ -17,6 +18,8 @@
     for each variant, or over all variants for each sample.}
   \item{use.names}{A logical indicating whether to assign variant or
     sample IDs as names of the output vector.}
+  \item{parallel}{Logical, numeric, or other value to control parallel
+    processing; see \code{\link{seqParallel}} for details.}
 }
 
 \details{

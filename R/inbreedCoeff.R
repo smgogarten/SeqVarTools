@@ -1,10 +1,10 @@
 
 setMethod("inbreedCoeff",
           "SeqVarGDSClass",
-          function(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE) {           
+          function(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE, parallel=FALSE) {           
             margin <- match.arg(margin)
             if (margin == "by.variant") {
-              counts <- .countGenotypes(gdsobj)
+              counts <- .countGenotypes(gdsobj, parallel=parallel)
               f <- .f(counts)
               if (use.names)
                 names(f) <- seqGetData(gdsobj, "variant.id")
@@ -24,7 +24,7 @@ setMethod("inbreedCoeff",
                 n <<- n + is.finite(d)           # output to the global variable "n"
                 d[!is.finite(d)] <- 0
                 s <<- s + d                      # output to the global variable "s"
-              }, margin="by.variant", as.is="none")
+              }, margin="by.variant", as.is="none", parallel=parallel)
 
               ## output
               ic <- s / n

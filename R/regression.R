@@ -80,7 +80,7 @@
 setMethod("regression",
           "SeqVarData",
           function(gdsobj, outcome, covar=NULL,
-                   model.type=c("linear", "logistic", "firth")) {
+                   model.type=c("linear", "logistic", "firth"), parallel=FALSE) {
               model.type <- match.arg(model.type)
               
               ## get covariates
@@ -117,7 +117,7 @@ setMethod("regression",
                       }
                   }
                   c(freq, setNames(reg, .outputNames(model.type)))
-              }, margin="by.variant", as.is="list")
+              }, margin="by.variant", as.is="list", parallel=parallel)
               res <- do.call(rbind, res)
               data.frame(variant.id=seqGetData(gdsobj, "variant.id"), res,
                          stringsAsFactors=FALSE)

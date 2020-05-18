@@ -1,7 +1,7 @@
 
 setMethod("refFrac",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=TRUE) {
+          function(gdsobj, use.names=TRUE, parallel=FALSE) {
             vars <- seqSummary(gdsobj, "annotation/format", check="none", verbose=FALSE)$ID
             if (!("AD" %in% vars)) {
               stop("annotation/format/AD must be present to compute allelic balance")
@@ -9,7 +9,7 @@ setMethod("refFrac",
             
             rf <- seqApply(gdsobj, "annotation/format/AD",
                            function(x) {x[,1] / rowSums(x)},
-                           margin="by.variant", as.is="list")
+                           margin="by.variant", as.is="list", parallel=parallel)
             rf <- matrix(unlist(rf), ncol=length(rf),
                          dimnames=list(sample=NULL, variant=NULL))
             if (use.names) .applyNames(gdsobj, rf) else rf
@@ -18,7 +18,7 @@ setMethod("refFrac",
 
 setMethod("refFracOverHets",
           "SeqVarGDSClass",
-          function(gdsobj, FUN=mean, use.names=TRUE) {
+          function(gdsobj, FUN=mean, use.names=TRUE, parallel=FALSE) {
             vars <- seqSummary(gdsobj, "annotation/format", check="none", verbose=FALSE)$ID
             if (!("AD" %in% vars)) {
               stop("annotation/format/AD must be present to compute allelic balance")
@@ -31,7 +31,7 @@ setMethod("refFracOverHets",
                              FUN(x$ad[het,1,drop=FALSE] /
                                  rowSums(x$ad[het,,drop=FALSE]), na.rm=TRUE)
                            },
-                           margin="by.variant", as.is="double")   
+                           margin="by.variant", as.is="double", parallel=parallel)   
             if (use.names)
               names(rf) <- seqGetData(gdsobj, "variant.id")
             rf

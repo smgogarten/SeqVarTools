@@ -13,8 +13,8 @@
 }
 
 \usage{
-\S4method{refFrac}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
-\S4method{refFracOverHets}{SeqVarGDSClass}(gdsobj, FUN=mean, use.names=TRUE)
+\S4method{refFrac}{SeqVarGDSClass}(gdsobj, use.names=TRUE, parallel=FALSE)
+\S4method{refFracOverHets}{SeqVarGDSClass}(gdsobj, FUN=mean, use.names=TRUE, parallel=FALSE)
 \S4method{refFracPlot}{SeqVarGDSClass}(gdsobj, variant.id, highlight=NULL, ...)
 }
 
@@ -23,6 +23,8 @@
   \item{FUN}{The function to apply over heterozygote calls (mean or median).}
   \item{use.names}{A logical indicating whether to assign variant or
     samples IDs as names of the output vector.}
+  \item{parallel}{Logical, numeric, or other value to control parallel
+    processing; see \code{\link{seqParallel}} for details.}
   \item{variant.id}{A vector of variant.ids to plot.}
   \item{highlight}{A list of sample.ids to highlight with sequential integers on each plot}
   \item{...}{Additional arguments passed to \code{\link{plot}}.}

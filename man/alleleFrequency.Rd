@@ -14,11 +14,14 @@
 \description{Calculate allele frequency for each variant}
 
 \usage{
-\S4method{alleleFrequency}{SeqVarGDSClass}(gdsobj, n=0, use.names=FALSE)
-\S4method{alleleFrequency}{SeqVarData}(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, male.diploid=TRUE, genome.build=c("hg19", "hg38"))
-\S4method{alleleCount}{SeqVarGDSClass}(gdsobj, n=0, use.names=FALSE)
-\S4method{alleleCount}{SeqVarData}(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, male.diploid=TRUE, genome.build=c("hg19", "hg38"))
-\S4method{minorAlleleCount}{SeqVarData}(gdsobj, use.names=FALSE, sex.adjust=TRUE, male.diploid=TRUE, genome.build=c("hg19", "hg38"))
+\S4method{alleleFrequency}{SeqVarGDSClass}(gdsobj, n=0, use.names=FALSE, parallel=FALSE)
+\S4method{alleleFrequency}{SeqVarData}(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, male.diploid=TRUE,
+    genome.build=c("hg19", "hg38"), parallel=FALSE)
+\S4method{alleleCount}{SeqVarGDSClass}(gdsobj, n=0, use.names=FALSE, parallel=FALSE)
+\S4method{alleleCount}{SeqVarData}(gdsobj, n=0, use.names=FALSE, sex.adjust=TRUE, male.diploid=TRUE,
+    genome.build=c("hg19", "hg38"), parallel=FALSE)
+\S4method{minorAlleleCount}{SeqVarData}(gdsobj, use.names=FALSE, sex.adjust=TRUE, male.diploid=TRUE,
+    genome.build=c("hg19", "hg38"), parallel=FALSE)
 }
 
 \arguments{
@@ -31,6 +34,8 @@
   \item{sex.adjust}{Logical for whether to adjust frequency calculations based on sex. If \code{TRUE}, X chromosome frequency (excluding the PAR) will be calculated assuming the dosage of the specifed allele for males is half that for females. Y chromosome frequency will be calculated using males only.}
   \item{male.diploid}{Logical for whether males on sex chromosomes are coded as diploid.}
   \item{genome.build}{A character sting indicating genome build; used to identify pseudoautosomal regions on the X and Y chromosomes.}
+  \item{parallel}{Logical, numeric, or other value to control parallel
+    processing; see \code{\link{seqParallel}} for details.}
 }
 
 \details{

@@ -8,12 +8,14 @@
   Single-Nucleotide Variants}
 
 \usage{
-\S4method{hwe}{SeqVarGDSClass}(gdsobj, permute=FALSE)
+\S4method{hwe}{SeqVarGDSClass}(gdsobj, permute=FALSE, parallel=FALSE)
 }
 
 \arguments{
   \item{gdsobj}{A \code{\link{SeqVarGDSClass}} object with VCF data.}
   \item{permute}{A logical indicating whether to permute the genotypes to get a set of p-values under the null hypothesis.}
+  \item{parallel}{Logical, numeric, or other value to control parallel
+    processing; see \code{\link{seqParallel}} for details.}
 }
 
 \details{

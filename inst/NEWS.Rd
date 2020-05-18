@@ -158,3 +158,8 @@
     \item Bug fix in minorAlleleCount when all samples have the same sex.
   }
 }
+\section{Changes in version 1.27.1}{
+  \itemize{
+    \item Add 'parallel' argument to methods.
+  }
+}

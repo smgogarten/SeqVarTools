@@ -8,7 +8,8 @@
 
 \usage{
 \S4method{regression}{SeqVarData}(gdsobj, outcome, covar=NULL,
-                                  model.type=c("linear", "logistic", "firth"))
+    model.type=c("linear", "logistic", "firth"),
+    parallel=FALSE)
 }
 
 \arguments{
@@ -16,6 +17,9 @@
   \item{outcome}{A character string with the name of the column in \code{sampleData(gdsobj)} containing the outcome variable}
   \item{covar}{A character vector with the name of the column(s) in \code{sampleData(gdsobj)} containing the covariates}
   \item{model.type}{the type of model to be run.  "linear" uses \code{\link{lm}}, "logistic" uses \code{\link{glm}} with \code{family=binomial()}, and "firth" uses \code{\link{logistf}}.}
+  \item{parallel}{Logical, numeric, or other value to control parallel
+    processing; see \code{\link{seqParallel}} for details.}
+
 }
 
 \details{

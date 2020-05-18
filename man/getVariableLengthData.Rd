@@ -10,7 +10,7 @@
 }
 
 \usage{
-\S4method{getVariableLengthData}{SeqVarGDSClass,character}(gdsobj, var.name, use.names=TRUE)
+\S4method{getVariableLengthData}{SeqVarGDSClass,character}(gdsobj, var.name, use.names=TRUE, parallel=FALSE)
 }
 
 \arguments{
@@ -19,6 +19,8 @@
     likely "annotation/format/VARIABLE_NAME".}
   \item{use.names}{A logical indicating whether to assign sample and
     variant IDs as dimnames of the resulting matrix.}
+  \item{parallel}{Logical, numeric, or other value to control parallel
+    processing; see \code{\link{seqParallel}} for details.}
 }
 
 \details{

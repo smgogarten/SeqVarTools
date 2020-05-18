@@ -20,19 +20,21 @@
 }
 
 \usage{
-\S4method{getGenotype}{SeqVarGDSClass}(gdsobj, use.names=TRUE)
-\S4method{getGenotypeAlleles}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sort=FALSE)
+\S4method{getGenotype}{SeqVarGDSClass}(gdsobj, use.names=TRUE, parallel=FALSE)
+\S4method{getGenotypeAlleles}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sort=FALSE, parallel=FALSE)
 \S4method{refDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, ...)
-\S4method{altDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sparse=FALSE, ...)
-\S4method{expandedAltDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sparse=FALSE)
-\S4method{alleleDosage}{SeqVarGDSClass,numeric}(gdsobj, n=0, use.names=TRUE)
-\S4method{alleleDosage}{SeqVarGDSClass,list}(gdsobj, n, use.names=TRUE)
+\S4method{altDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sparse=FALSE, parallel=FALSE, ...)
+\S4method{expandedAltDosage}{SeqVarGDSClass}(gdsobj, use.names=TRUE, sparse=FALSE, parallel=FALSE)
+\S4method{alleleDosage}{SeqVarGDSClass,numeric}(gdsobj, n=0, use.names=TRUE, parallel=FALSE)
+\S4method{alleleDosage}{SeqVarGDSClass,list}(gdsobj, n, use.names=TRUE, parallel=FALSE)
 }
 
 \arguments{
   \item{gdsobj}{A \code{\link{SeqVarGDSClass}} object with VCF data.}
   \item{use.names}{A logical indicating whether to assign sample and
     variant IDs as dimnames of the resulting matrix.}
+  \item{parallel}{Logical, numeric, or other value to control parallel
+    processing; see \code{\link{seqParallel}} for details.}
   \item{sort}{Logical for whether to sort alleles lexographically ("G/T"
     instead of "T/G").}
   \item{sparse}{Logical for whether to return the alterate allele dosage as a sparse matrix using the \pkg{link{Matrix}} package. In most cases, setting \code{sparse=TRUE} will dramatically reduce the size of the returned object.}

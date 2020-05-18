@@ -13,9 +13,11 @@
 }
 
 \usage{
-\S4method{heterozygosity}{SeqVarGDSClass}(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE)
-\S4method{homozygosity}{SeqVarGDSClass}(gdsobj, allele=c("any", "ref", "alt"), margin=c("by.variant", "by.sample"), use.names=FALSE)
-\S4method{hethom}{SeqVarGDSClass}(gdsobj, use.names=FALSE)
+\S4method{heterozygosity}{SeqVarGDSClass}(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE,
+    parallel=FALSE)
+\S4method{homozygosity}{SeqVarGDSClass}(gdsobj, allele=c("any", "ref", "alt"), margin=c("by.variant", "by.sample"), use.names=FALSE,
+    parallel=FALSE)
+\S4method{hethom}{SeqVarGDSClass}(gdsobj, use.names=FALSE, parallel=FALSE)
 }
 
 \arguments{
@@ -27,6 +29,8 @@
     samples IDs as names of the output vector.}
   \item{allele}{Possible values are "any", "ref," or "alt," indicating
     which alleles to consider when calculating homozygosity.}
+  \item{parallel}{Logical, numeric, or other value to control parallel
+    processing; see \code{\link{seqParallel}} for details.}
 }
 
 \details{

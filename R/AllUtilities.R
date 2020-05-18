@@ -175,11 +175,11 @@
     x
 }
 
-.countGenotypes <- function(gdsobj, permute=FALSE) {
+.countGenotypes <- function(gdsobj, permute=FALSE, parallel=FALSE) {
     n <- seqApply(gdsobj, "genotype", function(x) {
         if (permute) x <- .permuteGenotypes(x)
         c(nAA=.nHomRef(x), nAa=.nHetRef(x), naa=.nHomAlt(x))
-    }, margin="by.variant", as.is="list")
+    }, margin="by.variant", as.is="list", parallel=parallel)
     as.data.frame(do.call(rbind, n))
 }
 

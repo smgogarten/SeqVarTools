@@ -49,10 +49,11 @@ setMethod("nAlleles",
 ## descriptive methods
 setMethod("isVariant",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=FALSE) {
+          function(gdsobj, use.names=FALSE, parallel=FALSE) {
             var <- seqApply(gdsobj, "genotype",
                             function(x) {colSums(x, na.rm=TRUE) > 0},
-                            margin="by.variant", as.is="list")
+                            margin="by.variant", as.is="list",
+                            parallel=parallel)
             var <- matrix(unlist(var, use.names=FALSE), ncol=length(var))
             if (use.names) {
                 dimnames(var) <- list(sample=NULL, variant=NULL)
@@ -75,7 +76,7 @@ setMethod("isSNV",
 ## data retrieval and formatting
 setMethod("getGenotype",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=TRUE) {
+          function(gdsobj, use.names=TRUE, parallel=FALSE) {
               if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
               if (.ploidy(gdsobj) == 1) {
                   gc <- seqGetData(gdsobj, "genotype")[1,,]
@@ -83,7 +84,8 @@ setMethod("getGenotype",
                   gc <- seqApply(gdsobj, c(geno="genotype", phase="phase"),
                                  function(x) {sep=ifelse(x$phase, "|", "/")
                                      paste0(x$geno[1,], sep, x$geno[2,])},
-                                 margin="by.variant", as.is="list")
+                                 margin="by.variant", as.is="list",
+                                 parallel=parallel)
                   gc <- matrix(unlist(gc, use.names=FALSE), ncol=length(gc))
                   ## gc <- seqBlockApply(gdsobj, c(geno="genotype", phase="phase"),
                   ##                     function(x) {
@@ -102,7 +104,7 @@ setMethod("getGenotype",
 
 setMethod("getGenotypeAlleles",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=TRUE, sort=FALSE) {
+          function(gdsobj, use.names=TRUE, sort=FALSE, parallel=FALSE) {
               if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
               if (.ploidy(gdsobj) == 1) {
                   gc <- seqApply(gdsobj,
@@ -112,7 +114,8 @@ setMethod("getGenotypeAlleles",
                                                        use.names=FALSE)
                                      names(alleles) <- 0:(length(alleles) - 1)
                                      alleles[as.character(x$geno[1,])]
-                                 }, margin="by.variant", as.is="list")
+                                 }, margin="by.variant", as.is="list",
+                                 parallel=parallel)
                   gc <- matrix(unlist(gc, use.names=FALSE), ncol=length(gc))
               } else {
                   gc <- seqApply(gdsobj,
@@ -129,7 +132,8 @@ setMethod("getGenotypeAlleles",
                                          sep=ifelse(x$phase, "|", "/")
                                          paste0(a, sep, b)
                                      }
-                                 }, margin="by.variant", as.is="list", sort=sort)
+                                 }, margin="by.variant", as.is="list", sort=sort,
+                                 parallel=parallel)
                   gc <- matrix(unlist(gc, use.names=FALSE), ncol=length(gc))
                   ## gc <- seqBlockApply(gdsobj,
                   ##                c(geno="genotype", phase="phase", allele="allele"),
@@ -179,14 +183,15 @@ setMethod("refDosage",
 
 setMethod("altDosage",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=TRUE, sparse=FALSE, ...) {
+          function(gdsobj, use.names=TRUE, sparse=FALSE, parallel=FALSE, ...) {
             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
             d <- seqBlockApply(gdsobj, "genotype",
                                function(x) {
                                    m <- colSums(x != 0)
                                    if (sparse) m <- Matrix(m, sparse=TRUE)
                                    m
-                               }, margin="by.variant", as.is="list", ...)
+                               }, margin="by.variant", as.is="list",
+                               parallel=parallel, ...)
             #d <- do.call(cbind, d)
             d <- Reduce(cbind, d[-1], d[[1]])
             if (use.names) {
@@ -212,7 +217,7 @@ setMethod("altDosage",
 
 setMethod("alleleDosage",
           c("SeqVarGDSClass", "numeric"),
-          function(gdsobj, n=0, use.names=TRUE) {
+          function(gdsobj, n=0, use.names=TRUE, parallel=FALSE) {
             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
             if (length(n) == 1) n <- rep(n, .nVar(gdsobj))
             stopifnot(length(n) == .nVar(gdsobj))
@@ -220,7 +225,7 @@ setMethod("alleleDosage",
             d <- seqApply(gdsobj, "genotype",
                           function(index, x) {colSums(x == n[index])},
                           margin="by.variant", as.is="list",
-                          var.index="relative")
+                          var.index="relative", parallel=parallel)
             d <- matrix(unlist(d, use.names=FALSE), ncol=length(d))
             if (use.names) {
                 dimnames(d) <- list(sample=NULL, variant=NULL)
@@ -248,7 +253,7 @@ setMethod("alleleDosage",
 
 setMethod("alleleDosage",
           c("SeqVarGDSClass", "list"),
-          function(gdsobj, n, use.names=TRUE) {
+          function(gdsobj, n, use.names=TRUE, parallel=FALSE) {
             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
             stopifnot(length(n) == .nVar(gdsobj))
             samp.names <- if (use.names) seqGetData(gdsobj, "sample.id") else NULL
@@ -259,14 +264,14 @@ setMethod("alleleDosage",
                                      dimnames=list(sample=samp.names, allele=n[[index]]))
                           },
                           margin="by.variant", as.is="list",
-                          var.index="relative")
+                          var.index="relative", parallel=parallel)
             if (use.names) names(d) <- seqGetData(gdsobj, "variant.id")
             d
           })
 
 setMethod("expandedAltDosage",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=TRUE, sparse=FALSE) {
+          function(gdsobj, use.names=TRUE, sparse=FALSE, parallel=FALSE) {
             if (.emptyDim(gdsobj)) return(.emptyGenoMatrix(gdsobj, use.names=use.names))
 
             n <- nAlleles(gdsobj) - 1
@@ -285,7 +290,7 @@ setMethod("expandedAltDosage",
                               m
                           },
                           margin="by.variant", as.is="list",
-                          var.index="relative")
+                          var.index="relative", parallel=parallel)
             #https://stackoverflow.com/questions/37581417/getting-node-stack-overflow-when-cbind-multiple-sparse-matrices
             #d <- do.call(cbind, d)
             d <- Reduce(cbind, d[-1], d[[1]])
@@ -332,9 +337,10 @@ setMethod("variantInfo",
 
 setMethod("getVariableLengthData",
           c("SeqVarGDSClass", "character"),
-          function(gdsobj, var.name, use.names=TRUE) {
+          function(gdsobj, var.name, use.names=TRUE, parallel=FALSE) {
             var.list <- seqApply(gdsobj, var.name, function(x) {x},
-                                 margin="by.variant", as.is="list")
+                                 margin="by.variant", as.is="list",
+                                 parallel=parallel)
             .ncol <- function(x) ifelse(is.null(x), 0, ncol(x))
             n.alleles <- sapply(var.list, .ncol)
             nsamp <- .nSamp(gdsobj)
@@ -385,7 +391,7 @@ setMethod("imputedDosage",
 ## metrics    
 setMethod("titv",
           "SeqVarGDSClass",
-          function(gdsobj, by.sample=FALSE, use.names=FALSE) {
+          function(gdsobj, by.sample=FALSE, use.names=FALSE, parallel=FALSE) {
             ref <- refChar(gdsobj)
             alt <- altChar(gdsobj)
             ti <- .isTransition(ref, alt)
@@ -399,7 +405,8 @@ setMethod("titv",
                          tisum <<- tisum + (ti[index] & isVar(x));
                          tvsum <<- tvsum + (tv[index] & isVar(x))
                        },
-                       margin="by.variant", as.is="none", var.index="relative")
+                       margin="by.variant", as.is="none", var.index="relative",
+                       parallel=parallel)
               titv <- tisum / tvsum
               if (use.names)
                 names(titv) <- seqGetData(gdsobj, "sample.id")
@@ -413,11 +420,11 @@ setMethod("titv",
 ## n>0: freq of nth ALT allele
 setMethod("alleleFrequency",
           "SeqVarGDSClass",
-          function(gdsobj, n=0, use.names=FALSE) {
+          function(gdsobj, n=0, use.names=FALSE, parallel=FALSE) {
             ## af <- seqApply(gdsobj, "genotype",
             ##                function(x) {mean(x == n, na.rm=TRUE)},
             ##                margin="by.variant", as.is="double")
-            af <- seqAlleleFreq(gdsobj, ref.allele=n)
+            af <- seqAlleleFreq(gdsobj, ref.allele=n, parallel=parallel)
             ## frequency of alt=2, etc. should be 0 if there is no such allele
             af[is.na(af)] <- 0
             if (use.names)
@@ -429,8 +436,8 @@ setMethod("alleleFrequency",
 ## n>0: count of nth ALT allele
 setMethod("alleleCount",
           "SeqVarGDSClass",
-          function(gdsobj, n=0, use.names=FALSE) {
-            ac <- seqAlleleCount(gdsobj, ref.allele=n)
+          function(gdsobj, n=0, use.names=FALSE, parallel=FALSE) {
+            ac <- seqAlleleCount(gdsobj, ref.allele=n, parallel=parallel)
             ## count of alt=2, etc. should be 0 if there is no such allele
             ac[is.na(ac)] <- 0L
             if (use.names)
@@ -440,8 +447,8 @@ setMethod("alleleCount",
 
 setMethod("minorAlleleCount",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=FALSE) {
-              ref.cnt <- seqAlleleCount(gdsobj)
+          function(gdsobj, use.names=FALSE, parallel=FALSE) {
+              ref.cnt <- seqAlleleCount(gdsobj, parallel=parallel)
               n.obs <- .nSampObserved(gdsobj)
               ac <- pmin(ref.cnt, 2L*n.obs - ref.cnt)
               if (use.names)
@@ -451,14 +458,14 @@ setMethod("minorAlleleCount",
 
 setMethod("missingGenotypeRate",
           "SeqVarGDSClass",
-          function(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE) {
+          function(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE, parallel=FALSE) {
             margin <- match.arg(margin)
             if (margin == "by.variant") {
-              miss <- seqMissing(gdsobj, per.variant=TRUE)
+              miss <- seqMissing(gdsobj, per.variant=TRUE, parallel=parallel)
               if (use.names)
                 names(miss) <- seqGetData(gdsobj, "variant.id")
             } else {
-              miss <- seqMissing(gdsobj, per.variant=FALSE)
+              miss <- seqMissing(gdsobj, per.variant=FALSE, parallel=parallel)
               if (use.names)
                 names(miss) <- seqGetData(gdsobj, "sample.id")
             } 
@@ -495,7 +502,7 @@ setMethod("missingGenotypeRate",
 
 setMethod("heterozygosity",
           "SeqVarGDSClass",
-          function(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE) {
+          function(gdsobj, margin=c("by.variant", "by.sample"), use.names=FALSE, parallel=FALSE) {
             margin <- match.arg(margin)
             if (margin == "by.variant") {
             het <- seqApply(gdsobj, "genotype",
@@ -503,7 +510,7 @@ setMethod("heterozygosity",
                               sum(x[1,] != x[2,], na.rm=TRUE) /
                               sum(!is.na(x[1,]) & !is.na(x[2,]))
                             },
-                            margin=margin, as.is="double")
+                            margin=margin, as.is="double", parallel=parallel)
             if (use.names)
               names(het) <- seqGetData(gdsobj, "variant.id")
             het
@@ -517,7 +524,7 @@ setMethod("heterozygosity",
                        het <<- het + (x[1,] != x[2,] & nm)
                        nonmiss <<- nonmiss + nm
                      },
-                     margin="by.variant", as.is="none")
+                     margin="by.variant", as.is="none", parallel=parallel)
             if (use.names)
               names(het) <- seqGetData(gdsobj, "sample.id")
             het / nonmiss
@@ -535,7 +542,7 @@ setMethod("heterozygosity",
 setMethod("homozygosity",
           "SeqVarGDSClass",
           function(gdsobj, allele=c("any", "ref", "alt"),
-                   margin=c("by.variant", "by.sample"), use.names=FALSE) {
+                   margin=c("by.variant", "by.sample"), use.names=FALSE, parallel=FALSE) {
             hom.func <- switch(match.arg(allele),
                                any=function(a,b) {a == b},
                                ref=function(a,b) {a == b & a == 0},
@@ -547,7 +554,7 @@ setMethod("homozygosity",
                                 sum(hom.func(x[1,], x[2,]), na.rm=TRUE) /
                                   sum(!is.na(x[1,]) & !is.na(x[2,]))
                               },
-                              margin=margin, as.is="double")
+                              margin=margin, as.is="double", parallel=parallel)
               if (use.names)
                 names(hom) <- seqGetData(gdsobj, "variant.id")
               hom
@@ -561,7 +568,7 @@ setMethod("homozygosity",
                          hom <<- hom + (hom.func(x[1,], x[2,]) & nm)
                          nonmiss <<- nonmiss + nm
                        },
-                       margin="by.variant", as.is="none")
+                       margin="by.variant", as.is="none", parallel=parallel)
               if (use.names)
                 names(hom) <- seqGetData(gdsobj, "sample.id")
               hom / nonmiss
@@ -571,7 +578,7 @@ setMethod("homozygosity",
 
 setMethod("hethom",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=FALSE) {
+          function(gdsobj, use.names=FALSE, parallel=FALSE) {
             hom.func <- function(a,b) {a == b & a > 0}
             het <- integer(.nSamp(gdsobj))
             hom <- integer(.nSamp(gdsobj))
@@ -581,7 +588,7 @@ setMethod("hethom",
                        het <<- het + (x[1,] != x[2,] & nm)
                        hom <<- hom + (hom.func(x[1,], x[2,]) & nm)
                      },
-                     margin="by.variant", as.is="none")
+                     margin="by.variant", as.is="none", parallel=parallel)
              if (use.names)
                names(het) <- seqGetData(gdsobj, "sample.id")
              het / hom
@@ -590,7 +597,7 @@ setMethod("hethom",
 
 setMethod("meanBySample",
           "SeqVarGDSClass",
-          function(gdsobj, var.name, use.names=FALSE) {
+          function(gdsobj, var.name, use.names=FALSE, parallel=FALSE) {
             ns <- .nSamp(gdsobj)
             tot <- double(ns)
             nm <- double(ns)
@@ -599,7 +606,7 @@ setMethod("meanBySample",
                        val <- !is.na(x)
                        tot[val] <<- tot[val] + x[val]
                        nm[val] <<- nm[val] + 1
-                     }, margin="by.variant", as.is="none")
+                     }, margin="by.variant", as.is="none", parallel=parallel)
             if (use.names)
               names(tot) <- seqGetData(gdsobj, "sample.id")
             tot / nm
@@ -608,7 +615,7 @@ setMethod("meanBySample",
 
 setMethod("countSingletons",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=FALSE) {
+          function(gdsobj, use.names=FALSE, parallel=FALSE) {
             st <- integer(.nSamp(gdsobj))
             seqApply(gdsobj, "genotype",
                      function(x) {
@@ -617,7 +624,7 @@ setMethod("countSingletons",
                            st[nonref] <<- st[nonref] + 1
                        }
                      },
-                     margin="by.variant", as.is="none")
+                     margin="by.variant", as.is="none", parallel=parallel)
              if (use.names)
                names(st) <- seqGetData(gdsobj, "sample.id")
              st
