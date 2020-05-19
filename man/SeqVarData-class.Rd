@@ -24,7 +24,9 @@
 }
 
 \details{
-	A \code{SeqVarData} object adds an \code{\link{AnnotatedDataFrame}} for both samples and variants to a \code{\link{SeqVarGDSClass}} object.
+  A \code{SeqVarData} object adds an \code{\link{AnnotatedDataFrame}} for both samples and variants to a \code{\link{SeqVarGDSClass}} object.
+
+  Note that a \code{SeqVarData} object must be created using an \emph{unfiltered}  \code{\link{SeqVarGDSClass}} object. The \code{sample.id} column in the \code{sampleData} \code{\link{AnnotatedDataFrame}} must exactly match the \code{sample.id} node in the GDS file (and similarly for \code{variant.id} in \code{variantData}). This enables all subsequent filters set on the \code{SeqVarData} object to apply to the GDS and the annotation simultaneously.
 }
 
 \section{Constructor}{
