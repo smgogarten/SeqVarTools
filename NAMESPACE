@@ -1,21 +1,22 @@
 importFrom(grDevices, adjustcolor)
 importFrom(graphics, abline, plot, text)
 importFrom(stats, as.formula, binom.test, binomial, coef,
-           glm, lm, model.matrix, pchisq, qchisq, setNames,
-           vcov)
+           complete.cases, glm, lm, median, model.matrix,
+           na.omit, pchisq, qchisq, setNames, vcov)
 
 import(methods)
 import(gdsfmt)
 import(SeqArray)
-import(S4Vectors)
-import(IRanges)
-import(GenomicRanges)
+importFrom(BiocGenerics, end)
+importFrom(S4Vectors, elementMetadata, mcols, "mcols<-",
+           queryHits, subjectHits)
+importFrom(IRanges, IRanges, findOverlaps, mergeByOverlaps,
+           subsetByOverlaps)
+importFrom(GenomicRanges, GRanges, GRangesList, seqnames)
 import(Biobase)
 import(logistf)
+import(data.table)
 importFrom(GWASExactHW, HWExact)
-importFrom(dplyr, group_by, mutate, n)
-importFrom(tidyr, separate_rows)
-importFrom(rlang, .data)
 importFrom(Matrix, Matrix)
 
 exportClasses(SeqVarData,

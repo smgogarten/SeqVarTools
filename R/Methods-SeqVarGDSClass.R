@@ -309,6 +309,34 @@ setMethod("expandedVariantIndex",
               rep(1:nv, nAlt)
           })
 
+
+### tidyverse version
+## setMethod("variantInfo",
+##           "SeqVarGDSClass",
+##           function(gdsobj, alleles=TRUE, expanded=FALSE) {
+##               x <- data.frame(variant.id=seqGetData(gdsobj, "variant.id"),
+##                               chr=seqGetData(gdsobj, "chromosome"),
+##                               pos=seqGetData(gdsobj, "position"),
+##                               stringsAsFactors=FALSE)
+##               if (nrow(x) == 0) return(x)
+##               if (alleles) {
+##                   allele <- seqGetData(gdsobj, "allele")
+##                   x$ref <- .parseRefAllele(allele)
+##                   x$alt <- .parseAltAllele(allele)
+##               }
+##               if (expanded) {
+##                   if (alleles) {
+##                       x <- separate_rows(x, .data$alt, sep=",")
+##                   } else {
+##                       x <- x[expandedVariantIndex(gdsobj),]
+##                   }
+##                   x <- group_by(x, .data$variant.id)
+##                   x <- mutate(x, allele.index = 1:n())
+##                   x <- as.data.frame(x)
+##               }
+##               x
+##           })
+
 setMethod("variantInfo",
           "SeqVarGDSClass",
           function(gdsobj, alleles=TRUE, expanded=FALSE) {
@@ -319,20 +347,24 @@ setMethod("variantInfo",
               if (nrow(x) == 0) return(x)
               if (alleles) {
                   allele <- seqGetData(gdsobj, "allele")
-                  x$ref <- .parseRefAllele(allele)
-                  x$alt <- .parseAltAllele(allele)
+                  x <- as.data.table(x)
+                  x[, `:=`(ref = .parseRefAllele(allele),
+                           alt = .parseAltAllele(allele)
+                           )]
               }
               if (expanded) {
+                  x <- as.data.table(x)
                   if (alleles) {
-                      x <- separate_rows(x, .data$alt, sep=",")
+                      alt <- NULL
+                      x <- x[, strsplit(alt, ",", fixed=TRUE), by = c("variant.id", "chr", "pos", "ref", "alt")
+                        ][, alt := NULL
+                          ][, setnames(.SD, "V1", "alt")]
                   } else {
                       x <- x[expandedVariantIndex(gdsobj),]
                   }
-                  x <- group_by(x, .data$variant.id)
-                  x <- mutate(x, allele.index = 1:n())
-                  x <- as.data.frame(x)
+                  x[, "allele.index" := seq_len(.N), by="variant.id"]
               }
-              x
+              as.data.frame(x)
           })
 
 setMethod("getVariableLengthData",
