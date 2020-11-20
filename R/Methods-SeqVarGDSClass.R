@@ -423,7 +423,7 @@ setMethod("imputedDosage",
 ## metrics    
 setMethod("titv",
           "SeqVarGDSClass",
-          function(gdsobj, by.sample=FALSE, use.names=FALSE, parallel=FALSE) {
+          function(gdsobj, by.sample=FALSE, use.names=FALSE) {
             ref <- refChar(gdsobj)
             alt <- altChar(gdsobj)
             ti <- .isTransition(ref, alt)
@@ -437,8 +437,7 @@ setMethod("titv",
                          tisum <<- tisum + (ti[index] & isVar(x));
                          tvsum <<- tvsum + (tv[index] & isVar(x))
                        },
-                       margin="by.variant", as.is="none", var.index="relative",
-                       parallel=parallel)
+                       margin="by.variant", as.is="none", var.index="relative")
               titv <- tisum / tvsum
               if (use.names)
                 names(titv) <- seqGetData(gdsobj, "sample.id")
@@ -556,7 +555,7 @@ setMethod("heterozygosity",
                        het <<- het + (x[1,] != x[2,] & nm)
                        nonmiss <<- nonmiss + nm
                      },
-                     margin="by.variant", as.is="none", parallel=parallel)
+                     margin="by.variant", as.is="none")
             if (use.names)
               names(het) <- seqGetData(gdsobj, "sample.id")
             het / nonmiss
@@ -600,7 +599,7 @@ setMethod("homozygosity",
                          hom <<- hom + (hom.func(x[1,], x[2,]) & nm)
                          nonmiss <<- nonmiss + nm
                        },
-                       margin="by.variant", as.is="none", parallel=parallel)
+                       margin="by.variant", as.is="none")
               if (use.names)
                 names(hom) <- seqGetData(gdsobj, "sample.id")
               hom / nonmiss
@@ -610,7 +609,7 @@ setMethod("homozygosity",
 
 setMethod("hethom",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=FALSE, parallel=FALSE) {
+          function(gdsobj, use.names=FALSE) {
             hom.func <- function(a,b) {a == b & a > 0}
             het <- integer(.nSamp(gdsobj))
             hom <- integer(.nSamp(gdsobj))
@@ -620,7 +619,7 @@ setMethod("hethom",
                        het <<- het + (x[1,] != x[2,] & nm)
                        hom <<- hom + (hom.func(x[1,], x[2,]) & nm)
                      },
-                     margin="by.variant", as.is="none", parallel=parallel)
+                     margin="by.variant", as.is="none")
              if (use.names)
                names(het) <- seqGetData(gdsobj, "sample.id")
              het / hom
@@ -629,7 +628,7 @@ setMethod("hethom",
 
 setMethod("meanBySample",
           "SeqVarGDSClass",
-          function(gdsobj, var.name, use.names=FALSE, parallel=FALSE) {
+          function(gdsobj, var.name, use.names=FALSE) {
             ns <- .nSamp(gdsobj)
             tot <- double(ns)
             nm <- double(ns)
@@ -638,7 +637,7 @@ setMethod("meanBySample",
                        val <- !is.na(x)
                        tot[val] <<- tot[val] + x[val]
                        nm[val] <<- nm[val] + 1
-                     }, margin="by.variant", as.is="none", parallel=parallel)
+                     }, margin="by.variant", as.is="none")
             if (use.names)
               names(tot) <- seqGetData(gdsobj, "sample.id")
             tot / nm
@@ -647,7 +646,7 @@ setMethod("meanBySample",
 
 setMethod("countSingletons",
           "SeqVarGDSClass",
-          function(gdsobj, use.names=FALSE, parallel=FALSE) {
+          function(gdsobj, use.names=FALSE) {
             st <- integer(.nSamp(gdsobj))
             seqApply(gdsobj, "genotype",
                      function(x) {
@@ -656,7 +655,7 @@ setMethod("countSingletons",
                            st[nonref] <<- st[nonref] + 1
                        }
                      },
-                     margin="by.variant", as.is="none", parallel=parallel)
+                     margin="by.variant", as.is="none")
              if (use.names)
                names(st) <- seqGetData(gdsobj, "sample.id")
              st

@@ -7,15 +7,13 @@
 \description{Count singleton variants for each sample}
 
 \usage{
-\S4method{countSingletons}{SeqVarGDSClass}(gdsobj, use.names=FALSE, parallel=FALSE)
+\S4method{countSingletons}{SeqVarGDSClass}(gdsobj, use.names=FALSE)
 }
 
 \arguments{
   \item{gdsobj}{A \code{\link{SeqVarGDSClass}} object with VCF data.}
   \item{use.names}{A logical indicating whether to assign variant IDs
     as names of the output vector.}
-  \item{parallel}{Logical, numeric, or other value to control parallel
-    processing; see \code{\link{seqParallel}} for details.}
 }
 
 \details{

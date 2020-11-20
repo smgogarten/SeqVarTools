@@ -19,7 +19,8 @@
   \item{use.names}{A logical indicating whether to assign variant or
     sample IDs as names of the output vector.}
   \item{parallel}{Logical, numeric, or other value to control parallel
-    processing; see \code{\link{seqParallel}} for details.}
+    processing; see \code{\link{seqParallel}} for details. Only applies
+  if \code{margin="as.variant"}.}
 }
 
 \details{

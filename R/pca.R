@@ -1,7 +1,7 @@
 
 setMethod("pca",
           "SeqVarGDSClass",
-          function(gdsobj, eigen.cnt=32, parallel=FALSE) {
+          function(gdsobj, eigen.cnt=32) {
             nsamp <- .nSamp(gdsobj)
             if (eigen.cnt > nsamp) eigen.cnt <- nsamp
 
@@ -19,7 +19,7 @@ setMethod("pca",
                 m <- (g2 %o% g2) / (p*(1-p))  # genetic correlation matrix
                 m[!is.finite(m)] <- 0         # correct missing values
                 s <<- s + m                   # output to the global variable "s"
-              }, margin="by.variant", as.is="none", parallel=parallel)
+              }, margin="by.variant", as.is="none")
 
               ## output, scaled by the trace of matrix "s" over the number of samples
               s / (sum(diag(s)) / nsamp)

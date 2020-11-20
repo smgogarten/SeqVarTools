@@ -8,15 +8,13 @@
   SeqVarGDSClass object with Principal Component Analysis}
 
 \usage{
-\S4method{pca}{SeqVarGDSClass}(gdsobj, eigen.cnt=32, parallel=FALSE)
+\S4method{pca}{SeqVarGDSClass}(gdsobj, eigen.cnt=32)
 }
 
 \arguments{
   \item{gdsobj}{A \code{\link{SeqVarGDSClass}} object with VCF data.}
   \item{eigen.cnt}{An integer indicating how many eigenvalues and
     eignvectors to return.}
-  \item{parallel}{Logical, numeric, or other value to control parallel
-    processing; see \code{\link{seqParallel}} for details.}
 }
 
 \details{

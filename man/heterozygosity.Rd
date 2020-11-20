@@ -17,7 +17,7 @@
     parallel=FALSE)
 \S4method{homozygosity}{SeqVarGDSClass}(gdsobj, allele=c("any", "ref", "alt"), margin=c("by.variant", "by.sample"), use.names=FALSE,
     parallel=FALSE)
-\S4method{hethom}{SeqVarGDSClass}(gdsobj, use.names=FALSE, parallel=FALSE)
+\S4method{hethom}{SeqVarGDSClass}(gdsobj, use.names=FALSE)
 }
 
 \arguments{
@@ -30,7 +30,8 @@
   \item{allele}{Possible values are "any", "ref," or "alt," indicating
     which alleles to consider when calculating homozygosity.}
   \item{parallel}{Logical, numeric, or other value to control parallel
-    processing; see \code{\link{seqParallel}} for details.}
+    processing; see \code{\link{seqParallel}} for details. Only applies
+  if \code{margin="as.variant"}.}
 }
 
 \details{

@@ -9,7 +9,7 @@
 }
 
 \usage{
-\S4method{titv}{SeqVarGDSClass}(gdsobj, by.sample=FALSE, use.names=FALSE, parallel=FALSE)
+\S4method{titv}{SeqVarGDSClass}(gdsobj, by.sample=FALSE, use.names=FALSE)
 }
 
 \arguments{
@@ -18,8 +18,6 @@
     calculated by sample or overall for the entire GDS object.}
   \item{use.names}{A logical indicating whether to assign
     sample IDs as names of the output vector (if \code{by.sample=TRUE}).}
-  \item{parallel}{Logical, numeric, or other value to control parallel
-    processing; see \code{\link{seqParallel}} for details.}
 }
 
 \details{

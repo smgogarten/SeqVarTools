@@ -7,7 +7,7 @@
 \description{Calculate the mean value of a variable by sample over all variants}
 
 \usage{
-\S4method{meanBySample}{SeqVarGDSClass}(gdsobj, var.name, use.names=FALSE, parallel=FALSE)
+\S4method{meanBySample}{SeqVarGDSClass}(gdsobj, var.name, use.names=FALSE)
 }
 
 \arguments{
@@ -16,8 +16,6 @@
     likely "annotation/format/VARIABLE_NAME".}
   \item{use.names}{A logical indicating whether to assign sample IDs
     as names of the output vector.}
-  \item{parallel}{Logical, numeric, or other value to control parallel
-    processing; see \code{\link{seqParallel}} for details.}
 }
 
 \details{

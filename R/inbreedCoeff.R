@@ -24,7 +24,7 @@ setMethod("inbreedCoeff",
                 n <<- n + is.finite(d)           # output to the global variable "n"
                 d[!is.finite(d)] <- 0
                 s <<- s + d                      # output to the global variable "s"
-              }, margin="by.variant", as.is="none", parallel=parallel)
+              }, margin="by.variant", as.is="none")
 
               ## output
               ic <- s / n
