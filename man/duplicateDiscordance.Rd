@@ -10,9 +10,14 @@
 
 \usage{
 %\S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", check.phase=FALSE, verbose=TRUE)
-\S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", by.variant=FALSE, all.pairs=TRUE, verbose=TRUE)
-\S4method{duplicateDiscordance}{SeqVarIterator,missing}(gdsobj, match.samples.on="subject.id", by.variant=FALSE, all.pairs=TRUE, verbose=TRUE)
-\S4method{duplicateDiscordance}{SeqVarData,SeqVarData}(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"), match.variants.on=c("alleles", "position"), discordance.type=c("genotype", "hethom"), by.variant=FALSE, verbose=TRUE)
+\S4method{duplicateDiscordance}{SeqVarData,missing}(gdsobj, match.samples.on="subject.id", by.variant=FALSE,
+    all.pairs=TRUE, verbose=TRUE)
+\S4method{duplicateDiscordance}{SeqVarIterator,missing}(gdsobj, match.samples.on="subject.id", by.variant=FALSE,
+    all.pairs=TRUE, verbose=TRUE)
+\S4method{duplicateDiscordance}{SeqVarData,SeqVarData}(gdsobj, obj2, match.samples.on=c("subject.id", "subject.id"),
+    match.variants.on=c("alleles", "position"),
+    discordance.type=c("genotype", "hethom"),
+    by.variant=FALSE, verbose=TRUE)
 }
 
 \arguments{

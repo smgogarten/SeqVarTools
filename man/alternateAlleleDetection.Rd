@@ -7,7 +7,8 @@
 \description{Calculate rates of detecting minor alleles given a ``gold standard'' dataset}
 
 \usage{
-\S4method{alternateAlleleDetection}{SeqVarData,SeqVarData}(gdsobj, gdsobj2, match.samples.on=c("subject.id", "subject.id"), verbose=TRUE)
+\S4method{alternateAlleleDetection}{SeqVarData,SeqVarData}(gdsobj, gdsobj2,
+    match.samples.on=c("subject.id", "subject.id"), verbose=TRUE)
 }
 
 \arguments{
