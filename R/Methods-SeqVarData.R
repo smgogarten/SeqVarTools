@@ -193,10 +193,10 @@ setMethod("alleleFrequency",
                   n.M <- .nSampObserved(gdsobj)
                   #count.X.M <- freq.X.M * n.M
                   count.X.M <- seqAlleleCount(gdsobj, ref.allele=n, parallel=parallel)
+                  count.X.M[is.na(count.X.M)] <- 0L
                   if (male.diploid) {
                       count.X.M <- count.X.M / 2
                   }
-                  count.X.M[is.na(count.X.M)] <- 0L
                   seqSetFilter(gdsobj, action="pop", verbose=FALSE)
                   
                   freq[X] <- (count.X.F + count.X.M)/(2*n.F + n.M)
@@ -255,10 +255,12 @@ setMethod("alleleCount",
               if (any(X)) {
                   seqSetFilter(gdsobj, sample.sel=female, variant.sel=X, action="push+intersect", verbose=FALSE)
                   count.X.F <- callNextMethod(gdsobj, n=n, use.names=FALSE, parallel=parallel)
+                  count.X.F[is.na(count.X.F)] <- 0L
                   seqSetFilter(gdsobj, action="pop", verbose=FALSE)
               
                   seqSetFilter(gdsobj, sample.sel=male, variant.sel=X, action="push+intersect", verbose=FALSE)
                   count.X.M <- callNextMethod(gdsobj, n=n, use.names=FALSE, parallel=parallel)
+                  count.X.M[is.na(count.X.M)] <- 0L
                   if (male.diploid) {
                       ## correct for X chromosome coded as diploid in males
                       count.X.M <- count.X.M / 2 
@@ -272,7 +274,9 @@ setMethod("alleleCount",
               Y <- chr %in% "Y"
               if (any(Y)) {
                   seqSetFilter(gdsobj, sample.sel=male, variant.sel=Y, action="push+intersect", verbose=FALSE)
-                  count[Y] <- callNextMethod(gdsobj, n=n, use.names=use.names, parallel=parallel)
+                  count.Y <- callNextMethod(gdsobj, n=n, use.names=use.names, parallel=parallel)
+                  count.Y[is.na(count.Y)] <- 0L
+                  count[Y] <- count.Y
                   if (male.diploid) {
                       ## correct for Y chromosome coded as diploid in males
                       count[Y] <- count[Y] / 2
@@ -328,11 +332,13 @@ setMethod("minorAlleleCount",
               if (any(X)) {
                   seqSetFilter(gdsobj, sample.sel=female, variant.sel=X, action="push+intersect", verbose=FALSE)
                   count.X.F <- seqAlleleCount(gdsobj, parallel=parallel)
+                  count.X.F[is.na(count.X.F)] <- 0L
                   possible.X.F <- 2L * .nSampObserved(gdsobj)
                   seqSetFilter(gdsobj, action="pop", verbose=FALSE)
               
                   seqSetFilter(gdsobj, sample.sel=male, variant.sel=X, action="push+intersect", verbose=FALSE)
                   count.X.M <- seqAlleleCount(gdsobj, parallel=parallel)
+                  count.X.M[is.na(count.X.M)] <- 0L
                   if (male.diploid) {
                       ## correct for X chromosome coded as diploid in males
                       count.X.M <- count.X.M / 2 
@@ -348,7 +354,9 @@ setMethod("minorAlleleCount",
               Y <- chr %in% "Y"
               if (any(Y)) {
                   seqSetFilter(gdsobj, sample.sel=male, variant.sel=Y, action="push+intersect", verbose=FALSE)
-                  count[Y] <- seqAlleleCount(gdsobj, parallel=parallel)
+                  count.Y <- seqAlleleCount(gdsobj, parallel=parallel)
+                  count.Y[is.na(count.Y)] <- 0L
+                  count[Y] <- count.Y
                   if (male.diploid) {
                       ## correct for Y chromosome coded as diploid in males
                       count[Y] <- count[Y] / 2 
