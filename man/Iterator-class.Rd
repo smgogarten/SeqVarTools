@@ -59,8 +59,8 @@
 
 
 \section{Constructors}{
-  \describe{
-    \item{}{
+  \itemize{
+    \item{
       \code{SeqVarBlockIterator(seqData, variantBlock=10000, verbose=TRUE)}: Returns a \code{SeqVarBlockIterator} object with the filter set to the first block.
 
       \code{seqData} is a \code{\link{SeqVarData}} object.
@@ -69,7 +69,7 @@
 
       \code{verbose} is a logical indicator for verbose output.
     }
-    \item{}{
+    \item{
       \code{SeqVarRangeIterator(seqData, variantRanges=GRanges(), verbose=TRUE)}: Returns a \code{SeqVarRangeIterator} object with the filter set to the first range.
 
       \code{seqData} is a \code{\link{SeqVarData}} object.
@@ -78,7 +78,7 @@
 
       \code{verbose} is a logical indicator for verbose output.
     }
-    \item{}{
+    \item{
       \code{SeqVarWindowIterator(seqData,  windowSize=10000, windowShift=5000, verbose=TRUE)}: Returns a \code{SeqVarWindowIterator} object with the filter set to the first window.
 
       \code{seqData} is a \code{\link{SeqVarData}} object.
@@ -89,7 +89,7 @@
 
       \code{verbose} is a logical indicator for verbose output.
     }
-    \item{}{
+    \item{
       \code{SeqVarListIterator(seqData, variantRanges, verbose=TRUE)}: Returns a \code{SeqVarRangeIterator} object with the filter set to the first range.
 
       \code{seqData} is a \code{\link{SeqVarData}} object.
@@ -103,22 +103,22 @@
 
 
 \section{Accessors}{
-  \describe{
-    \item{}{\code{iterateFilter(x)}: Advance the filter to the next block, range, or set of ranges. Returns \code{TRUE} while there are still variants left to be read, \code{FALSE} if the end of iteration is reached.
+  \itemize{
+    \item{\code{iterateFilter(x)}: Advance the filter to the next block, range, or set of ranges. Returns \code{TRUE} while there are still variants left to be read, \code{FALSE} if the end of iteration is reached.
     }
-    \item{}{\code{lastFilter(x)}, \code{lastFilter(x)<- value}: Get or set the last filter index from the previous call to \code{iterateFilter}.
+    \item{\code{lastFilter(x)}, \code{lastFilter(x)<- value}: Get or set the last filter index from the previous call to \code{iterateFilter}.
     }
-    \item{}{\code{variantBlock(x)}: Get the size of the variant block.
+    \item{\code{variantBlock(x)}: Get the size of the variant block.
     }
-    \item{}{\code{variantFilter(x)}: Get the list of variant indices.
+    \item{\code{variantFilter(x)}: Get the list of variant indices.
     }
-    \item{}{\code{variantRanges(x)}: Get the variant ranges.
+    \item{\code{variantRanges(x)}: Get the variant ranges.
     }
-    \item{}{\code{currentRanges(x)}: Get the ranges selected in the current iteration.
+    \item{\code{currentRanges(x)}: Get the ranges selected in the current iteration.
     }
-    \item{}{\code{currentVariants(x)}: Get the variants selected in the current iteration. Returns a \code{\link{DataFrame}} where the row name is the variant.id, "variant" is the variant position as a \code{link{GRanges}}, "range" is the range the variant is from, and any columns in either \code{\link{variantData}} or the metadata columns of \code{currentRanges} are included.
+    \item{\code{currentVariants(x)}: Get the variants selected in the current iteration. Returns a \code{\link{DataFrame}} where the row name is the variant.id, "variant" is the variant position as a \code{link{GRanges}}, "range" is the range the variant is from, and any columns in either \code{\link{variantData}} or the metadata columns of \code{currentRanges} are included.
     }
-    \item{}{\code{resetIterator(x)}: Set the filter to the first block, range, or set of ranges (the same variants that are selected when the iterator object is created).
+    \item{\code{resetIterator(x)}: Set the filter to the first block, range, or set of ranges (the same variants that are selected when the iterator object is created).
     }
   }
 }

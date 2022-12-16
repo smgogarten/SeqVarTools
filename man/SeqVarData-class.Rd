@@ -30,8 +30,8 @@
 }
 
 \section{Constructor}{
-  \describe{
-    \item{}{
+  \itemize{
+    \item{
       \code{SeqVarData(gds, sampleData, variantData)}: Returns a \code{SeqVarData} object.
 
       \code{gds} can be either the filename of a sequencing GDS file or an existing \code{\link{SeqVarGDSClass}} object.
@@ -45,20 +45,20 @@
 
 
 \section{Accessors}{
-	\describe{	
-		\item{}{
+	\itemize{	
+		\item{
 			\code{sampleData(x)}, \code{sampleData(x)<- value}:
 				Get or set the \code{\link{AnnotatedDataFrame}} with sample data. If a sample filter has been applied with \code{\link{seqSetFilter}}, only selected samples will be returned. \code{value} must include all samples.
 		}	
-		\item{}{
+		\item{
 			\code{variantData(x)}, \code{variantData(x)<- value}:
 				Get or set the \code{\link{AnnotatedDataFrame}} with variant data. If a variant filter has been applied with \code{\link{seqSetFilter}}, only selected variants will be returned. \code{value} must include all variants.
 		}	
-		\item{}{
+		\item{
 			\code{granges(x)}:
 				Return a \code{\link{GRanges}} object with the columns of \code{variantData} as metadata columns.
 		}	
-		\item{}{
+		\item{
 			\code{validateSex(x)}:
 				Return the contents of a column named "sex" in \code{sampleData(x)}, provided the contents are valid (values either "M"/"F" or 1/2, or NA). If the column is missing or invalid, return \code{NULL}.
 		}	
