@@ -1,5 +1,5 @@
 Package: SeqVarTools
-Version: 1.51.0
+Version: 1.51.1
 Type: Package
 Title: Tools for variant data
 Description: An interface to the fast-access storage format for VCF
@@ -11,10 +11,11 @@ Depends: SeqArray
 Imports: grDevices, graphics, stats, methods,
 	 Biobase, BiocGenerics, gdsfmt, GenomicRanges, IRanges, S4Vectors,
 	 GWASExactHW, logistf, Matrix, data.table,
-Suggests: BiocStyle, RUnit, stringr
+Suggests: BiocStyle, RUnit, stringr, knitr, rmarkdown
 License: GPL-3
 URL: https://github.com/smgogarten/SeqVarTools
 LazyData: yes
+VignetteBuilder: knitr
 biocViews: SNP, GeneticVariability, Sequencing, Genetics
 Collate: 
   AllClasses.R
