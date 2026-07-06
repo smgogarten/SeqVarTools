@@ -6,6 +6,7 @@ output:
     BiocStyle::html_document
 vignette: >
   %\VignetteIndexEntry{Iterators in SeqVarTools}
+  %\VignetteDepends{SeqVarTools, GenomicRanges}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
