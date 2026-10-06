@@ -8,8 +8,8 @@ analysis.
 [http://www.bioconductor.org/packages/release/bioc/html/SeqVarTools.html](http://www.bioconductor.org/packages/release/bioc/html/SeqVarTools.html)
 
 * Tutorials
-  * [Introduction to SeqVarTools](https://bioconductor.org/packages/release/bioc/vignettes/SeqVarTools/inst/doc/SeqVarTools.pdf)
-  * [Iterators in SeqVarTools](https://bioconductor.org/packages/release/bioc/vignettes/SeqVarTools/inst/doc/Iterators.pdf)
+  * [Introduction to SeqVarTools](https://bioconductor.org/packages/devel/bioc/vignettes/SeqVarTools/inst/doc/SeqVarTools.html)
+  * [Iterators in SeqVarTools](https://bioconductor.org/packages/devel/bioc/vignettes/SeqVarTools/inst/doc/Iterators.html)
 * [Reference manual](http://www.bioconductor.org/packages/release/bioc/manuals/SeqVarTools/man/SeqVarTools.pdf)
 * [News](http://bioconductor.org/packages/release/bioc/news/SeqVarTools/NEWS)
 
